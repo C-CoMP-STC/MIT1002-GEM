@@ -24,13 +24,26 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * MEMOTE exists [@lieven2020memote]
     * but it's more of a benchmarking tool- a lot of things is just about the file
         * test what the custom tests ever did
+* They had a TRAVIS integration where it would run, but MEMOTE can never fail, it always required a human to read, understand, and evaluate the tests
 
 #### standard-GEM
-* standard-GEM is... [@anton2023standardgem]
+* standard-GEM is a set of requirements for the format of GEMs versioned with git [@anton2023standardgem]
 * no tests
+    * they show running MACAW in a workflow, and they call it `macawTests.py` but it's not a test, it doesn't assert anything, equivalent to a "script"
+    * code/test and MEMOTE are only possibility/capability, not a requirement or even a recommendation
+* technically just because it's on git doesn't mean you're regularly pushing- you could upload everything once and meet standard-GEM requirements, even if not in spirit
 
 #### human-GEM and yeast-GEM
-* some tests
+* Human-GEM
+    * 2023: check-metabolictasks.yml
+        * "metabolic tasks" on push and PR
+        * using a self-hosted MATLAB runner
+    * 2024: Gene essentiality workflow
+    * 2026: model-qc.yml
+* yeast-GEM
+    * 2018: automated benchmarking MEMOTE + Travis CI 
+    * 2020: MEMOTE on GitHub actions + YAML-vaildation
+    * 2026: model-qc.yml
 * A lot of things were not enforced, just reminders and check boxes
 
 ### What's new here
@@ -39,7 +52,8 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * Improved tracking removed reactions/metabolites
 
 ## What's the cost?
-
+* Requires set up and maintenance
+* Requires learning more about Git and automation than someone with a biology background may currently have
 
 ## Set-Up
 ### What is GitHub?
