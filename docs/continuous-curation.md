@@ -432,6 +432,9 @@ For example:
 
 ### Step 4) Release
 * What counts as a new version
+    * major: an ID or file layout breaks, or any growth call flips
+    * minor: the model file changes without flipping a call
+    * patch: the model file is unchanged
 * Chores upon release
     * different file types
     * MEMOTE [@lieven2020memote]
