@@ -457,6 +457,7 @@ For example:
             * now every version is a very small change
             * This is continuous delivery in software engineering, and since releases are automated, there is no real cost to doing this, but most of the releases aren't really useful
     * We sit somewhere between a & b, with multiple releases before publication as major changes in the model occurred
+        * trigger a (publication) is the hard rule
 1. Decide what size bump is required
     * Run locally: `PYTHONPATH=code python -m tools.release check`
 2. On GitHub -> Actions -> Prepare-Release -> Run Workflow
