@@ -38,6 +38,8 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * Biomass component producibility heatmaps
 * Improved tracking removed reactions/metabolites
 
+## What's the cost?
+
 
 ## Set-Up
 ### What is GitHub?
@@ -535,11 +537,33 @@ For example:
 * And very possible to have packages with importable tests and shared functions
 * Everyone will have different data, every model has it's own quirks, its worth writing your own to really get full coverage of your model
 
-## What's the cost?
-
-## How to think like a Programmer
-### Questions to Ask Yourself:
-1. 
+## Develop Good Code/GitHub Habits
+* If it isn't pushed, it doesn't exist
+    * Commit often, push daily
+    * One commit- one reasons
+* Work on a branch
+    * Lets you be braver, you never have to worry about "breaking" anything
+* Don't let your branch live too long
+* If you've put a date or _final on a version on GitHub, you've done something wrong
+    * i.e. never have model_v3_final_FINAL.xml
+* Write down the why, the diff already records the what
+    * Use issues like a lab notebook
+    * Future you will NOT remember the why
+* Don't copy and paste- if you are using the same code more than once it should be a function
+    * That way if there's something wring, they are wrong in the same way, and they are never slightly different
+    * Make a function with arguments, don't copy and tweak code
+    * And once you make a function, make a test
+* No magic numbers
+    * Use named constants- define them once and use them across scripts
+        * e.g., `GROWTH_THRESHOLD`
+* If you're doing something by hand more than twice, automate it
+* Never edit data in place
+    * I.e., don't download an excel file, and add a new column and save it, now you've lost the original. Instead, keep the orginal, and in a new script, read it, make the changes, and save the copy to a new file
+* Assert, don't eyeball
+* Don't store the same fact twice
+    * Things will drift
+    * If you much, have a test to ensure that they don't drift
+        * e.g., my removed reactions list
 
 ## Glossary
 * **Artifact**:
