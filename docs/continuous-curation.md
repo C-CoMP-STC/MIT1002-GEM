@@ -531,8 +531,9 @@ For example:
 
 ## Why can't you just make it for me?
 * Can't you just make an installable tool that makes all of this for me?
-* Everyone will have different data
 * It is very possible to make a template- i.e. Standard-GEM
+* And very possible to have packages with importable tests and shared functions
+* Everyone will have different data, every model has it's own quirks, its worth writing your own to really get full coverage of your model
 
 ## What's the cost?
 
