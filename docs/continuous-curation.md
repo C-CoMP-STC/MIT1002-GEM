@@ -431,10 +431,32 @@ For example:
 * While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
 
 ### Step 4) Release
-* What counts as a new version
+* What is semantic versioning
+    * [Semantic Versioning](https://semver.org) is a way to define your program's version based on the type of changes you've introduced. It's defined as a three-number string (separated with a period) in the format of MAJOR.MINOR.PATCH.
+    * MAJOR version when you make incompatible API changes
+    * MINOR version when you add functionality in a backward compatible manner
+    * PATCH version when you make backward compatible bug fixes
+* What counts as a major/minor/patch change for a GEM
     * major: an ID or file layout breaks, or any growth call flips
     * minor: the model file changes without flipping a call
     * patch: the model file is unchanged
+* What counts as a new version
+    * With continuous curation (as in continuous integration) the `develop` branch is always tested (there shouldn't be anything broken on the `develop` branch), so a release isn't any better quality
+    * A release is really just a fixed point that someone can point at and cite
+    * Possible triggers of when to make a release
+        * When the model leaves the lab
+            * i.e., when you publish a paper, give a talk, or send the model to a collaborator for them to use
+            * So that no one outside the lab/curators is ever pointing to the `develop` branch
+        * When the model needs a major bump
+            * Whenever you have a growth call flipped or a broken ID
+        * Time-based
+            * e.g. every week, or every month
+            * Keeps changes from piling up, and from `develop` getting too far ahead of `main`, but some of the changes may be so small (patches), that they are meaningless on their own
+        * Every merged model change (continuous delivery)
+            * Every change to the model (i.e., every merge to `develop`) gets its own release
+            * now every version is a very small change
+            * This is continuous delivery in software engineering, and since releases are automated, there is no real cost to doing this, but most of the releases aren't really useful
+    * We sit somewhere between a & b, with multiple releases before publication as major changes in the model occurred
 1. Decide what size bump is required
     * Run locally: `PYTHONPATH=code python -m tools.release check`
 2. On GitHub -> Actions -> Prepare-Release -> Run Workflow
