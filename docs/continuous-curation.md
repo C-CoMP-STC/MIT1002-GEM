@@ -435,12 +435,28 @@ For example:
     * major: an ID or file layout breaks, or any growth call flips
     * minor: the model file changes without flipping a call
     * patch: the model file is unchanged
-* Chores upon release
-    * different file types
-    * MEMOTE [@lieven2020memote]
+1. Decide what size bump is required
+    * Run locally: `PYTHONPATH=code python -m tools.release check`
+2. On GitHub -> Actions -> Prepare-Release -> Run Workflow
+    * Branch: develop
+    * Kind: whatever size bump you decided on in 1
+3. Prepare-Release runs
+    * It commits changes to develop with the message `release: {new version number}`
+        * Updates version.txt
+        * Updates the CHANGELOG.md entry
+    * And opens a PR from `develop` into `main` called `release: {new version number}`
+4. Upon the release PR being opened, Release-Checks runs
+    * MEMOTE report [@lieven2020memote]
     * MACAW [@moyer2025macaw]
-* GitHub release
-* Zenodo release
+5. Wait for Release-Checks to finish
+    * Can take ~15 min because of MACAW
+6. Then merge the PR into main
+7. The merge triggers the Publish workflow to run
+    * Exports model to all formats
+    * Make a tag for the new release
+    * Creates the GuitHub release
+        * Zenodo integration makes the DOI
+    * Deploys MEMOTE to Pages
 
 ### Step 5) Run
 * This is the fun part, where you, or others, actually try to use the model
