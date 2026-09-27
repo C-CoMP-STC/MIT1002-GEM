@@ -118,36 +118,110 @@ We chose to use a branching strategy based on the popular GitFlow strategy. We h
 
 #### Data
 
+### Unit Tests
+* Testing code is important, Unit tests are considered critical to the success of any project
+* Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome
+
+##### Software example
+* Imagine you have a python module called `hello` with a single function, also called `hello`, that says "Hello" to a person, given their name:
+```python
+def hello(name: str):
+    message = 'Hello, ' + name + '!'
+
+    return message
+```
+* To write the unit test, you would make a new file, by convention in a directory named "test" or "tests", and name the file "test_[module name]", for that individual python module, so in our case "test_hello"
+* While there are other testing frameworks, we show the python standard-library testing framework, unittest
+* In your test, you first import unittest, and your function that you are testing
+```python
+import unittest
+
+from hello import hello
+```
+* All tests are put within a class
+```python
+class TestHello(unittest.TestCase):
+```
+* Within that class you can write multiple tests
+* For example, first test an expected input, e.g., "Helen"
+    * ```python
+        def test_helen(self):
+            # Define a name
+            name = 'Helen'
+            # Call the function
+            message = hello(name)
+
+            # Assert that the function returns the correct string
+            self.assertEqual(message, 'Hello, Helen!')
+        ```
+    * You define if the output is correct or not with an assert statement
+    * There are other options for assert statements that make sense for different kinds of tests
+        * Table/list of assert statements
+* Then test an edge case, something that could return a bad output if your function is not properly written, e.g. a number
+```python
+    # Add a test checking that the function fails when an integer is passed
+    def test_integer(self):
+        # Define a name
+        name = 123
+        # Call the function
+        with self.assertRaises(TypeError):
+            message = hello.hello(name)
+```
+* At the end of the file- set it to run all of the classes
+```python
+if __name__ == '__main__':
+    unittest.main()
+```
+* Unit tests can be run manually- e.g., a developer runs them on their own computer and verifies that they all pass before pushing code
+* Or they can be run automatically (e.g., as part of a GitHub action)
+
+#### What makes a Good Unit Test?
+* Needs to pass/fail, have an expected outcome, not generate an artifact
+    * Boolean result- pass or fail
+    * Self-validating — it returns pass or fail, not output a human must inspect
+* One reason to fail — a test asserting five things tells you "something broke," not what
+* Fast — slow tests don't get run, and a suite people skip provides no safety
+* Independent — no test depends on another's state or on run order
+* Repeatable — same result on any machine, any time; no network, no clock, no randomness
+* Deterministic — the intermittent test is worse than no test, because it trains people to re-run until green
+* No logic in the test — conditionals and loops inside a test can themselves be buggy, and then you're debugging your test
+* Tests behavior, not implementation — a test that breaks when you refactor without changing behavior is a liability
+* A name that says what broke without opening the file
+
+* Table with columns:
+    * Example of good unit tests
+        * Test that a script generate the correct data and saves a plot with the correct path
+    * Example of bad unit tests
+        * Generate a figure, that you need to look at
+        * A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)
+
 ### GitHub Actions
-We used automation through GitHub actions to run tests and scripts upon the opening of a pull request.
-GitHub actions 
+We used GitHub Actions to automate running tests, generating reports, and releasing the model. GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
 
 #### Defining an Action with a YML file
 * The steps of an Action are defined in a workflow file
 * Workflow files use YAML syntax, and the files must end in `.yml` or `.yaml` and must be stored in `.github/workflows` in the repo
 * For more information on YAML see: [Learn YAML in Y Minutes](https://learnxinyminutes.com/yaml/) and the [GitHub Workflows and Actions documentation](https://docs.github.com/en/actions/reference/workflows-and-actions)
-* MIT1002-GEM has multiple Actions, that are described in detail in the following section
 * Our workflow files have the following key sections, others exist, see more exhaustive documentation:
     * `name`
     * `on`
     * `permissions`
     * `concurrency`
     * `jobs`
-* For an example we will walk through the YAML file of our CI workflow
-    * We first define the name of the workflow, this will show up in the Actions tab on GitHub
-    * In the YAML file we write:
-```yaml
-name: Test-and-Report
-```
-Which shows up as "Test-and-Report" on GitHub:
-![A screenshot from the GitHub Actions page for MIT1002-GEM shows the names of all the Workflows.](./figures/png/github-actions-names.png)
 
-The next line in the file, defines when the workflow will run. `Test-and-Report` says:
+* For an example we will walk through what a YAML file for automated running of the tests for our `hello` module.
+* We first define the name of the workflow, this will show up in the Actions tab on GitHub
+* In the YAML file we write:
 ```yaml
-on:
-  pull_request:
+name: Test-Hello
 ```
-so that it runs whenever a pull request is opened or changes are pushed to the PR branch
+* Then we define when this workflow will run, what will trigger it to run:
+```yaml
+# Run this every time anything is pushed to the repository
+on: push
+```
+This means that whenever changes are pushed to the repo, this workflow will run.
+
 Other possible triggers for a workflow are (again, not exhaustive):
 * `push`: when changes are pushed to any branch or release
 * `schedule`: on a specific schedule, i.e., every day
@@ -155,117 +229,44 @@ Other possible triggers for a workflow are (again, not exhaustive):
 
 The next section in the workflow file, `jobs` defines the actual work done in the workflow.
 * A workflow run is made up of one or more jobs that can run sequentially or in parallel.
-* `Test-and-Report` is made up of two jobs, `test` and `report`
-* In the YAML file this looks like:
+* In this YAML file we will only have one job, `test`
 ```yaml
 jobs:
   test:
-    ...
-  
-  report:
-    ...
 ```
-* Each job first defines the runner that the job will run on:
+* Within test, we first define what virtual machine this workflow is running on
+    * This means what computer envionment
+    * Note this enviornemnt starts totally clean every time, so you can always test what it would be like to start on a totally new computer, this is good because you know exactly what needs to be done/installed (you never have a "well it runs on my machine" moment), but it does mean you need to set it up with every run
 ```yaml
-jobs:
   test:
+    # The machine it runs on
     runs-on: ubuntu-22.04
 ```
-ubuntu-22.04 is a specific version of the Linux runner, using a specific version is good because it will not change whenever the latest Linux runner is updated, so it is less fragile.
-
-Within the `test` block, `steps` represents a sequence of tasks that will be executed as part of the job. The steps of the `test` job are to: Check out the repository, so the job can access your files, install all required dependencies, and then run the tests.
-Each step can be named with `name`, and either calls a published action with `uses` or executes shell commands in the runner with `run`.
+* The job is defined by a series of `steps`, a sequence of tasks that will be executed as part of the job.
+* Each step can be named with `name`, and either calls a published action with `uses` or executes shell commands in the runner with `run`.
+* Since we are starting in a totally blank virtual machine, the first few steps are usually dedicated to setting it up:
 ```yaml
-jobs:
-  test:
-    runs-on: ubuntu-22.04
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
+      # Copy the repository onto that machine
+      - uses: actions/checkout@v7
+
+      # Put a known version of Python on it
+      - uses: actions/setup-python@v6
         with:
-          ref: ${{ github.head_ref || github.ref_name }}
-          fetch-depth: 0
+          python-version: "3.11"
 
-      # Install everything I need
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-
-      # Run the custom tests
-      - name: Run Custom Tests with pytest
+      # Install what the tests need
+      - name: Install dependencies
+        run: pip install pytest
+```
+* Here we checked out the repository, so our virtual machine has all of the code on our repo, then we installed a specific version of Python (using a specific version is good, because it won't drift as Python is updated, so things won't break). Then we can install our specific dependencies, in this case `pytest`
+* The next step is to actually run the tests:
+```yaml
+      # Run them
+      - name: Run tests
         run: pytest
 ```
-The following job, `report` does the "Report" steps of the Continuous Curation pipeline.
-```yaml
-  report:
-    runs-on: ubuntu-22.04
-    # 'needs: test' makes this job wait for the 'test' job to finish.
-    needs: test
-    # 'if: always()' ensures this job runs even if the 'test' job failed.
-    if: always()
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v3
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
-          fetch-depth: 0
-
-      # Install everything I need
-      - name: Install Dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
-
-      # Generate the analysis reports
-      - name: Generate Analysis Reports
-        run: |
-          python code/scripts/generate_growth_report.py
-          python code/scripts/generate_pathway_report.py
-          python code/scripts/generate_biomass_table.py
-          python code/scripts/check_cue_values.py
-
-      - name: Mention PR# in README.md
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-        run: sed -i -e "s/[[:digit:]]\{3,4\}\*\* (TEST-AND-REPORT)/$PR_NUMBER\*\* (TEST-AND-REPORT)/" code/scripts/results/README.md
-
-      # You cannot know your PR number before opening the PR, so `--pr` is
-      # optional when deprecating something. Fill in the blanks here, the same
-      # way the step above stamps the PR number into code/scripts/results/README.md.
-      # Only empty cells are touched, so rows attributed to a different PR or
-      # to an issue are left alone.
-      - name: Stamp PR# into deprecated identifier lists
-        env:
-          PR_NUMBER: ${{ github.event.number }}
-        run: PYTHONPATH=code python -m tools.deprecate stamp-pr "$PR_NUMBER"
-
-      # Auto-commit the changes directly without stashing
-      - name: Auto-commit results
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_user_name: action-bot
-          commit_message: "chore: add Test-and-Report results"
-          file_pattern: code/scripts/results/* data/deprecated_identifiers/*.tsv
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.number }}
-
-      - name: Get commit SHA
-        id: get-commit-sha
-        run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
-
-      - name: Post comment
-        uses: NejcZdovc/comment-pr@v2
-        with:
-          file: "ci_comment.md"
-          identifier: "GITHUB_COMMENT_TEST_AND_REPORT"
-        env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          GH_ACTION_RUN: ${{github.run_id}}
-          COMMIT_SHA: ${{ env.COMMIT_SHA }}
-```
-
+Then you get a clean read out if your test passed or failed with every change, you never need to run the tests yourself, or count on other people running them.
 
 ## The Continuous Curation Loop
 
@@ -334,87 +335,7 @@ One critical component of the history of changes to the model is the “why”- 
 ### Step 2) Test
 * Testing code is important, testing the model is just as important
 * Typical software tools can be used, but some concepts need to generalized
-* Unit tests are considered critical to the success of any project
-
-#### What is a Unit Test?
-* Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome
-
-##### Software example
-* Imagine you have a python module called `hello` with a single function, also called `hello`, that says "Hello" to a person, given their name:
-```python
-def hello(name: str):
-    message = 'Hello, ' + name + '!'
-
-    return message
-```
-* To write the unit test, you would make a new file, by convention in a directory named "test" or "tests", and name the file "test_[module name]", for that individual python module, so in our case "test_hello"
-* While there are other testing frameworks, we show the python standard-library testing framework, unittest
-* In your test, you first import unittest, and your function that you are testing
-```python
-import unittest
-
-from hello import hello
-```
-* All tests are put within a class
-```python
-class TestHello(unittest.TestCase):
-```
-* Within that class you can write multiple tests
-* For example, first test an expected input, e.g., "Helen"
-    * ```python
-        def test_helen(self):
-            # Define a name
-            name = 'Helen'
-            # Call the function
-            message = hello(name)
-
-            # Assert that the function returns the correct string
-            self.assertEqual(message, 'Hello, Helen!')
-        ```
-    * You define if the output is correct or not with an assert statement
-    * There are other options for assert statements that make sense for different kinds of tests
-        * Table/list of assert statements
-* Then test an edge case, something that could return a bad output if your function is not properly written, e.g. a number
-```python
-    # Add a test checking that the function fails when an integer is passed
-    def test_integer(self):
-        # Define a name
-        name = 123
-        # Call the function
-        with self.assertRaises(TypeError):
-            message = hello.hello(name)
-```
-* At the end of the file- set it to run all of the classes
-```python
-if __name__ == '__main__':
-    unittest.main()
-```
-* Unit tests can be run manually- e.g., a developer runs them on their own computer and verifies that they all pass before pushing code
-* Or they can be run automatically (e.g., as part of a GitHub action)
-* In MIT1002-GEM we run them all automatically in the CI-workflow, finding and executing tests with `pytest`
-
-#### What makes a Good Unit Test?
-* Needs to pass/fail, have an expected outcome, not generate an artifact
-    * Boolean result- pass or fail
-    * Self-validating — it returns pass or fail, not output a human must inspect
-* One reason to fail — a test asserting five things tells you "something broke," not what
-* Fast — slow tests don't get run, and a suite people skip provides no safety
-* Independent — no test depends on another's state or on run order
-* Repeatable — same result on any machine, any time; no network, no clock, no randomness
-* Deterministic — the intermittent test is worse than no test, because it trains people to re-run until green
-* No logic in the test — conditionals and loops inside a test can themselves be buggy, and then you're debugging your test
-* Tests behavior, not implementation — a test that breaks when you refactor without changing behavior is a liability
-* A name that says what broke without opening the file
-
-* Table with columns:
-    * Example of good unit tests
-        * Test that a script generate the correct data and saves a plot with the correct path
-    * Example of bad unit tests
-        * Generate a figure, that you need to look at
-        * A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)
-
 * We can differentiate the tests used in MIT1002-GEM by what they tested, the model, the data files, the helper tools, or consistency between two things. A single test file can contain multiple different kinds of tests, so some file names may repeat across the list.
-
 #### Examples of Unit Tests on the Model
 * In traditional software engineering, the unit being tested is often a function, however for the case of model curation, we are testing the model as a whole, but can write tests to focus on individual aspects of the model
 * The ones we present here are by no means an exhaustive list of everything that could or should be tested.
@@ -576,6 +497,37 @@ For example:
         * `test_mirror_matches_tsv`
         * `test_pointer_present`
         * `test_mirror_survives_cobrapy_round_trip`
+#### GitHub Action
+* In MIT1002-GEM we run them all automatically in the CI-workflow `Test-and-Report`, finding and executing tests with `pytest`
+* The next line in the file, defines when the workflow will run. `Test-and-Report` says:
+```yaml
+on:
+  pull_request:
+```
+so that it runs whenever a pull request is opened or changes are pushed to the PR branch
+* Within the `test` block, `steps` represents a sequence of tasks that will be executed as part of the job. The steps of the `test` job are to: Check out the repository, so the job can access your files, install all required dependencies, and then run the tests.
+* ubuntu-22.04 is a specific version of the Linux runner, using a specific version is good because it will not change whenever the latest Linux runner is updated, so it is less fragile.
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      # Install everything I need
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # Run the custom tests
+      - name: Run Custom Tests with pytest
+        run: pytest
+```
 
 
 ### Step 3) Report
@@ -595,6 +547,76 @@ For example:
 #### Examples of Scripts Used for Model Curation
 * Using the same underlying code as the growth test, we generated a plot of which experimentally known growth phenotypes the model matched or not. The heatmap visualization was useful for sharing results.
 * While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
+#### GitHub Action Workflow
+The following job, `report` does the "Report" steps of the Continuous Curation pipeline.
+```yaml
+  report:
+    runs-on: ubuntu-22.04
+    # 'needs: test' makes this job wait for the 'test' job to finish.
+    needs: test
+    # 'if: always()' ensures this job runs even if the 'test' job failed.
+    if: always()
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      # Install everything I need
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # Generate the analysis reports
+      - name: Generate Analysis Reports
+        run: |
+          python code/scripts/generate_growth_report.py
+          python code/scripts/generate_pathway_report.py
+          python code/scripts/generate_biomass_table.py
+          python code/scripts/check_cue_values.py
+
+      - name: Mention PR# in README.md
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: sed -i -e "s/[[:digit:]]\{3,4\}\*\* (TEST-AND-REPORT)/$PR_NUMBER\*\* (TEST-AND-REPORT)/" code/scripts/results/README.md
+
+      # You cannot know your PR number before opening the PR, so `--pr` is
+      # optional when deprecating something. Fill in the blanks here, the same
+      # way the step above stamps the PR number into code/scripts/results/README.md.
+      # Only empty cells are touched, so rows attributed to a different PR or
+      # to an issue are left alone.
+      - name: Stamp PR# into deprecated identifier lists
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: PYTHONPATH=code python -m tools.deprecate stamp-pr "$PR_NUMBER"
+
+      # Auto-commit the changes directly without stashing
+      - name: Auto-commit results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_user_name: action-bot
+          commit_message: "chore: add Test-and-Report results"
+          file_pattern: code/scripts/results/* data/deprecated_identifiers/*.tsv
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+
+      - name: Get commit SHA
+        id: get-commit-sha
+        run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Post comment
+        uses: NejcZdovc/comment-pr@v2
+        with:
+          file: "ci_comment.md"
+          identifier: "GITHUB_COMMENT_TEST_AND_REPORT"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_ACTION_RUN: ${{github.run_id}}
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+```
 
 ### Step 4) Release
 * What is semantic versioning
