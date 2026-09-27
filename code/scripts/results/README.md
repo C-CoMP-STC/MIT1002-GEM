@@ -2,7 +2,7 @@
 
 The results shown here were obtained by the GitHub Actions run in:
 
-- **PR #457** (CUSTOM-CI)
+- **PR #457** (TEST-AND-REPORT)
 
 The results will be updated by any subsequent pull request. Summary results are shown as a comment in the corresponding pull request.
 

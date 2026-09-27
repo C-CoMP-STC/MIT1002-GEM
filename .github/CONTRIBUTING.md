@@ -72,15 +72,15 @@ detected automatically, so check that list: a renamed ID is a major change too.
 1. Make sure everything for the release is merged into `develop`.
 2. Optionally, preview it locally:
    `PYTHONPATH=code python -m tools.release prepare --bump <kind> --dry-run`.
-3. On GitHub, go to **Actions → Prepare-Release → Run workflow**, choose the
+3. On GitHub, go to **Actions → Release: Prepare → Run workflow**, choose the
    `develop` branch and the kind of release. It refuses a bump smaller than the
    changes need. Otherwise it commits the new `version.txt` and a
    [`CHANGELOG.md`](../CHANGELOG.md) entry to `develop`, and opens a PR from
    `develop` into `main` titled `release: X.Y.Z`.
 4. Review the PR: its description lists every merged PR, the growth calls that
    flipped, and the reaction and metabolite IDs added and removed.
-5. Wait for Release-Checks to pass on the PR. The MACAW job can take hours.
-6. Merge it into `main` (with a merge commit, not squash). Publish then exports
+5. Wait for Release: Check to pass on the PR. The MACAW job can take hours.
+6. Merge it into `main` (with a merge commit, not squash). The Release: Publish workflow then exports
    the model to every format, tags the release `X.Y.Z`, creates the GitHub
    release with the model files attached, and updates the MEMOTE report on
    GitHub Pages.

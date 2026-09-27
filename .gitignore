@@ -26,7 +26,7 @@ code/blast/dbs/*
 code/simulations/CAFBA/results/json_fluxes/*
 code/simulations/smf_dissipation/sweep/results/flux_distributions/*
 .claude
-# Model exports. They live only on main, where Publish commits them with
+# Model exports. They live only on main, where the Release: Publish workflow commits them with
 # `git add -f`; standard-GEM forbids the binary ones on any other branch.
 model/MIT1002-GEM.json
 model/MIT1002-GEM.yml
