@@ -151,7 +151,7 @@ deprecate_reactions(
 
 Note the absence of a `pr` argument above. You remove things on your branch
 *before* you open the pull request, so the number does not exist yet. Leave it
-blank and CI fills it in: the `Custom-CI` workflow runs
+blank and CI fills it in: the `Test-and-Report` workflow runs
 `PYTHONPATH=code python -m tools.deprecate stamp-pr "$PR_NUMBER"` on every pull request and
 commits the result, exactly as it already stamps the PR number into
 `code/scripts/results/README.md`.

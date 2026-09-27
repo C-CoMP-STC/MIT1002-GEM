@@ -9,7 +9,7 @@ Writes, next to ``model/MIT1002-GEM.xml``:
 * ``.mat``  -- COBRA Toolbox (MATLAB)
 
 The binary formats (``.xlsx``, ``.mat``) must only ever be committed to
-``main``; the Publish workflow runs this there. Run it by hand only to look at
+``main``; the Release: Publish workflow runs this there. Run it by hand only to look at
 the output, and do not commit it on another branch.
 """
 

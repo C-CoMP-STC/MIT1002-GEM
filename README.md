@@ -11,13 +11,13 @@ The narrative for generating the draft model, is available here: https://narrati
 
 This repo uses GitHub Actions to test and release the model:
 
-1. **Every pull request** (Custom-CI) runs the tests in `code/test/` -- SBML
+1. **Every pull request** (Test-and-Report) runs the tests in `code/test/` -- SBML
    validity, no growth without carbon, the known growth phenotypes, ATP-generating
    cycles, and that no deprecated identifier is back in the model -- and
    regenerates the reports in `code/scripts/results/`.
-2. **Release PRs into `main`** (Release-Checks) also check the version bump and
+2. **Release PRs into `main`** (Release: Check) also check the version bump and
    changelog, build the full MEMOTE report, and run the full MACAW suite.
-3. **Merging a release into `main`** (Publish) exports the model to every
+3. **Merging a release into `main`** (Release: Publish) exports the model to every
    format, tags and creates the GitHub release, and publishes the MEMOTE report
    to GitHub Pages.
 
