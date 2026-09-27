@@ -82,9 +82,10 @@ For a more in depth coverage, see...
 ### What's in a Name?: Choosing your Model and Repository Name
 * BiGG names models following a pattern, of i{Author's Initials}{Number of genes in the model} [@reed2003ijr904]
     * the i in the name refers to an in silico model (that is, a computer model)
-    * e.g., iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904)
-    * The 'i' in the name refers to an in silico model (that is, a computer model). This 'i' is followed by the initials (XX) of the person who developed the model and then the number of genes (xxx) included in the model. [@reed2003ijr904]
-    * i.e. the current E. coli model is iML1515
+    * 'i' is followed by the initials (XX) of the person who developed the model and then the number of genes (xxx) included in the model. [@reed2003ijr904]
+    * e.g.,
+        * iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904)
+        * the current E. coli model is iML1515
         * M stands from Jonathan Monk, L stands for Colton Lloyd
     * iJO1366 is by Jeffrey Orth
 * But this naming is inherently a snapshot, and would have to be continuously updated as the model evolved
@@ -98,7 +99,9 @@ For a more in depth coverage, see...
     * We followed that advice, and named the model MIT1002-GEM
 
 ### Branches
-Branching is a key feature of Git- it allows developers to isolate their changes so that the main version of the repository is not affected. This allows multiple developers to work simultaneously, and allows developers to test out changes where they will not affect anyone else. We chose to use a branching strategy based on the popular GitFlow strategy. We had two long-lived branches, “main”, the main branch, which had the official releases of the model, and “dev”, the development branch, where all accepted changes to the model were integrate before an official release. All changes made the model were made on feature branches that branched off of and were merged back into the dev branch. This ensured that any new feature development did not disturb the main model. Early on in development, branching is critical to XXX, and later branching became increasingly important to differentiate the version of model from users vs from developers.
+Branching is a key feature of Git- it allows developers to isolate their changes so that the main version of the repository is not affected. This allows multiple developers to work simultaneously, and allows developers to test out changes where they will not affect anyone else.
+
+We chose to use a branching strategy based on the popular GitFlow strategy. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
 
 ![](./figures/png/branches.png)
 
@@ -112,8 +115,59 @@ Branching is a key feature of Git- it allows developers to isolate their changes
 
 ### GitHub Actions
 We used automation through GitHub actions to run tests and scripts upon the opening of a pull request.
+GitHub actions 
 
 #### Defining an Action with a YML file
+* The steps of an Action are defined in a workflow file
+* Workflow files use YAML syntax, and the files must end in `.yml` or `.yaml` and must be stored in `.github/workflows` in the repo
+* For more information on YAML see: [Learn YAML in Y Minutes](https://learnxinyminutes.com/yaml/) and the [GitHub Workflows and Actions documentation](https://docs.github.com/en/actions/reference/workflows-and-actions)
+* MIT1002-GEM has multiple Actions, that are described in detail in the following section
+* Our workflow files have the following key sections, others exist, see more exhaustive documentation:
+    * `name`
+    * `on`
+    * `permissions`
+    * `concurrency`
+    * `jobs`
+* For an example we will walk through the YAML file of our CI workflow
+    * We first define the name of the workflow, this will show up in the Actions tab on GitHub
+    * In the YAML file we write:
+```yaml
+name: Test-and-Report
+```
+Which shows up as "Test-and-Report" on GitHub:
+![A screenshot from the GitHub Actions page for MIT1002-GEM ](./figures/png/github-actions-names.png)
+
+The next line in the file, defines when the workflow will run. `Test-and-Report` says:
+```yaml
+on:
+  pull_request:
+```
+so that it runs whenever a pull request is opened
+Other possible triggers for a workflow are (again, not exhaustive):
+* `push`: when changes are pushed to any branch
+* `schedule`: on a specific schedule, i.e., every day
+* `workflow_dispatch`: manually triggered with a button
+
+The next section in the workflow file, `jobs` defines the actual work done in the workflow.
+* A workflow run is made up of one or more jobs that can run sequentially on in parallel.
+* `Test-and-Report` is made up of two jobs, `test` and `report`
+* In the YAML file this looks like:
+```yaml
+jobs:
+  test:
+    ...
+  
+  report:
+    ...
+```
+* Each job first defines the runner that the job will run on:
+```yaml
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+```
+ubuntu-22.04 is 
+
 
 
 ## The Continuous Curation Loop
@@ -538,7 +592,7 @@ For example:
         * Step-by-step instructions for replicating the bug
             * include code, logs, or screenshots
         * Environment details
-            * What OS are you using, what version of tools (e.g., COBRApy) are you using, what version of the model are you using, did you start from a release, from the main branch, from the dev branch
+            * What OS are you using, what version of tools (e.g., COBRApy) are you using, what version of the model are you using, did you start from a release, from the main branch, from the develop branch
     * Note your issue is public, so don't include anything you don't want shared
     * Other repos (Human-GEM) have templates for reporting bugs, which can be helpful to ensure that someone gives all of the information needed to recreate and investigate the bug
 * Anyone can comment on issues
@@ -619,6 +673,7 @@ For example:
 * **Run**:
   * *In software engineering*:
   * *In continuous curation*:
+* **Runner**: 
 * **SBML**:
 * **Script**:
   * *In software engineering*:
