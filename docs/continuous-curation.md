@@ -166,7 +166,28 @@ jobs:
   test:
     runs-on: ubuntu-22.04
 ```
-ubuntu-22.04 is 
+ubuntu-22.04 is the standard Linux runner.
+
+Within the `test` block, `steps` represents a sequence of tasks that will be executed as part of the job. The steps of the `test` job are to: Check out the repository, so the job can access your files, install all required dependencies, and then run the tests.
+Each step either calls an action with `uses` or is defined with a `name` and with commands in `run`.
+```yaml
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      # Install everything I need
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # Run the custom tests
+      - name: Run Custom Tests with pytest
+        run: pytest
+```
 
 
 
