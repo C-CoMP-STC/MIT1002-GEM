@@ -101,6 +101,11 @@ For a more in depth coverage, see...
 ### Branches
 Branching is a key feature of Git- it allows developers to isolate their changes so that the main version of the repository is not affected. This allows multiple developers to work simultaneously, and allows developers to test out changes where they will not affect anyone else.
 
+* Define
+    * Branch
+    * Merge
+    * Pull Request
+
 We chose to use a branching strategy based on the popular GitFlow strategy. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
 
 ![](./figures/png/branches.png)
@@ -135,21 +140,21 @@ GitHub actions
 name: Test-and-Report
 ```
 Which shows up as "Test-and-Report" on GitHub:
-![A screenshot from the GitHub Actions page for MIT1002-GEM ](./figures/png/github-actions-names.png)
+![A screenshot from the GitHub Actions page for MIT1002-GEM shows the names of all the Workflows.](./figures/png/github-actions-names.png)
 
 The next line in the file, defines when the workflow will run. `Test-and-Report` says:
 ```yaml
 on:
   pull_request:
 ```
-so that it runs whenever a pull request is opened
+so that it runs whenever a pull request is opened or changes are pushed to the PR branch
 Other possible triggers for a workflow are (again, not exhaustive):
-* `push`: when changes are pushed to any branch
+* `push`: when changes are pushed to any branch or release
 * `schedule`: on a specific schedule, i.e., every day
 * `workflow_dispatch`: manually triggered with a button
 
 The next section in the workflow file, `jobs` defines the actual work done in the workflow.
-* A workflow run is made up of one or more jobs that can run sequentially on in parallel.
+* A workflow run is made up of one or more jobs that can run sequentially or in parallel.
 * `Test-and-Report` is made up of two jobs, `test` and `report`
 * In the YAML file this looks like:
 ```yaml
@@ -166,11 +171,14 @@ jobs:
   test:
     runs-on: ubuntu-22.04
 ```
-ubuntu-22.04 is the standard Linux runner.
+ubuntu-22.04 is a specific version of the Linux runner, using a specific version is good because it will not change whenever the latest Linux runner is updated, so it is less fragile.
 
 Within the `test` block, `steps` represents a sequence of tasks that will be executed as part of the job. The steps of the `test` job are to: Check out the repository, so the job can access your files, install all required dependencies, and then run the tests.
-Each step either calls an action with `uses` or is defined with a `name` and with commands in `run`.
+Each step can be named with `name`, and either calls a published action with `uses` or executes shell commands in the runner with `run`.
 ```yaml
+jobs:
+  test:
+    runs-on: ubuntu-22.04
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
@@ -188,13 +196,80 @@ Each step either calls an action with `uses` or is defined with a `name` and wit
       - name: Run Custom Tests with pytest
         run: pytest
 ```
+The following job, `report` does the "Report" steps of the Continuous Curation pipeline.
+```yaml
+  report:
+    runs-on: ubuntu-22.04
+    # 'needs: test' makes this job wait for the 'test' job to finish.
+    needs: test
+    # 'if: always()' ensures this job runs even if the 'test' job failed.
+    if: always()
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
 
+      # Install everything I need
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      # Generate the analysis reports
+      - name: Generate Analysis Reports
+        run: |
+          python code/scripts/generate_growth_report.py
+          python code/scripts/generate_pathway_report.py
+          python code/scripts/generate_biomass_table.py
+          python code/scripts/check_cue_values.py
+
+      - name: Mention PR# in README.md
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: sed -i -e "s/[[:digit:]]\{3,4\}\*\* (TEST-AND-REPORT)/$PR_NUMBER\*\* (TEST-AND-REPORT)/" code/scripts/results/README.md
+
+      # You cannot know your PR number before opening the PR, so `--pr` is
+      # optional when deprecating something. Fill in the blanks here, the same
+      # way the step above stamps the PR number into code/scripts/results/README.md.
+      # Only empty cells are touched, so rows attributed to a different PR or
+      # to an issue are left alone.
+      - name: Stamp PR# into deprecated identifier lists
+        env:
+          PR_NUMBER: ${{ github.event.number }}
+        run: PYTHONPATH=code python -m tools.deprecate stamp-pr "$PR_NUMBER"
+
+      # Auto-commit the changes directly without stashing
+      - name: Auto-commit results
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_user_name: action-bot
+          commit_message: "chore: add Test-and-Report results"
+          file_pattern: code/scripts/results/* data/deprecated_identifiers/*.tsv
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.number }}
+
+      - name: Get commit SHA
+        id: get-commit-sha
+        run: echo "COMMIT_SHA=$(git rev-parse HEAD)" >> $GITHUB_ENV
+
+      - name: Post comment
+        uses: NejcZdovc/comment-pr@v2
+        with:
+          file: "ci_comment.md"
+          identifier: "GITHUB_COMMENT_TEST_AND_REPORT"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          GH_ACTION_RUN: ${{github.run_id}}
+          COMMIT_SHA: ${{ env.COMMIT_SHA }}
+```
 
 
 ## The Continuous Curation Loop
 
-![Continuous Curation is an iterative process with the following steps: Curate, Test, Report, Release, Run, and Monitor.
-](./figures/png/continuous-curation-loop.png)
+![Continuous Curation is an iterative process with the following steps: Curate, Test, Report, Release, Run, and Monitor.](./figures/png/continuous-curation-loop.png)
 
 The Continuous Curation loop consists of 6 steps:
 1. Curate
