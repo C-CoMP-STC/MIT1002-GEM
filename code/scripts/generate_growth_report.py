@@ -1,13 +1,13 @@
 import os
 
+# Make `tools` importable; everything else comes from tools.paths.
+import sys
+
 import cobra
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from gem_utilities import biomass
-
-# Make `tools` importable; everything else comes from tools.paths.
-import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -18,7 +18,6 @@ from docx.oxml.ns import qn  # noqa: E402
 from docx.shared import Emu, Pt  # noqa: E402
 from openpyxl import load_workbook  # noqa: E402
 from openpyxl.styles import PatternFill  # noqa: E402
-
 from tools.media import MEDIA  # noqa: E402
 from tools.paths import DATA_DIR, MODEL_PATH  # noqa: E402
 from tools.phenotypes import evaluate_phenotypes  # noqa: E402
@@ -37,8 +36,8 @@ media_names = {
     "l1": "L1",
     "mbm": "Minimal Basal Medium (Moran Lab)",
     "promm_no_c": "ProMM",
-    "marine_broth_wo_yeast_and_peptone": "Marine Broth",
-    "marine_broth_wo_yeast_and_peptone_no_n": "Marine Broth (No Nitrogen)",
+    "marine_broth_wo_yeast_and_peptone": "Kratzl Base Medium (with N-solution)",
+    "marine_broth_wo_yeast_and_peptone_no_n": "Kratzl Base Medium",
     "swm": "Seawater Medium",
 }
 
@@ -403,7 +402,11 @@ def _column_widths(exp_pred_table: pd.DataFrame, total_width):
     weights = []
     for column_name in exp_pred_table.columns:
         longest_value = max(
-            (len(str(value)) for value in exp_pred_table[column_name] if pd.notna(value)),
+            (
+                len(str(value))
+                for value in exp_pred_table[column_name]
+                if pd.notna(value)
+            ),
             default=0,
         )
         # Headers are bold, so they run wider than a character count suggests;

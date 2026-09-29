@@ -1,4 +1,21 @@
 Minimal Media	Medium N Source(s)	Added Metabolite(s)	Experimental Growth	Reference	Reason for Exclusion	FBA Predicted Growth Rate	Result
+Kratzl Base Medium		Ammonium, Succinate	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium		Nitrate, Succinate	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium		Urea, Succinate	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Alanine	Yes	(Kratzl, 2026)		0.585	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Alanine, Pyruvate	Yes	(Kratzl, 2026)		0.766	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Arginine	Yes	(Kratzl, 2026)		0.613	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Arginine, Pyruvate	Yes	(Kratzl, 2026)		0.78	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Cystine	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Cystine, Pyruvate	No	(Kratzl, 2026)		0.565	False Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Glutamine	Yes	(Kratzl, 2026)		0.719	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Glutamine, Pyruvate	Yes	(Kratzl, 2026)		0.889	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Lysine	Yes	(Kratzl, 2026)		0.504	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Lysine, Pyruvate	Yes	(Kratzl, 2026)		0.692	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Methionine	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Methionine, Pyruvate	Yes	(Kratzl, 2026)		0.565	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Proline	No	(Kratzl, 2026)		0.687	False Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Proline, Pyruvate	Yes	(Kratzl, 2026)		0.852	True Positive
 L1	Nitrate	Acetate	Yes			0.37	True Positive
 L1	Nitrate	Alanine	Yes			0.585	True Positive
 L1	Nitrate	DHPS (dihydroxypropanesulfonate)	Yes			0.583	True Positive
@@ -8,23 +25,6 @@ L1	Nitrate	Glycerol-3-phosphate	Yes			0.804	True Positive
 L1	Nitrate	Proline	Yes			0.687	True Positive
 L1	Nitrate	Tyrosine	Yes			0.327	True Positive
 L1	Nitrate	Valine	Yes			0.492	True Positive
-Marine Broth	NH3, Nitrate	Alanine	Yes	(Kratzl, 2026)		0.585	True Positive
-Marine Broth	NH3, Nitrate	Alanine, Pyruvate	Yes	(Kratzl, 2026)		0.766	True Positive
-Marine Broth	NH3, Nitrate	Arginine	Yes	(Kratzl, 2026)		0.613	True Positive
-Marine Broth	NH3, Nitrate	Arginine, Pyruvate	Yes	(Kratzl, 2026)		0.78	True Positive
-Marine Broth	NH3, Nitrate	Cystine	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth	NH3, Nitrate	Cystine, Pyruvate	No	(Kratzl, 2026)		0.565	False Positive
-Marine Broth	NH3, Nitrate	Glutamine	Yes	(Kratzl, 2026)		0.719	True Positive
-Marine Broth	NH3, Nitrate	Glutamine, Pyruvate	Yes	(Kratzl, 2026)		0.889	True Positive
-Marine Broth	NH3, Nitrate	Lysine	Yes	(Kratzl, 2026)		0.504	True Positive
-Marine Broth	NH3, Nitrate	Lysine, Pyruvate	Yes	(Kratzl, 2026)		0.692	True Positive
-Marine Broth	NH3, Nitrate	Methionine	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth	NH3, Nitrate	Methionine, Pyruvate	Yes	(Kratzl, 2026)		0.565	True Positive
-Marine Broth	NH3, Nitrate	Proline	No	(Kratzl, 2026)		0.687	False Positive
-Marine Broth	NH3, Nitrate	Proline, Pyruvate	Yes	(Kratzl, 2026)		0.852	True Positive
-Marine Broth (No Nitrogen)		Ammonium, Succinate	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth (No Nitrogen)		Nitrate, Succinate	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth (No Nitrogen)		Urea, Succinate	No	(Kratzl, 2026)		0.0	True Negative
 Minimal Basal Medium (Moran Lab)	NH3	3-hydroxybutyrate	Yes			0.55	True Positive
 Minimal Basal Medium (Moran Lab)	NH3	6-Phosphogluconate	Yes			0.778	True Positive
 Minimal Basal Medium (Moran Lab)	NH3	Acetate	Yes			0.385	True Positive
@@ -54,9 +54,9 @@ Seawater Medium	NH3	alpha-Mannan	Yes	(Koch, 2020)		0.0	False Negative
 Minimal Basal Medium (Moran Lab)	NH3	Alanine	Unsure			0.585	Unsure
 Minimal Basal Medium (Moran Lab)	NH3	Homarine	Unsure			0.0	Unsure
 Minimal Basal Medium (Moran Lab)	NH3	Proline	Unsure			0.638	Unsure
-Marine Broth (No Nitrogen)		Ammonium, Glucose	Yes	(Kratzl, 2026)	control_failed	0.75	Excluded
-Marine Broth (No Nitrogen)		Ammonium, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.565	Excluded
-Marine Broth (No Nitrogen)		Nitrate, Glucose	Yes	(Kratzl, 2026)	control_failed	0.647	Excluded
-Marine Broth (No Nitrogen)		Nitrate, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.486	Excluded
-Marine Broth (No Nitrogen)		Urea+Pyruvate	No	(Kratzl, 2026)	control_failed	0.0	Excluded
-Marine Broth (No Nitrogen)		Urea, Glucose	Yes	(Kratzl, 2026)	control_failed	0.0	Excluded
+Kratzl Base Medium		Ammonium, Glucose	Yes	(Kratzl, 2026)	control_failed	0.75	Excluded
+Kratzl Base Medium		Ammonium, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.565	Excluded
+Kratzl Base Medium		Nitrate, Glucose	Yes	(Kratzl, 2026)	control_failed	0.647	Excluded
+Kratzl Base Medium		Nitrate, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.486	Excluded
+Kratzl Base Medium		Urea+Pyruvate	No	(Kratzl, 2026)	control_failed	0.0	Excluded
+Kratzl Base Medium		Urea, Glucose	Yes	(Kratzl, 2026)	control_failed	0.0	Excluded
