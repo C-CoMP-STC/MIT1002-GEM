@@ -111,12 +111,15 @@ We chose to use a branching strategy based on the popular GitFlow strategy. We h
 ![](./figures/png/branches.png)
 
 ### Repository Structure
+
 #### Model
 ##### What file type to use?
 * XML
 * SBML
 
 #### Data
+
+#### Code
 
 ### Unit Tests
 * Testing code is important, Unit tests are considered critical to the success of any project
