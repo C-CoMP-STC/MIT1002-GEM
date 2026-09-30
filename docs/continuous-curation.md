@@ -51,10 +51,11 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * Biomass component producibility heatmaps
 * Improved tracking removed reactions/metabolites
 
-## Set-Up
 ### What's the cost?
 * Requires set up and maintenance
 * Requires learning more about Git and automation than someone with a biology background may currently have
+
+## Background/Primer
 
 ### What is GitHub?
 Version control is critical for model curation because it tracks the “who”, “what”, and “when” of all changes made to the model. Who edited the model file, when did they make the edits, and what exactly was changed. It also maintains the historical versions of the model file, so at any time you can revert changes and return to an older version of the model.
@@ -79,25 +80,6 @@ Version control keeps a historical record of changes made to tracked files in a 
 
 For a more in depth coverage, see...
 
-### What's in a Name?: Choosing your Model and Repository Name
-* BiGG names models following a pattern, of i{Author's Initials}{Number of genes in the model} [@reed2003ijr904]
-    * the i in the name refers to an in silico model (that is, a computer model)
-    * 'i' is followed by the initials (XX) of the person who developed the model and then the number of genes (xxx) included in the model. [@reed2003ijr904]
-    * e.g.,
-        * iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904)
-        * the current E. coli model is iML1515
-        * M stands from Jonathan Monk, L stands for Colton Lloyd
-    * iJO1366 is by Jeffrey Orth
-* But this naming is inherently a snapshot, and would have to be continuously updated as the model evolved
-    * Every time you add or remove a gene you would need to change the number
-    * As new curators contribute to the model or take over, the author list may expand or change, or people may be annoyed to leave an old authors name at the prime spot
-* It would be better instead to have a single name that is not dependent on the author or gene list, that is specific to the organism
-    * It would be nice to instead have on model with different versions
-    * e.g. e.coli model v1, e.coli model v2, to make it clear the lineage of the model
-* The recommendation from standard-GEM is to name the repository and model {something}-GEM, a common name, KEGG organism, or taxonomy-derived short name
-    * e.g. Human-GEM and yeast-GEM
-    * We followed that advice, and named the model MIT1002-GEM
-
 ### Branches
 Branching is a key feature of Git- it allows developers to isolate their changes so that the main version of the repository is not affected. This allows multiple developers to work simultaneously, and allows developers to test out changes where they will not affect anyone else.
 
@@ -105,46 +87,6 @@ Branching is a key feature of Git- it allows developers to isolate their changes
     * Branch
     * Merge
     * Pull Request
-
-We chose to use a branching strategy based on the popular GitFlow strategy. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
-
-![](./figures/png/branches.png)
-
-### Repository Structure
-Following and buildign upon the Standard-GEM [@anton2023standardgem] specification, the MIT1002-GEM repo is structured as:
-```
-MIT1002-GEM/
-|-- .github/
-|   |-- ISSUE_TEMPLATE/
-|   |-- workflows/                  # CI, release, standard-GEM update
-|   |-- CONTRIBUTING.md
-|   `-- pull_request_template.md
-|-- code/
-|   |-- test/                       # assert pass/fail; block a merge
-|   |-- scripts/                    # generate artifacts for a human to read
-|   |-- tools/                      # shared importable functions
-|   `-- ...                         # exploratory analyses (biomass, pangenome)
-|-- data/
-|   |-- deprecated_identifiers/     # what was removed, and why
-|   |-- known_growth_phenotypes.tsv
-|   `-- README.md
-|-- docs/
-|   `-- continuous-curation.md
-|-- model/
-|   `-- MIT1002-GEM.xml             # the only model file on develop
-|-- CHANGELOG.md
-|-- README.md
-|-- requirements.txt
-`-- version.txt
-```
-#### Model
-##### What file type to use?
-* XML
-* SBML
-
-#### Data
-
-#### Code
 
 ### Unit Tests
 * Testing code is important, Unit tests are considered critical to the success of any project
@@ -223,7 +165,7 @@ if __name__ == '__main__':
         * Generate a figure, that you need to look at
         * A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)
 
-### GitHub Actions
+### Automation with GitHub Actions
 We used GitHub Actions to automate running tests, generating reports, and releasing the model. GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
 
 #### Defining an Action with a YML file
@@ -295,6 +237,76 @@ jobs:
         run: pytest
 ```
 Then you get a clean read out if your test passed or failed with every change, you never need to run the tests yourself, or count on other people running them.
+
+## Set-Up
+
+### What's in a Name?: Choosing your Model and Repository Name
+* BiGG names models following a pattern, of i{Author's Initials}{Number of genes in the model} [@reed2003ijr904]
+    * the i in the name refers to an in silico model (that is, a computer model)
+    * 'i' is followed by the initials (XX) of the person who developed the model and then the number of genes (xxx) included in the model. [@reed2003ijr904]
+    * e.g.,
+        * iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904)
+        * the current E. coli model is iML1515
+        * M stands from Jonathan Monk, L stands for Colton Lloyd
+    * iJO1366 is by Jeffrey Orth
+* But this naming is inherently a snapshot, and would have to be continuously updated as the model evolved
+    * Every time you add or remove a gene you would need to change the number
+    * As new curators contribute to the model or take over, the author list may expand or change, or people may be annoyed to leave an old authors name at the prime spot
+* It would be better instead to have a single name that is not dependent on the author or gene list, that is specific to the organism
+    * It would be nice to instead have on model with different versions
+    * e.g. e.coli model v1, e.coli model v2, to make it clear the lineage of the model
+* The recommendation from standard-GEM is to name the repository and model {something}-GEM, a common name, KEGG organism, or taxonomy-derived short name
+    * e.g. Human-GEM and yeast-GEM
+    * We followed that advice, and named the model MIT1002-GEM
+
+### Branching Strategy
+We chose to use a branching strategy based on the popular GitFlow strategy. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
+
+![](./figures/png/branches.png)
+
+### Repository Structure
+Following and building upon the Standard-GEM [@anton2023standardgem] specification, the MIT1002-GEM repo is structured as:
+```
+MIT1002-GEM/
+|-- .github/
+|   |-- ISSUE_TEMPLATE/
+|   |-- workflows/                  # CI, release, standard-GEM update
+|   |-- CONTRIBUTING.md
+|   `-- pull_request_template.md
+|-- code/
+|   |-- test/                       # assert pass/fail; block a merge
+|   |-- scripts/                    # generate artifacts for a human to read
+|   |-- tools/                      # shared importable functions
+|   `-- ...                         # exploratory analyses (biomass, pangenome)
+|-- data/
+|   |-- deprecated_identifiers/     # what was removed, and why
+|   |-- known_growth_phenotypes.tsv
+|   `-- README.md
+|-- docs/
+|   `-- continuous-curation.md
+|-- model/
+|   `-- MIT1002-GEM.xml             # the only model file on develop
+|-- CHANGELOG.md
+|-- README.md
+|-- requirements.txt
+`-- version.txt
+```
+
+#### `.github/`
+
+#### `code/`
+* Standard-GEM requires a `code` directory to house all the code used in generating the model. We further refine `code` into 4 categories
+    * Tests
+    * Scripts
+    * Tools
+    * Exploratory Analyses
+
+#### `data/`
+
+#### `model/`
+##### What file type to use?
+* XML
+* SBML
 
 ## The Continuous Curation Loop
 
