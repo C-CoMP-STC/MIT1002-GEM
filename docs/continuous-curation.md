@@ -51,11 +51,11 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * Biomass component producibility heatmaps
 * Improved tracking removed reactions/metabolites
 
-## What's the cost?
+## Set-Up
+### What's the cost?
 * Requires set up and maintenance
 * Requires learning more about Git and automation than someone with a biology background may currently have
 
-## Set-Up
 ### What is GitHub?
 Version control is critical for model curation because it tracks the “who”, “what”, and “when” of all changes made to the model. Who edited the model file, when did they make the edits, and what exactly was changed. It also maintains the historical versions of the model file, so at any time you can revert changes and return to an older version of the model.
 
@@ -111,7 +111,22 @@ We chose to use a branching strategy based on the popular GitFlow strategy. We h
 ![](./figures/png/branches.png)
 
 ### Repository Structure
-
+Standard-GEM [@anton2023standardgem] asserts that the repo should be structured as:
+```
+{something}-GEM
+  | .gitignore
+  | LICENSE.md
+  | README.md
+  | version.txt
+  |- .github
+      | CONTRIBUTING.md
+      |- workflows
+  |- code
+  |- data
+  |   | README
+  |- model
+      | {something}-GEM.{xml/json/mat/etc}
+```
 #### Model
 ##### What file type to use?
 * XML
