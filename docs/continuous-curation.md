@@ -111,21 +111,31 @@ We chose to use a branching strategy based on the popular GitFlow strategy. We h
 ![](./figures/png/branches.png)
 
 ### Repository Structure
-Standard-GEM [@anton2023standardgem] asserts that the repo should be structured as:
+Following and buildign upon the Standard-GEM [@anton2023standardgem] specification, the MIT1002-GEM repo is structured as:
 ```
-{something}-GEM
-  | .gitignore
-  | LICENSE.md
-  | README.md
-  | version.txt
-  |- .github
-      | CONTRIBUTING.md
-      |- workflows
-  |- code
-  |- data
-  |   | README
-  |- model
-      | {something}-GEM.{xml/json/mat/etc}
+MIT1002-GEM/
+|-- .github/
+|   |-- ISSUE_TEMPLATE/
+|   |-- workflows/                  # CI, release, standard-GEM update
+|   |-- CONTRIBUTING.md
+|   `-- pull_request_template.md
+|-- code/
+|   |-- test/                       # assert pass/fail; block a merge
+|   |-- scripts/                    # generate artifacts for a human to read
+|   |-- tools/                      # shared importable functions
+|   `-- ...                         # exploratory analyses (biomass, pangenome)
+|-- data/
+|   |-- deprecated_identifiers/     # what was removed, and why
+|   |-- known_growth_phenotypes.tsv
+|   `-- README.md
+|-- docs/
+|   `-- continuous-curation.md
+|-- model/
+|   `-- MIT1002-GEM.xml             # the only model file on develop
+|-- CHANGELOG.md
+|-- README.md
+|-- requirements.txt
+`-- version.txt
 ```
 #### Model
 ##### What file type to use?
