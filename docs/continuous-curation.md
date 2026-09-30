@@ -380,6 +380,7 @@ One critical component of the history of changes to the model is the “why”- 
 * In traditional software engineering, the unit being tested is often a function, however for the case of model curation, we are testing the model as a whole, but can write tests to focus on individual aspects of the model
 * The ones we present here are by no means an exhaustive list of everything that could or should be tested.
 * Many of these tests use previously published tools (e.g., MEMOTE), but we found that by implementing them with unit tests on a GitHub action it was easier to track model performance over time and recognize errors introduced into the model quickly.
+* Part of the MIT1002-GEM repo is helper functions (i.e. for XXX), these functions, just like any other functions in a python module should be tested.
 
 #### GitHub Action
 * In MIT1002-GEM we run them all automatically in the CI-workflow `Test-and-Report`, finding and executing tests with `pytest`
