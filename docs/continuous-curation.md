@@ -205,8 +205,8 @@ jobs:
   test:
 ```
 * Within test, we first define what virtual machine this workflow is running on
-    * This means what computer envionment
-    * Note this enviornemnt starts totally clean every time, so you can always test what it would be like to start on a totally new computer, this is good because you know exactly what needs to be done/installed (you never have a "well it runs on my machine" moment), but it does mean you need to set it up with every run
+    * This means what computer environment
+    * Note this environment starts totally clean every time, so you can always test what it would be like to start on a totally new computer, this is good because you know exactly what needs to be done/installed (you never have a "well it runs on my machine" moment), but it does mean you need to set it up with every run
 ```yaml
   test:
     # The machine it runs on
