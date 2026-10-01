@@ -481,6 +481,8 @@ The Continuous Curation loop consists of 6 steps:
         * And the test to make sure it does not drift
     * The test that no old reactions are still in the model file
 
+In the model file, lists of the IDs of the removed reactions and metabolites are stored in the “notes” element, which survives the model being read and re-written by libSBML and COBRApy. Additional information about the removed reactions and metabolites is stored in the “deprecated_reactions.tsv” and “deprecated_metabolites.tsv” files respectively. This includes a reason for the removal, chosen from the following controlled vocabulary: duplicate, id_changed, no_genomic_evidence, no_experimental_evidence, mass_imbalance, infeasible_cycle, dead_end, orphaned, erroneous_annotation, out_of_scope, and unknown. Other information included in this file is the pull request of the removal (automatically added for all new entries when a pull request is opened) and the date. Note that the process of removing a reaction from the model is structured: a helper function was written to both remove an entity from the model and add it to both lists. Unit tests ensure that the TSV files are well-formed, that the list in the model mirrors the TSV files, and that entities in the deprecated lists are not present in the model (i.e., things that were removed were not re-added).
+
 #### Commits
 * Commit often- don't just wait until the end of all your changes
 * Use concise descriptive commit messages
