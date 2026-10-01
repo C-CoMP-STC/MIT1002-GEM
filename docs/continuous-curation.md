@@ -247,7 +247,7 @@ Then you get a clean read out if your test passed or failed with every change, y
     * e.g.,
         * iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904)
         * the current E. coli model is iML1515
-        * M stands from Jonathan Monk, L stands for Colton Lloyd
+        * presumably, M stands for Jonathan Monk, L stands for Colton Lloyd the two first authors of the related paper
     * iJO1366 is by Jeffrey Orth
 * But this naming is inherently a snapshot, and would have to be continuously updated as the model evolved
     * Every time you add or remove a gene you would need to change the number
