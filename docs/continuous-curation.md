@@ -400,9 +400,9 @@ MIT1002-GEM/
     ```
     * Species it points to:
     ```xml
-    <species id="M_cpd00443_c0" name="4-aminobenzoate" compartment="c0"
-        fbc:charge="-1" fbc:chemicalFormula="C7H6NO2" .../>
-        ```
+    <species id="M_cpd00443_c0" name="Octanoyl-ACP" compartment="c0"
+        fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS" .../>
+    ```
 * A couple random points of clarification
     * COBRApy adds prefixes to all the IDs because SBML IDs must begun with a letter or underscore, and strips them when actually displaying the file
         * `R_` for reactions
