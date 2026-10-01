@@ -366,50 +366,52 @@ MIT1002-GEM/
             </reaction>
             ```
         * indentation shows nesting
-    * Elements relevant to GEMs
-        | Element | Holds |
-        |---|---|
-        | <listOfUnitDefinitions> | units |
-        | <listOfCompartments> | c0, e0 |
-        | <listOfSpecies> | metabolites |
-        | <listOfParameters> | the flux-bound values |
-        | <listOfReactions> | reactions |
-        | <fbc:listOfObjectives> | what FBA maximises |
-        | fbc:listOfGeneProducts> | genes |
-        * some tags say `fbc:` because they are specifically from the Flux Balance Constraints package which adds the necessary attributes for FBA [@olivier2018fbc2]
-    * Nothing really contains anything- they only point at each other
-        * E.g., a reaction doesn't contain a metabolite, it points at the metabolite using its ID
-    * Example
-        * Reaction
-        ```xml
-        <reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
-          fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
-        <listOfReactants>
-            <speciesReference species="M_cpd11470_c0" stoichiometry="1" constant="true"/>
-        </listOfReactants>
-        <listOfProducts>
-            <speciesReference species="M_cpd11493_c0" stoichiometry="1" constant="true"/>
-            <speciesReference species="M_cpd14953_c0" stoichiometry="1" constant="true"/>
-        </listOfProducts>
-        <fbc:geneProductAssociation>
-            <fbc:geneProductRef fbc:geneProduct="G_WP_049588698__46__1"/>
-        </fbc:geneProductAssociation>
-        </reaction>
+* Elements relevant to GEMs
+
+| Element | Holds |
+|---|---|
+| `<listOfUnitDefinitions>` | units |
+| `<listOfCompartments>` | c0, e0 |
+| `<listOfSpecies>` | metabolites |
+| `<listOfParameters>` | the flux-bound values |
+| `<listOfReactions>` | reactions |
+| `<fbc:listOfObjectives>` | what FBA maximizes |
+| `<fbc:listOfGeneProducts>` | genes |
+
+* some tags say `fbc:` because they are specifically from the Flux Balance Constraints package which adds the necessary attributes for FBA [@olivier2018fbc2]
+* Nothing really contains anything- they only point at each other
+    * E.g., a reaction doesn't contain a metabolite, it points at the metabolite using its ID
+* Example
+    * Reaction
+    ```xml
+    <reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
+        fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+    <listOfReactants>
+        <speciesReference species="M_cpd11470_c0" stoichiometry="1" constant="true"/>
+    </listOfReactants>
+    <listOfProducts>
+        <speciesReference species="M_cpd11493_c0" stoichiometry="1" constant="true"/>
+        <speciesReference species="M_cpd14953_c0" stoichiometry="1" constant="true"/>
+    </listOfProducts>
+    <fbc:geneProductAssociation>
+        <fbc:geneProductRef fbc:geneProduct="G_WP_049588698__46__1"/>
+    </fbc:geneProductAssociation>
+    </reaction>
+    ```
+    * Species it points to:
+    ```xml
+    <species id="M_cpd00443_c0" name="4-aminobenzoate" compartment="c0"
+        fbc:charge="-1" fbc:chemicalFormula="C7H6NO2" .../>
         ```
-        * Species it points to:
-        ```xml
-        <species id="M_cpd00443_c0" name="4-aminobenzoate" compartment="c0"
-         fbc:charge="-1" fbc:chemicalFormula="C7H6NO2" .../>
-         ```
-    * A couple random points of clarification
-        * COBRApy adds prefixes to all the IDs because SBML IDs must begun with a letter or underscore, and strips them when actually displaying the file
-            * `R_` for reactions
-            * `M_` for metabolites
-            * `G_` for genes
-        * `__46__` is an escaped period
-            * SBML IDs can't contain dots
-            * So COBRApy encodes them as `__` plus the ASCI code (46=`.`)
-            * So `G_WP_049588698__46__1` is really `WP_049588698.1`.
+* A couple random points of clarification
+    * COBRApy adds prefixes to all the IDs because SBML IDs must begun with a letter or underscore, and strips them when actually displaying the file
+        * `R_` for reactions
+        * `M_` for metabolites
+        * `G_` for genes
+    * `__46__` is an escaped period
+        * SBML IDs can't contain dots
+        * So COBRApy encodes them as `__` plus the ASCI code (46=`.`)
+        * So `G_WP_049588698__46__1` is really `WP_049588698.1`.
 
 ## The Continuous Curation Loop
 
