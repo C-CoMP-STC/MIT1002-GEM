@@ -108,7 +108,7 @@ import unittest
 
 from hello import hello
 ```
-* All tests are put within a class
+* All tests are put within a class (for unittest)
 ```python
 class TestHello(unittest.TestCase):
 ```
@@ -135,7 +135,7 @@ class TestHello(unittest.TestCase):
         name = 123
         # Call the function
         with self.assertRaises(TypeError):
-            message = hello.hello(name)
+            message = hello(name)
 ```
 * At the end of the file- set it to run all of the classes
 ```python
