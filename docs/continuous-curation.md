@@ -59,7 +59,7 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * Requires set up and maintenance
 * Requires learning more about Git and automation than someone with a biology background may currently have
 
-## Background/Primer
+## Background: Primer on Version Control and Automation with GitHub
 
 ### What is GitHub?
 Version control is critical for model curation because it tracks the “who”, “what”, and “when” of all changes made to the model. Who edited the model file, when did they make the edits, and what exactly was changed. It also maintains the historical versions of the model file, so at any time you can revert changes and return to an older version of the model.
@@ -102,7 +102,7 @@ A diff is TODO:
 
 For a more in depth coverage, see [@chacon2014progit].
 
-### Branches
+#### Branches
 Branching is a key feature of Git- it allows developers to isolate their changes so that the main version of the repository is not affected. This allows multiple developers to work simultaneously, and allows developers to test out changes where they will not affect anyone else.
 
 A branch is an isolated version of the repository that lives in parallel to all other branches. Changes made on one branch do not affect the other branches.
@@ -272,7 +272,7 @@ jobs:
 ```
 Then you get a clean read out if your test passed or failed with every change, you never need to run the tests yourself, or count on other people running them.
 
-## Set-Up
+## Setting-Up a GEM Repository
 
 ### What's in a Name?: Choosing your Model and Repository Name
 * BiGG names models following a pattern, of i{Author's Initials}{Number of genes in the model} [@reed2003ijr904]
