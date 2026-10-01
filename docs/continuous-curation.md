@@ -293,6 +293,9 @@ MIT1002-GEM/
 ```
 
 #### `.github/`
+* The `.github/` directory is to hold all GitHub-specific configuration files (e.g., the contributing guidelines, code of conduct, issue templates)
+* the `workflows` subdirectory within it, holds the YAML workflow files
+    * In MIT1002-GEM we have 5 workflow files within `.github/workflows`, the specific workflows will be described in detail in [the following section](#the-continuous-curation-loop)
 
 #### `code/`
 * Standard-GEM requires a `code` directory to house all the code used in generating the model. We further refine `code` into 4 categories
@@ -300,13 +303,112 @@ MIT1002-GEM/
     * Scripts
     * Tools
     * Exploratory Analyses
+* Tests are all unit tests (as described [above](#unit-tests))
+* Scripts differ from tests because they cannot “pass” or “fail”, and instead generate artifacts (e.g., plots) for a human curator to look at
+* If you can state in advance what is right or wrong- make a test
+* If you can use the information, but you're not sure what is right- make a scripts
+* Tests can block a merge- you need to pass all tests before you can merge a PR
+* Scripts don't block anything
+* Automated- also ran through GitHub actions
+    * Doesn't include any arguments or hand editing
+* Should be something you need continually- not just a one off for a specific question
+    * If no one is looking at the artifact- you don't need the script
+    * A one-off for a specific question is an exploratory analysis and can live in its own directory, e.g., `biomass` or `blast`
+* They might share code with tests
+    * E.g. the growth phenotype plot uses the same code as the growth phenotype ratchet test
+    * Make sure shared code lives in tools, not recreated in both files
 
 #### `data/`
+* This folder contains the data used in generating the model.
+* It must also include a README.md file that describes how the folder is organized.
 
 #### `model/`
-##### What file type to use?
-* XML
-* SBML
+* This directory houses your model file(s)
+* The model file should have the same name as your repository ({something}-GEM)
+* There are many different file formats that you can use (e.g., JSON, MATLAB, SBML, etc)
+* Different tools use different file types/different users may have different 
+* We strongly recommend that you pick one file type to be your "default" and have only that file on your `develop` branch, and export the model to all other file types only on the `main` branch
+
+##### What file type to use as your default?
+* the eXtensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing data.
+* "The Systems Biology Markup Language (SBML) is a file format for representing computational models in a declarative form that different software systems can exchange" [@sbmlLevel3Version2CoreRelease2] and is encoded in XML
+* SBML is formally defined in the specification documents
+    * The major advantage is that SBML files can be validated against the published SBML specification
+    * This only constrains form, not the biology, just because the SBML is valid, doesn't mean the biology within it is correct
+* SBML looks intimidating, but it's straight forward
+    * It's plain text, so you can open it and read the raw file yourself (i.e., it's not binary), which also means it diffs cleanly
+    * Most of the time, you don't need to read an SBML file, you work with the model as an object loaded into a tool (e.g., COBRApy)
+    * But sometimes you will need to look at the raw file, e.g., when you are looking at a diff
+    * The file is big, but very repetitive
+    * XML mechanics
+        * Tags open and close
+            * `<species>` ... `</species>`
+            * A tag can close itself: `<compartment id="c0" constant="true"/>`
+                * the `/>` means no children
+        * Attributes live inside the opening tag
+            * Like writing on the outside of the box
+            * Can only be one simple value, and can't contain anything
+            * What this looks like in the file
+            ```xml
+                <species id="M_cpd00443_c0" name="4-aminobenzoate" fbc:charge="-1"/>
+                         |-------- all three of these are attributes --------|
+            ```
+        * Children live between the tags
+            * Boxes inside of the box
+            * Can be multiple of something, or something with parts of its own
+            * What this looks like in the file
+            ```xml
+            <reaction id="R_octanoyl_xfer" reversible="false">   <-- attributes
+              <listOfReactants>                                  <-- a child element
+                <speciesReference species="M_cpd11470_c0"/>      <-- a child of that child
+              </listOfReactants>
+            </reaction>
+            ```
+        * indentation shows nesting
+    * Elements relevant to GEMs
+        | Element | Holds |
+        |---|---|
+        | <listOfUnitDefinitions> | units |
+        | <listOfCompartments> | c0, e0 |
+        | <listOfSpecies> | metabolites |
+        | <listOfParameters> | the flux-bound values |
+        | <listOfReactions> | reactions |
+        | <fbc:listOfObjectives> | what FBA maximises |
+        | fbc:listOfGeneProducts> | genes |
+        * some tags say `fbc:` because they are specifically from the Flux Balance Constraints package which adds the necessary attributes for FBA
+    * Nothing really contains anything- they only point at each other
+        * E.g., a reaction doesn't contain a metabolite, it points at the metabolite using its ID
+    * Example
+        * Reaction
+        ```xml
+        <reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
+          fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+        <listOfReactants>
+            <speciesReference species="M_cpd11470_c0" stoichiometry="1" constant="true"/>
+        </listOfReactants>
+        <listOfProducts>
+            <speciesReference species="M_cpd11493_c0" stoichiometry="1" constant="true"/>
+            <speciesReference species="M_cpd14953_c0" stoichiometry="1" constant="true"/>
+        </listOfProducts>
+        <fbc:geneProductAssociation>
+            <fbc:geneProductRef fbc:geneProduct="G_WP_049588698__46__1"/>
+        </fbc:geneProductAssociation>
+        </reaction>
+        ```
+        * Species it points to:
+        ```xml
+        <species id="M_cpd00443_c0" name="4-aminobenzoate" compartment="c0"
+         fbc:charge="-1" fbc:chemicalFormula="C7H6NO2" .../>
+         ```
+    * A couple random points of clarification
+        * COBRApy adds prefixes to all the IDs because SBML IDs must begun with a letter or underscore, and strips them when actually displaying the file
+            * `R_` for reactions
+            * `M_` for metabolites
+            * `G_` for genes
+        * `__46__` is an escaped period
+            * SBML IDs can't contain dots
+            * So COBRApy encodes them as `__` plus the ASCI code (46=`.`)
+            * So `G_WP_049588698__46__1` is really `WP_049588698.1`.
 
 ## The Continuous Curation Loop
 
@@ -416,19 +518,6 @@ jobs:
 
 
 ### Step 3) Report
-#### Scripts vs Tests
-* Scripts differ from tests because they cannot “pass” or “fail”, and instead generate artifacts (e.g., plots) for a human curator to look at
-* If you can state in advance what is right or wrong- make a test
-* If you can use the information, but you're not sure what is right- make a scripts
-* Tests can block a merge- you need to pass all tests before you can merge a PR
-* Scripts don't block anything
-* Automated- also ran through GitHub actions
-    * Doesn't include any arguments or hand editing
-* Should be something you need continually- not just a one off for a specific question
-    * If no one is looking at the artifact- you don't need the script
-* They might share code with tests
-    * E.g. the growth phenotype plot uses the same code as the growth phenotype ratchet test
-    * Make sure shared code lives in tools, not recreated in both files
 #### Examples of Scripts Used for Model Curation
 * Using the same underlying code as the growth test, we generated a plot of which experimentally known growth phenotypes the model matched or not. The heatmap visualization was useful for sharing results.
 * While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
