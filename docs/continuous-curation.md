@@ -375,7 +375,7 @@ MIT1002-GEM/
         | <listOfReactions> | reactions |
         | <fbc:listOfObjectives> | what FBA maximises |
         | fbc:listOfGeneProducts> | genes |
-        * some tags say `fbc:` because they are specifically from the Flux Balance Constraints package which adds the necessary attributes for FBA
+        * some tags say `fbc:` because they are specifically from the Flux Balance Constraints package which adds the necessary attributes for FBA [@olivier2018fbc2]
     * Nothing really contains anything- they only point at each other
         * E.g., a reaction doesn't contain a metabolite, it points at the metabolite using its ID
     * Example
