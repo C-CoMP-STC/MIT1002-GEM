@@ -194,7 +194,7 @@ on: push
 This means that whenever changes are pushed to the repo, this workflow will run.
 
 Other possible triggers for a workflow are (again, not exhaustive):
-* `push`: when changes are pushed to any branch or release
+* `push`: when changes are pushed to any branch or tag
 * `schedule`: on a specific schedule, i.e., every day
 * `workflow_dispatch`: manually triggered with a button
 
