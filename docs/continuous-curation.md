@@ -5,7 +5,7 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * None of this is really new
     * we borrowed all of this from software engineering
     * other groups do or are developing similar things
-        * we took some things directly from human-GEM and standard-GEM
+        * we took some things directly from Human-GEM and standard-GEM
     * the field is crystallizing
     * but the field lacks a single reference point for guidelines
 
@@ -23,7 +23,7 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 #### MEMOTE
 * MEMOTE exists [@lieven2020memote]
     * but it's more of a benchmarking tool- a lot of things is just about the file
-        * test what the custom tests ever did
+        * TODO: Check what the custom tests ever did
 * They had a TRAVIS integration where it would run, but MEMOTE can never fail, it always required a human to read, understand, and evaluate the tests
 
 #### standard-GEM
@@ -33,7 +33,7 @@ GEMs are, at their heart, a software product, and we took lessons from software 
     * code/test and MEMOTE are only possibility/capability, not a requirement or even a recommendation
 * technically just because it's on git doesn't mean you're regularly pushing- you could upload everything once and meet standard-GEM requirements, even if not in spirit
 
-#### human-GEM and yeast-GEM
+#### Human-GEM and yeast-GEM
 * Human-GEM
     * 2023: check-metabolictasks.yml
         * "metabolic tasks" on push and PR
@@ -42,12 +42,16 @@ GEMs are, at their heart, a software product, and we took lessons from software 
     * 2026: model-qc.yml
 * yeast-GEM
     * 2018: automated benchmarking MEMOTE + Travis CI 
-    * 2020: MEMOTE on GitHub actions + YAML-vaildation
+    * 2020: MEMOTE on GitHub actions + YAML-validation
     * 2026: model-qc.yml
 * A lot of things were not enforced, just reminders and check boxes
 
 ### What's new here
-* Our specific unit tests- not really clear who go to running it as CI first...
+* Continuous curation is really more of an ethos than any single pipeline
+* Concurrent independent development of similar procedures across organizations/models
+* We began running automated tests and scripts on GitHub actions in XXX
+    * not really clear who go to running it as CI first...
+* Our specific unit tests
 * Biomass component producibility heatmaps
 * Improved tracking removed reactions/metabolites
 
@@ -62,37 +66,56 @@ Version control is critical for model curation because it tracks the “who”, 
 
 Version control keeps a historical record of changes made to tracked files in a specialized database called a repository (or “repo”). Git is the software tool that enables version control, and GitHub is one popular cloud-based platform to host Git repositories, that also offers other functionalities such as issue tracking and wiki hosting. While we used GitHub, and will use GitHub-focused terminology (e.g., pull requests, actions) it not the only option for hosting Git repositories, other popular options include GitLab, Bitbucket and Azure DevOps, each of which have analogous tools to those we describe here and could similarly be used for a continuous curation pipeline.
 
-* A Git repository lives in two places...
-* Local vs Remote, basic terminology (commit, push, pull, etc.)
+A Git repository lives in two places, locally on your computer, and on a remote server. The two copies of the repository are respectively called the "Local Repository" and the "Remote Repository".
+You will be actively working on your local repository, and periodically syncing your changes to the remote repository. The three basic commands for tracking and syncing your commands are `commit`, `push`, and `pull`.
 
 ![An introduction to basic Git terminology: Local and remote repositories, commit, push, and pull](./figures/png/github-intro.png)
 
-#### Diffs
-* How to read a diff
+`commit` is done locally, to save your changes, along with a "commit message". Each commit has a hash, so you refer to the exact version of the code. Commits also track who makes the commit and when. So all changes are attributable.
+Because commits flag specific versions in the code, it is recommended to commit often (i.e., multiple times a day), and to leave a helpful commit message so if you are going back through your commit history you will know what version is which.
 
-![](./figures/png/diff-sbml.png)
+![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.](.figures/png/github-commits)
+
+`push` syncs all of the commits that have been made to your local repository to the remote repository. Making all of your changes available on GitHub or to other people. It is not necessary to push every commit individually, but you should push regularly, especially when working as a group so that your version is not significantly ahead of other people's copies. One maxim is to "Commit often, push daily".
+
+`pull` is the inverse of `push`, it syncs any new changes from the remote repository to your local repository. This could be done if a collaborator has made changes on their own local copy, pushed it to the remote, and now you need those changes on your local repository.
+
+Pushing and pulling frequently ensures that your local copy is never too far ahead or behind the remote repository.
+
+We will not discuss here the mechanics of how to make a repository or execute commands, for that see one of the many available Git tutorials, for your chosen platform, e.g.:
+* 
+
+#### Diffs
+A diff is TODO:
+
+ Diffs are typically shown with the two versions of the file side-by-side, with the old version of the file on the left, and the new version on the right. The lines of the file are aligned so that the matching content in the file lines up with each other, regardless of insertions and deletions.
+
+ TODO: Are the colors standardized? Is the bolding? Symbols?
+
+![An example of a "diff" on the MIT1002-GEM model file.](./figures/png/diff-sbml.png)
 
 * Not all diffs are equally helpful
     * File types to avoid
         * Microsoft office files: e.g., xlsx
 
-![](./figures/png/diff-excel-vs-csv.png)
+![An example of diffs for an excel file (top), and a CSV file (bottom). ](./figures/png/diff-excel-vs-csv.png)
 
-For a more in depth coverage, see...
+For a more in depth coverage, see [@chacon2014progit].
 
 ### Branches
 Branching is a key feature of Git- it allows developers to isolate their changes so that the main version of the repository is not affected. This allows multiple developers to work simultaneously, and allows developers to test out changes where they will not affect anyone else.
 
-* Define
-    * Branch
-    * Merge
-    * Pull Request
+A branch is an isolated version of the repository that lives in parallel to all other branches. Changes made on one branch do not affect the other branches.
+
+Merging is the process of integrating all of the changes from one branch into another. When using GitHub, merges are often (though not necessarily always) started by opening a Pull Request.
+
+A Pull Request is a request to merge two branches, that can be commented on or reviewed by others.
 
 ### Unit Tests
 * Testing code is important, Unit tests are considered critical to the success of any project
 * Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome
 
-##### Software example
+#### Example
 * Imagine you have a python module called `hello` with a single function, also called `hello`, that says "Hello" to a person, given their name:
 ```python
 def hello(name: str):
@@ -126,7 +149,19 @@ class TestHello(unittest.TestCase):
         ```
     * You define if the output is correct or not with an assert statement
     * There are other options for assert statements that make sense for different kinds of tests
-        * Table/list of assert statements
+
+| Assert Statement | What it does |
+|------------------|--------------|
+|`assertEqual` | Check that two objects are equal |
+|`assertAlmostEqual` | Checks that two objects are equal when rounded to the given number of decimal `places`. |
+|`assertLess` | Check that the first object is less than the second|
+|`assertLessEqual` | Check that the first object is less than or equal to the second |
+|`assertTrue` | Check that the expression is true |
+|`assertFalse` | Check that the expression is false |
+|`assertIn` | Check that the first object is in the second |
+|`assertIsNone` | Check that an object is `None` |
+|`assertRaises` | Fail unless an exception of class expected_exception is raised |
+
 * Then test an edge case, something that could return a bad output if your function is not properly written, e.g. a number
 ```python
     # Add a test checking that the function fails when an integer is passed
@@ -159,12 +194,10 @@ if __name__ == '__main__':
 * Tests behavior, not implementation — a test that breaks when you refactor without changing behavior is a liability
 * A name that says what broke without opening the file
 
-* Table with columns:
-    * Example of good unit tests
-        * Test that a script generate the correct data and saves a plot with the correct path
-    * Example of bad unit tests
-        * Generate a figure, that you need to look at
-        * A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)
+| Example of good unit tests | Example of bad unit tests|
+|----------------------------|--------------------------|
+|Test that a script generate the correct data and saves a plot with the correct path | Generate a figure, that you need to look at |
+| | A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)|
 
 ### Automation with GitHub Actions
 We used GitHub Actions to automate running tests, generating reports, and releasing the model. GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
@@ -263,7 +296,7 @@ Then you get a clean read out if your test passed or failed with every change, y
 ### Branching Strategy
 We chose to use a branching strategy based on the popular GitFlow strategy [@driessen2010gitflow]. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
 
-![](./figures/png/branches.png)
+![The branches used in Continuous Curation are: `main`, a long-lived branch for the official releases of the model, `develop`, a long-lived branch for all the accepted changes to the model, and short-lived feature branches for making edits to the repository.](./figures/png/branches.png)
 
 ### Repository Structure
 Following and building upon the Standard-GEM [@anton2023standardgem] specification, the MIT1002-GEM repo is structured as:
@@ -287,6 +320,7 @@ MIT1002-GEM/
 |   `-- continuous-curation.md
 |-- model/
 |   `-- MIT1002-GEM.xml             # the only model file on develop
+|-- .standard-GEM.md                # checklist for standard-GEM requirements
 |-- CHANGELOG.md
 |-- README.md
 |-- requirements.txt
@@ -307,7 +341,7 @@ MIT1002-GEM/
 * Tests are all unit tests (as described [above](#unit-tests))
 * Scripts differ from tests because they cannot “pass” or “fail”, and instead generate artifacts (e.g., plots) for a human curator to look at
 * If you can state in advance what is right or wrong- make a test
-* If you can use the information, but you're not sure what is right- make a scripts
+* If you can use the information, but you're not sure what is right- make a script
 * Tests can block a merge- you need to pass all tests before you can merge a PR
 * Scripts don't block anything
 * Automated- also ran through GitHub actions
@@ -404,13 +438,16 @@ MIT1002-GEM/
         fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS" .../>
     ```
 * A couple random points of clarification
-    * COBRApy adds prefixes to all the IDs because SBML IDs must begun with a letter or underscore, and strips them when actually displaying the file
+    * COBRApy adds prefixes to all the IDs because
+        * SBML IDs must begin with a letter or underscore
+        * SBML IDs have to unique across the whole document (i.e., not just within the metabolites or reactions), this ensures that even the same ID for a metabolite and a reaction are still different
+        * and strips them when actually reading the file
         * `R_` for reactions
         * `M_` for metabolites
         * `G_` for genes
     * `__46__` is an escaped period
         * SBML IDs can't contain dots
-        * So COBRApy encodes them as `__` plus the ASCI code (46=`.`)
+        * So COBRApy encodes them as `__` plus the ASCII code (46=`.`)
         * So `G_WP_049588698__46__1` is really `WP_049588698.1`.
 
 ## The Continuous Curation Loop
@@ -429,10 +466,15 @@ The Continuous Curation loop consists of 6 steps:
 *NOTE: We do not discuss here how to make curation decisions, but rather how to implement them*
 
 * How big is one curation task?
+    * Definitely don't think of all of curation being a single monolithic task
+    * The point is to do many small curation tasks, and update the model with small changes frequently 
+    * Aim for things to take on the order of days (maybe a week max)
+    * Early on (e.g., the first round of gap filling)- don't just say gap fill on  glucose, instead go through the biomass components and gap fill for production of a given biomass component one by one
+    * Once all biomass components are producible, gap fill for growth on a new carbon source is probably small enough
 
 #### Removing Reactions/Metabolites
 * Palsson said to do it [@thiele2010protocol]
-* What we took from human-GEM: the table
+* What we took from Human-GEM: the table
 * What is new
     * The standard vocabulary of reason
     * The list of removed things in the model file itself
@@ -486,12 +528,15 @@ One critical component of the history of changes to the model is the “why”- 
     * Why testing a model is not like testing a function [@kanewala2014testing]
 * The ones we present here are by no means an exhaustive list of everything that could or should be tested.
 * Many of these tests use previously published tools (e.g., MEMOTE), but we found that by implementing them with unit tests on a GitHub action it was easier to track model performance over time and recognize errors introduced into the model quickly.
-* Part of the MIT1002-GEM repo is helper functions (i.e. for XXX), these functions, just like any other functions in a python module should be tested.
+* Part of the MIT1002-GEM repo is helper functions (i.e. for setting the media, or running common simulations, or styling plots), these functions, just like any other functions in a python module should be tested.
 
 #### GitHub Action
 * In MIT1002-GEM we run them all automatically in the CI-workflow `Test-and-Report`, finding and executing tests with `pytest`
-* The next line in the file, defines when the workflow will run. `Test-and-Report` says:
+
+* The beginning of the YAML file sets the worksflow's name and when it will run
 ```yaml
+name: Test-and-Report
+
 on:
   pull_request:
 ```
@@ -522,6 +567,8 @@ jobs:
 
 
 ### Step 3) Report
+The report phase automatically runs scripts stored in `code/scripts` to generate artifacts (e.g., plots or reports) for human inspection.
+
 #### Examples of Scripts Used for Model Curation
 * Using the same underlying code as the growth test, we generated a plot of which experimentally known growth phenotypes the model matched or not. The heatmap visualization was useful for sharing results.
 * While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
@@ -643,7 +690,7 @@ The following job, `report` does the "Report" steps of the Continuous Curation p
 7. The merge triggers the Publish workflow to run
     * Exports model to all formats
     * Make a tag for the new release
-    * Creates the GuitHub release
+    * Creates the GitHub release
         * Zenodo integration makes the DOI
     * Deploys MEMOTE to Pages
 
@@ -699,7 +746,7 @@ The following job, `report` does the "Report" steps of the Continuous Curation p
 * Can't you just make an installable tool that makes all of this for me?
 * It is very possible to make a template- i.e. Standard-GEM
 * And very possible to have packages with importable tests and shared functions
-* Everyone will have different data, every model has it's own quirks, its worth writing your own to really get full coverage of your model
+* Everyone will have different data, every model has its own quirks, it's worth writing your own to really get full coverage of your model
 
 ## Develop Good Code/GitHub Habits
 This is a summary of established best practices, not new to us [@taschuk2017ten,@wilson2017good]
@@ -715,7 +762,7 @@ This is a summary of established best practices, not new to us [@taschuk2017ten,
     * Use issues like a lab notebook
     * Future you will NOT remember the why
 * Don't copy and paste- if you are using the same code more than once it should be a function
-    * That way if there's something wring, they are wrong in the same way, and they are never slightly different
+    * That way if there's something wrong, they are wrong in the same way, and they are never slightly different
     * Make a function with arguments, don't copy and tweak code
     * And once you make a function, make a test
 * No magic numbers
@@ -727,7 +774,7 @@ This is a summary of established best practices, not new to us [@taschuk2017ten,
 * Assert, don't eyeball
 * Don't store the same fact twice
     * Things will drift
-    * If you much, have a test to ensure that they don't drift
+    * If you have to, have a test to ensure that they don't drift
         * e.g., my removed reactions list
 
 ## Glossary
