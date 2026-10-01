@@ -146,6 +146,7 @@ if __name__ == '__main__':
 * Or they can be run automatically (e.g., as part of a GitHub action)
 
 #### What makes a Good Unit Test?
+* CITE [@meszaros2007xunit] and [@martin2008clean]
 * Needs to pass/fail, have an expected outcome, not generate an artifact
     * Boolean result- pass or fail
     * Self-validating — it returns pass or fail, not output a human must inspect
@@ -260,7 +261,7 @@ Then you get a clean read out if your test passed or failed with every change, y
     * We followed that advice, and named the model MIT1002-GEM
 
 ### Branching Strategy
-We chose to use a branching strategy based on the popular GitFlow strategy. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
+We chose to use a branching strategy based on the popular GitFlow strategy [@driessen2010gitflow]. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
 
 ![](./figures/png/branches.png)
 
@@ -480,6 +481,7 @@ One critical component of the history of changes to the model is the “why”- 
 * We can differentiate the tests used in MIT1002-GEM by what they tested, the model, the data files, the helper tools, or consistency between two things. A single test file can contain multiple different kinds of tests, so some file names may repeat across the list.
 #### Examples of Unit Tests on the Model
 * In traditional software engineering, the unit being tested is often a function, however for the case of model curation, we are testing the model as a whole, but can write tests to focus on individual aspects of the model
+    * Why testing a model is not like testing a function [@kanewala2014testing]
 * The ones we present here are by no means an exhaustive list of everything that could or should be tested.
 * Many of these tests use previously published tools (e.g., MEMOTE), but we found that by implementing them with unit tests on a GitHub action it was easier to track model performance over time and recognize errors introduced into the model quickly.
 * Part of the MIT1002-GEM repo is helper functions (i.e. for XXX), these functions, just like any other functions in a python module should be tested.
@@ -698,6 +700,7 @@ The following job, `report` does the "Report" steps of the Continuous Curation p
 * Everyone will have different data, every model has it's own quirks, its worth writing your own to really get full coverage of your model
 
 ## Develop Good Code/GitHub Habits
+This is a summary of established best practices, not new to us [@taschuk2017ten,@wilson2017good]
 * If it isn't pushed, it doesn't exist
     * Commit often, push daily
     * One commit- one reasons
