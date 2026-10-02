@@ -336,28 +336,30 @@ And can see the full test output:
 Running tests as part of a workflow is very helpful, because your tests will run with every change, you never need to run the tests yourself, or count on other people running them.
 
 ## Setting-Up a GEM Repository
+Having established the pre-requisite knowledge of using GitHub, and writing/running tests and workflows. This section will now walk you through how to set up a GitHub repository specifically for a "continuously curated" GEM.
 
-### What's in a Name?: Choosing your Model and Repository Name
-* BiGG names models following a pattern, of i{Author's Initials}{Number of genes in the model} [@reed2003ijr904]
-    * the i in the name refers to an in silico model (that is, a computer model)
-    * 'i' is followed by the initials (XX) of the person who developed the model and then the number of genes (xxx) included in the model. [@reed2003ijr904]
-    * e.g.,
-        * iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904)
-        * the current E. coli model is iML1515
-        * presumably, M stands for Jonathan Monk, L stands for Colton Lloyd the two first authors of the related paper
-    * iJO1366 is by Jeffrey Orth
-* But this naming is inherently a snapshot, and would have to be continuously updated as the model evolved
-    * Every time you add or remove a gene you would need to change the number
-    * As new curators contribute to the model or take over, the author list may expand or change, or people may be annoyed to leave an old authors name at the prime spot
-* It would be better instead to have a single name that is not dependent on the author or gene list, that is specific to the organism
-    * It would be nice to instead have on model with different versions
-    * e.g. e.coli model v1, e.coli model v2, to make it clear the lineage of the model
-* The recommendation from standard-GEM is to name the repository and model {something}-GEM, a common name, KEGG organism, or taxonomy-derived short name
-    * e.g. Human-GEM and yeast-GEM
-    * We followed that advice, and named the model MIT1002-GEM
+### What's in a Name?: Choosing your Repository and Model Name
+To create a GitHub repository, you must select a name. The name must be unique to the GitHub account that owns the repository, and should be short yet descriptive.
+![Screenshot of the Create a Repo page]()
+
+standard-GEM requires that the repository and model file have the same name and that the name is a short name followed by "-GEM". The short name can be a common name, the KEGG organism, or taxonomy-derived short name (e.g., Human-GEM, yeast-GEM, MIT1002-GEM).
+
+This differs from the naming convention used by the BiGG GEMs, notably the widely used *E. coli* models.
+BiGG names models following a pattern, of i{Author's Initials}{Number of genes in the model} [@reed2003ijr904].
+The i in the name refers to an in silico model (that is, a computer model)
+For example: iJR904 is an in silico model (i), built by Jennifer Reed (JR), containing 904 genes (904). Recent *E. coli* models are iML1515, where M and L presumably stand for 
+Monk and Lloyd the two first authors of the related paper, and iJO1366 is by Jeffrey Orth.
+
+While this naming is very descriptive, it is inherently a snapshot, and would have to be continuously updated as the model evolved. For example, every time you add or remove a gene you would need to change the number, and as new curators contribute to the model or take over, the author list may expand or change. It also does not capture how models are related. For example, from the name it is unclear if iML1515 is a revised and expanded version of iJO1366 or of it was a whole new *E. coli* that was built independently.
+
+With the standard-GEM format, the model name is now only organism specific, and so will remain accurate as the model is updated. Discrete versions of the model (e.g., Human-GEM TODO: get real numbers) can capture the snapshot of the model in time without losing track of how model versions are related.
 
 ### Branching Strategy
-We chose to use a branching strategy based on the popular GitFlow strategy [@driessen2010gitflow]. We had two long-lived branches, `main`, the main branch, which had the official releases of the model, and `develop`, the development branch, where all accepted changes to the model were integrated before an official release. All changes made the model were made on feature branches that branched off of and were merged back into `develop`. This ensured that any new feature development did not disturb the main model.
+By default GitHub will create a single branch called `main`. We will also immediately create a second branch, called `develop`.
+
+Both of these branches will be "long-lived", meaning they will never be deleted.
+
+`main`, will have the official releases of the model, and `develop`, will be the branch where all of the accepted changes to the model are integrated before an official release. All changes made the model will be made on short-lived feature branches that branch off of and are merged back into `develop`. This will ensure that any new feature development will not disturb the main model.
 
 ![The branches used in Continuous Curation are: `main`, a long-lived branch for the official releases of the model, `develop`, a long-lived branch for all the accepted changes to the model, and short-lived feature branches for making edits to the repository.](./figures/png/branches.png)
 
@@ -391,41 +393,36 @@ MIT1002-GEM/
 ```
 
 #### `.github/`
-* The `.github/` directory is to hold all GitHub-specific configuration files (e.g., the contributing guidelines, code of conduct, issue templates)
-* the `workflows` subdirectory within it, holds the YAML workflow files
-    * In MIT1002-GEM we have 5 workflow files within `.github/workflows`, the specific workflows will be described in detail in [the following section](#the-continuous-curation-loop)
+The `.github/` directory holds all GitHub-specific configuration files (e.g., the contributing guidelines, code of conduct, issue templates).
+The `workflows` subdirectory within it, holds the YAML workflow files used by GitHub Actions.
+In MIT1002-GEM we have 5 workflow files, the specific workflows will be described in detail in [the following section](#the-continuous-curation-loop)
 
 #### `code/`
-* Standard-GEM requires a `code` directory to house all the code used in generating the model. We further refine `code` into 4 categories
-    * Tests
-    * Scripts
-    * Tools
-    * Exploratory Analyses
-* Tests are all unit tests (as described [above](#unit-tests))
-* Scripts differ from tests because they cannot “pass” or “fail”, and instead generate artifacts (e.g., plots) for a human curator to look at
-* If you can state in advance what is right or wrong- make a test
-* If you can use the information, but you're not sure what is right- make a script
-* Tests can block a merge- you need to pass all tests before you can merge a PR
-* Scripts don't block anything
-* Automated- also ran through GitHub actions
-    * Doesn't include any arguments or hand editing
-* Should be something you need continually- not just a one off for a specific question
-    * If no one is looking at the artifact- you don't need the script
-    * A one-off for a specific question is an exploratory analysis and can live in its own directory, e.g., `biomass` or `blast`
-* They might share code with tests
-    * E.g. the growth phenotype plot uses the same code as the growth phenotype ratchet test
-    * Make sure shared code lives in tools, not recreated in both files
+Standard-GEM requires a `code` directory to house all the code used in generating the model. We further refine `code` into 4 categories
+* Tests
+* Scripts
+* Tools
+* Exploratory Analyses
+
+Tests are the unit tests (as described [above](#unit-tests)) for the repository.
+
+Scripts are python files that are run automatically like tests, but they do not “pass” or “fail”, and instead generate artifacts (e.g., plots, reports) for a human curator to look at. 
+
+Tools are the shared helper functions, definitions, and command-line utilities a curator runs deliberately, either by hand, or imported by the above. If there is a task you find yourself doing repeatedly, it should be a tool, not re-written in multiple files.
+
+Exploratory Analyses are all of the other directories within `code`.
+Each directory was a one-off for a specific question is an exploratory analysis and can live in its own directory, e.g., `biomass` or `blast`
 
 #### `data/`
-* This folder contains the data used in generating the model.
-* It must also include a README.md file that describes how the folder is organized.
+This folder contains the data used in generating the model. It must also include a README.md file that describes how the folder is organized.
 
 #### `model/`
-* This directory houses your model file(s)
-* The model file should have the same name as your repository ({something}-GEM)
-* There are many different file formats that you can use (e.g., JSON, MATLAB, SBML, etc)
-* Different tools use different file types/different users may have different 
-* We strongly recommend that you pick one file type to be your "default" and have only that file on your `develop` branch, and export the model to all other file types only on the `main` branch
+This directory houses your model file(s).
+The model file should have the same name as your repository ({something}-GEM).
+There are many different file formats that you can use (e.g., JSON, MATLAB, SBML, etc).
+Different tools use different file types, and different users may have their own preferred file types, so it is typical (and required by standard-GEM) to have your model available in multiple file types.
+However, we strongly recommend that you pick one file type to be your "default" and have only that file on your `develop` branch, and export the model to all other file types only on the `main` branch.
+While this means the most up-to-date model will not be available in all file types, it does mean that 
 
 ##### What file type to use as your default?
 * the eXtensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing data.
