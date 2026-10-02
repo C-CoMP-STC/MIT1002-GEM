@@ -55,6 +55,13 @@ GEMs are, at their heart, a software product, and we took lessons from software 
 * Biomass component producibility heatmaps
 * Improved tracking removed reactions/metabolites
 
+### Why can't you just make it for me?
+* Can't you just make an installable tool that makes all of this for me?
+* It is very possible to make a template- i.e. Standard-GEM
+* And very possible to have packages with importable tests and shared functions
+* Everyone will have different data, every model has its own quirks, it's worth writing your own to really get full coverage of your model
+* Beware walled-gardens
+
 ### What's the cost?
 * Requires set up and maintenance
 * Requires learning more about Git and automation than someone with a biology background may currently have
@@ -76,17 +83,17 @@ Because commits flag specific versions in the code, it is recommended to commit 
 
 ![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.](.figures/png/github-commits)
 
-`push` syncs all of the commits that have been made to your local repository to the remote repository. Making all of your changes available on GitHub or to other people. It is not necessary to push every commit individually, but you should push regularly, especially when working as a group so that your version is not significantly ahead of other people's copies. One maxim is to "Commit often, push daily".
+`push` syncs all of the commits that have been made to your local repository to the remote repository. Making all of your changes available on GitHub to other people. It is not necessary to push every commit individually, but you should push regularly, especially when working as a group so that your version is not significantly ahead of other people's copies. One maxim is to "Commit often, push daily".
 
-`pull` is the inverse of `push`, it syncs any new changes from the remote repository to your local repository. This could be done if a collaborator has made changes on their own local copy, pushed it to the remote, and now you need those changes on your local repository.
+`pull` is the inverse of `push`, it syncs any new changes from the remote repository to your local repository. This might be done if a collaborator has made changes on their own local copy, pushed it to the remote, and now you need those changes on your local repository.
 
 Pushing and pulling frequently ensures that your local copy is never too far ahead or behind the remote repository.
 
 We will not discuss here the mechanics of how to make a repository or execute commands, for that see one of the many available Git tutorials, for your chosen platform, e.g.:
-* 
+* TODO
 
 #### Diffs
-A diff is TODO:
+A diff is TODO
 
  Diffs are typically shown with the two versions of the file side-by-side, with the old version of the file on the left, and the new version on the right. The lines of the file are aligned so that the matching content in the file lines up with each other, regardless of insertions and deletions.
 
@@ -112,92 +119,133 @@ Merging is the process of integrating all of the changes from one branch into an
 A Pull Request is a request to merge two branches, that can be commented on or reviewed by others.
 
 ### Unit Tests
-* Testing code is important, Unit tests are considered critical to the success of any project
-* Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome
+It is a truth universally acknowledged that not all code is equally good.
+Code may have bugs, or have unexpected behaviors.
+One way to guard your code against bugs and to write and regularly run tests for your code.
 
-#### Example
-* Imagine you have a python module called `hello` with a single function, also called `hello`, that says "Hello" to a person, given their name:
+Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome, and are considered critical to the success of any software development project.
+
+#### Python Example
+Here we will show a step by step example for how to write a test for a python function.
+There are multiple testing frameworks for python, this example (like all the unit tests on MIT1002-GEM) will use the python standard-library testing framework, `unittest`
+
+Imagine you have a python module called `hello` with a single function, also called `hello`, that says "Hello" to a person, given their name.
+
+Your function, might look like this:
 ```python
 def hello(name: str):
     message = 'Hello, ' + name + '!'
 
     return message
 ```
-* To write the unit test, you would make a new file, by convention in a directory named "test" or "tests", and name the file "test_[module name]", for that individual python module, so in our case "test_hello"
-* While there are other testing frameworks, we show the python standard-library testing framework, unittest
-* In your test, you first import unittest, and your function that you are testing
+
+To write the unit test, you would make a new file, by convention in a directory named `test` or `tests`, and name the file `test_{module name}.py`, for that individual python module, so in our case `test_hello.py`.
+
+In your test file, you first need to import the library `unittest`, and the function (`hello`) that you are testing:
 ```python
 import unittest
 
 from hello import hello
 ```
-* All tests are put within a class (for unittest)
+
+For `unittest`, all tests are put within a class, so we will first define a class called `TestHello`:
 ```python
 class TestHello(unittest.TestCase):
 ```
-* Within that class you can write multiple tests
-* For example, first test an expected input, e.g., "Helen"
-    * ```python
-        def test_helen(self):
-            # Define a name
-            name = 'Helen'
-            # Call the function
-            message = hello(name)
 
-            # Assert that the function returns the correct string
-            self.assertEqual(message, 'Hello, Helen!')
-        ```
-    * You define if the output is correct or not with an assert statement
-    * There are other options for assert statements that make sense for different kinds of tests
+Within that class you can write multiple tests, each defined as a function. We will write two tests for `hello`. The first test will check that we receive the expected output given an given input. In this case, the input is the name "Helen", and we can check that the output of the test is correct using an assert statement. `assertEqual` compares the string that we receive from `hello` to "Hello, Helen!", if the strings are not equal to one another, the test will fail.
 
-| Assert Statement | What it does |
-|------------------|--------------|
-|`assertEqual` | Check that two objects are equal |
-|`assertAlmostEqual` | Checks that two objects are equal when rounded to the given number of decimal `places`. |
-|`assertLess` | Check that the first object is less than the second|
-|`assertLessEqual` | Check that the first object is less than or equal to the second |
-|`assertTrue` | Check that the expression is true |
-|`assertFalse` | Check that the expression is false |
-|`assertIn` | Check that the first object is in the second |
-|`assertIsNone` | Check that an object is `None` |
-|`assertRaises` | Fail unless an exception of class expected_exception is raised |
-
-* Then test an edge case, something that could return a bad output if your function is not properly written, e.g. a number
 ```python
-    # Add a test checking that the function fails when an integer is passed
+    # Note this block is indented because it will sit within the class `TestHello`
+    def test_helen(self):
+    """Test that hello prints the expected message for the name Helen"""
+        # Define a name
+        name = 'Helen'
+        # Call the function
+        message = hello(name)
+
+        # Assert that the function returns the correct string
+        self.assertEqual(message, 'Hello, Helen!')
+```
+
+We can then define a second test within the `TestHello` class to test edge cases or ways we expect the function to fail. For example, if someone were to provide a number rather a string for the name, we expect that the function will fail. To test that case, our test function could be:
+```python
     def test_integer(self):
+    """Test checking that the function fails when an integer is passed"""
         # Define a name
         name = 123
         # Call the function
         with self.assertRaises(TypeError):
             message = hello(name)
 ```
-* At the end of the file- set it to run all of the classes
+Here, rather than using `assertEqual` we use `assertRaises` to define that the expected outcome when `hello` is provided with a number (e.g., `123`) would be to raise a `TypeError`.
+
+At the end of the test file, we add the following block to set it to run all of the classes of tests, and all of their test functions whenever the test is ran, with:
 ```python
 if __name__ == '__main__':
     unittest.main()
 ```
-* Unit tests can be run manually- e.g., a developer runs them on their own computer and verifies that they all pass before pushing code
-* Or they can be run automatically (e.g., as part of a GitHub action)
+
+TODO: How to run this test and what the output are
+To run our tests, we run the test file with python, e.g., from the directory where this test is saved, run:
+```bash
+python test_hello.py
+```
+
+And in the terminal we receive the following test output:
+```
+TODO
+```
+
+In the case of a test failing, the test output would look like:
+```
+TODO
+```
+
+Once you have multiple tests, you can also set up TODO... so that all your tests run simultaneously, with jsut the command `TODO`, rather than needing to run each file individually. 
+
+#### Assert Statements
+
+This example used two different assert statements, `assertEqual` and `assertRaises`. There are many other assert statements that make sense for different kinds of tests. here is a list of just some examples of potential assert statements.
+
+| Assert Statement | What it does |
+|------------------|--------------|
+|`assertEqual` | Checks that two objects are equal |
+|`assertAlmostEqual` | Checks that two objects are equal when rounded to the given number of decimal `places`. |
+|`assertLess` | Checks that the first object is less than the second|
+|`assertLessEqual` | Checks that the first object is less than or equal to the second |
+|`assertTrue` | Checks that the expression is true |
+|`assertFalse` | Checks that the expression is false |
+|`assertIn` | Checks that the first object is in the second |
+|`assertIsNone` | Checks that an object is `None` |
+|`assertRaises` | Checks that exception of specified class is raised |
 
 #### What makes a Good Unit Test?
-* CITE [@meszaros2007xunit] and [@martin2008clean]
-* Needs to pass/fail, have an expected outcome, not generate an artifact
-    * Boolean result- pass or fail
-    * Self-validating — it returns pass or fail, not output a human must inspect
-* One reason to fail — a test asserting five things tells you "something broke," not what
-* Fast — slow tests don't get run, and a suite people skip provides no safety
-* Independent — no test depends on another's state or on run order
-* Repeatable — same result on any machine, any time; no network, no clock, no randomness
-* Deterministic — the intermittent test is worse than no test, because it trains people to re-run until green
-* No logic in the test — conditionals and loops inside a test can themselves be buggy, and then you're debugging your test
-* Tests behavior, not implementation — a test that breaks when you refactor without changing behavior is a liability
-* A name that says what broke without opening the file
+When writing tests for your code, keep in mind the following rules [@meszaros2007xunit,@martin2008clean].
+1. Tests must give a clear pass/fail.
+Your test should be self-validating, meaning that a human does not need to look at the output to decide if the fail passed or not. This results in each test giving a boolean (True/False) result.
+2. Tests should fail for one specific reason
+TODO: Check this
+Write your tests so that they fail for one reason only, if your test asserts multiple things, when the test fails you won't know which one failed, only that something did.
+3. Tests should be fast
+Tests are designed to be run often and running them should not be a burden. If a test is slow, there is a high likelihood that people will skip the test, and a test that doesn't get run is no good to anyone. If the function you are testing is designed to work on  large data types (e.g., sequencing data), you can make a mock smaller version of the data for the test rather than running on a real example.
+4. The outcome of a test must be repeatable
+Your test must work the same every time, regardless of who is running it, where or when they are running it. If your test or the code it is testing relies on randomness set a seed, so that the test will use the same number every time. A test that sometimes passes and sometimes fails for no real reason, will train people to ignore it or just keep rerunning it until it passes.
+5. Tests should be independent
+Each test should be able to pass or fail independently, and not depends on another's state or on run order.
+6. No logic in the test
+Conditionals and loops inside a test can themselves be buggy, and then you're debugging your test
+7. Test Behavior, not implementation
+You want your test to test the outcome of a function, not how the function is written. If you refactor or re-write the function, your test shouldn't break just because the function is different.
+8. Tests have clear names
+Test should have a name that says what broke without opening the file.
 
 | Example of good unit tests | Example of bad unit tests|
 |----------------------------|--------------------------|
 |Test that a script generate the correct data and saves a plot with the correct path | Generate a figure, that you need to look at |
 | | A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)|
+
+Here we showed tests being run manually, where a developer would need to run `TODO` on their own computer and verify that all the tests pass. To ensure that tests and never forgotten, or that a failure is missed, tests can also be run automatically (e.g., as part of a workflow on GitHub Actions).
 
 ### Automation with GitHub Actions
 We used GitHub Actions to automate running tests, generating reports, and releasing the model. GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
@@ -743,12 +791,6 @@ The following job, `report` does the "Report" steps of the Continuous Curation p
 * Anyone can comment on issues
 * Unlike in traditional software this is a more human-dependent step- we aren't just getting crash reports, we require people to really run the model and manually open issues
 * While this might seem trivial, this is a critical step, because without opening issues curation becomes a straight line, not a loop, and can't be continuous any more- so all issues are welcome!
-
-## Why can't you just make it for me?
-* Can't you just make an installable tool that makes all of this for me?
-* It is very possible to make a template- i.e. Standard-GEM
-* And very possible to have packages with importable tests and shared functions
-* Everyone will have different data, every model has its own quirks, it's worth writing your own to really get full coverage of your model
 
 ## Develop Good Code/GitHub Habits
 This is a summary of established best practices, not new to us [@taschuk2017ten,@wilson2017good]
