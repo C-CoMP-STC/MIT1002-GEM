@@ -81,7 +81,7 @@ You will be actively working on your local repository, and periodically syncing 
 `commit` is done locally, to save your changes, along with a "commit message". Each commit has a hash, so you refer to the exact version of the code. Commits also track who makes the commit and when. So all changes are attributable.
 Because commits flag specific versions in the code, it is recommended to commit often (i.e., multiple times a day), and to leave a helpful commit message so if you are going back through your commit history you will know what version is which.
 
-![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.](.figures/png/github-commits)
+![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.]()
 
 `push` syncs all of the commits that have been made to your local repository to the remote repository. Making all of your changes available on GitHub to other people. It is not necessary to push every commit individually, but you should push regularly, especially when working as a group so that your version is not significantly ahead of other people's copies. One maxim is to "Commit often, push daily".
 
@@ -248,55 +248,57 @@ Test should have a name that says what broke without opening the file.
 Here we showed tests being run manually, where a developer would need to run `TODO` on their own computer and verify that all the tests pass. To ensure that tests and never forgotten, or that a failure is missed, tests can also be run automatically (e.g., as part of a workflow on GitHub Actions).
 
 ### Automation with GitHub Actions
-We used GitHub Actions to automate running tests, generating reports, and releasing the model. GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
+GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
+
+For example, you can set up an action to run all of your tests, so that you are not dependent on everyone running the tests locally.
 
 #### Defining an Action with a YML file
-* The steps of an Action are defined in a workflow file
-* Workflow files use YAML syntax, and the files must end in `.yml` or `.yaml` and must be stored in `.github/workflows` in the repo
-* For more information on YAML see: [Learn YAML in Y Minutes](https://learnxinyminutes.com/yaml/) and the [GitHub Workflows and Actions documentation](https://docs.github.com/en/actions/reference/workflows-and-actions)
-* Our workflow files have the following key sections, others exist, see more exhaustive documentation:
-    * `name`
-    * `on`
-    * `permissions`
-    * `concurrency`
-    * `jobs`
+The steps of an Action are defined in a workflow file.
+Workflow files use YAML syntax, and the files must end in `.yml` or `.yaml` and must be stored in `.github/workflows` in the repo.
+For more information on YAML see: [Learn YAML in Y Minutes](https://learnxinyminutes.com/yaml/) and the [GitHub Workflows and Actions documentation](https://docs.github.com/en/actions/reference/workflows-and-actions).
 
-* For an example we will walk through what a YAML file for automated running of the tests for our `hello` module.
-* We first define the name of the workflow, this will show up in the Actions tab on GitHub
-* In the YAML file we write:
+For an example we will walk through a YAML file for automated running of the tests for our `hello` module that we wrote above.
+
+We first define the name of the workflow, this will show up in the Actions tab on GitHub.
+
+In the YAML file we write:
 ```yaml
 name: Test-Hello
 ```
-* Then we define when this workflow will run, what will trigger it to run:
+
+Then we define what will trigger this Action to run. For this example, we will set it so that the Action runs whenever changes are pushed to the repo, using the keyword `push`.
 ```yaml
 # Run this every time anything is pushed to the repository
 on: push
 ```
-This means that whenever changes are pushed to the repo, this workflow will run.
 
-Other possible triggers for a workflow are (again, not exhaustive):
-* `push`: when changes are pushed to any branch or tag
-* `schedule`: on a specific schedule, i.e., every day
-* `workflow_dispatch`: manually triggered with a button
+Other possible triggers for a workflow are: `schedule`, to run on a specific schedule (e.g., every day, and `workflow_dispatch`, to run only manually triggered with a button. For a complete list of the workflow triggers see TODO.
 
-The next section in the workflow file, `jobs` defines the actual work done in the workflow.
-* A workflow run is made up of one or more jobs that can run sequentially or in parallel.
-* In this YAML file we will only have one job, `test`
+The next section in the workflow file, `jobs`, defines the actual work done in the workflow. There can be one or more jobs that can run sequentially or in parallel.
+
+In this YAML file we will only have one job, `test`.
 ```yaml
 jobs:
   test:
 ```
-* Within test, we first define what virtual machine this workflow is running on
-    * This means what computer environment
-    * Note this environment starts totally clean every time, so you can always test what it would be like to start on a totally new computer, this is good because you know exactly what needs to be done/installed (you never have a "well it runs on my machine" moment), but it does mean you need to set it up with every run
+
+Within `test`, we first define the computer environment that this job will be run in.
+GitHub Actions run on a "Virtual Machine" on GitHub servers, TODO: what does this even mean
+This environment starts totally clean every time, so you can always test what it would be like to start on a totally new computer, this is good because you know exactly what needs to be done/installed (you never have a "well it runs on my machine" moment), but it does mean you need to set it up with every run.
+We will use a specific version of the Linux environment "ubuntu":
 ```yaml
-  test:
+    # This is indented because it is within `test`
     # The machine it runs on
     runs-on: ubuntu-22.04
 ```
-* The job is defined by a series of `steps`, a sequence of tasks that will be executed as part of the job.
-* Each step can be named with `name`, and either calls a published action with `uses` or executes shell commands in the runner with `run`.
-* Since we are starting in a totally blank virtual machine, the first few steps are usually dedicated to setting it up:
+
+The job is defined by a series of `steps`, a sequence of tasks that will be executed as part of the job.
+Each step can be named with `name`, and either calls a published action with `uses` or executes shell commands in the runner with `run`.
+Since we are starting in a totally blank virtual machine, the first few steps are usually dedicated to setting it up.
+
+First we muse check out the repository, so our virtual machine has all of the code on our repo. Because this is such a common task, there is a published action, `checkout`, that we can call that will handle all of the necessary sub-steps to checkout our repository.
+Then we install a specific version of Python to our virtual machine. Specifying the version of python, rather than using the latest version is good, because it won't drift as Python is updated, so things won't break.
+Then we can install our specific dependencies, in this case the python library `pytest`
 ```yaml
     steps:
       # Copy the repository onto that machine
@@ -311,14 +313,27 @@ jobs:
       - name: Install dependencies
         run: pip install pytest
 ```
-* Here we checked out the repository, so our virtual machine has all of the code on our repo, then we installed a specific version of Python (using a specific version is good, because it won't drift as Python is updated, so things won't break). Then we can install our specific dependencies, in this case `pytest`
-* The next step is to actually run the tests:
+
+The final step is to actually run the tests as we did locally before:
 ```yaml
       # Run them
       - name: Run tests
         run: pytest
 ```
-Then you get a clean read out if your test passed or failed with every change, you never need to run the tests yourself, or count on other people running them.
+
+When we push to our repository, and this test runs, we can see the workflow running in the Actions tab:
+![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively running.]()
+
+When we look at the individual run of the workflow, we can see our named job, `test`, in the case of a workflow with multiple jobs, this diagram would have more boxes.
+![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of thw workflow in the files job(s), in this case the single job, `test`.]()
+
+And when the workflow is complete we get a clear if your test passed or failed:
+![The total run as a pass or a fail on the main Actions page. A green check indicates that the workflow did not encounter any errors. A red X would indicate that the workflow failed. Note the workflow could fail for reasons other than the tests failing, e.g., an error in setting up the virtual environment.]()
+
+And can see the full test output:
+![The full test output (the same as what you see in the terminal when running tests locally) is shown in the logs for each run.]()
+
+Running tests as part of a workflow is very helpful, because your tests will run with every change, you never need to run the tests yourself, or count on other people running them.
 
 ## Setting-Up a GEM Repository
 
@@ -509,6 +524,8 @@ The Continuous Curation loop consists of 6 steps:
 4. Release
 5. Run
 6. Monitor
+
+We used GitHub Actions to automate running tests, generating reports, and releasing the model.
 
 ### Step 1) Curate
 *NOTE: We do not discuss here how to make curation decisions, but rather how to implement them*
