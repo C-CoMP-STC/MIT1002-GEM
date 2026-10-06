@@ -93,15 +93,19 @@ We will not discuss here the mechanics of how to make a repository or execute co
 * TODO
 
 #### Diffs
-A diff is TODO
+A diff (short for difference) is a visual way to see the changes made to a file.
+They are a quick and easy way to see how a file has changed, and so are very valuable when reviewing changes or looking for a specific edit.
 
- Diffs are typically shown with the two versions of the file side-by-side, with the old version of the file on the left, and the new version on the right. The lines of the file are aligned so that the matching content in the file lines up with each other, regardless of insertions and deletions.
+ On GitHub, diffs are typically shown with two versions of a file side-by-side (e.g., the older version and a new edited version). The old version of the file on the left, and the new version on the right. The lines of the file are aligned so that the matching content in the file lines up with each other, regardless of insertions and deletions.
 
- TODO: Are the colors standardized? Is the bolding? Symbols?
+Additions to the file are highlighted in green and marked with a `+` to the left of the line. Deletions to the file are highlighted in red and marked with a `-`.
 
 ![An example of a "diff" on the MIT1002-GEM model file.](./figures/png/diff-sbml.png)
 
-* Not all diffs are equally helpful
+Not all diffs are equally helpful. Binary files do not have a readable raw format. So they cannot show what lines were changed on a commit, only that the file was edited somewhere.
+For that reason, it is recommended to avoid using binary files (e.g., xlsx).
+
+For example, if you edit one row in an excel file, and commit the change, the diff will only show 
     * File types to avoid
         * Microsoft office files: e.g., xlsx
 
@@ -422,22 +426,26 @@ The model file should have the same name as your repository ({something}-GEM).
 There are many different file formats that you can use (e.g., JSON, MATLAB, SBML, etc).
 Different tools use different file types, and different users may have their own preferred file types, so it is typical (and required by standard-GEM) to have your model available in multiple file types.
 However, we strongly recommend that you pick one file type to be your "default" and have only that file on your `develop` branch, and export the model to all other file types only on the `main` branch.
-While this means the most up-to-date model will not be available in all file types, it does mean that 
+While this means the most up-to-date model will not be available in all file types, it does remove the risk of different curators making edits on different files and them becoming out of sync, or the changes being lost. 
 
-##### What file type to use as your default?
-* the eXtensible Markup Language (XML) is a markup language and file format for storing, transmitting, and reconstructing data.
-* "The Systems Biology Markup Language (SBML) is a file format for representing computational models in a declarative form that different software systems can exchange" [@sbmlLevel3Version2CoreRelease2] and is encoded in XML
-* SBML is formally defined in the specification documents
-    * The major advantage is that SBML files can be validated against the published SBML specification
-    * This only constrains form, not the biology, just because the SBML is valid, doesn't mean the biology within it is correct
-* SBML looks intimidating, but it's straight forward
-    * It's plain text, so you can open it and read the raw file yourself (i.e., it's not binary), which also means it diffs cleanly
-    * Most of the time, you don't need to read an SBML file, you work with the model as an object loaded into a tool (e.g., COBRApy)
-    * But sometimes you will need to look at the raw file, e.g., when you are looking at a diff
-    * The file is big, but very repetitive
-    * XML mechanics
-        * Tags open and close
-            * `<species>` ... `</species>`
+##### The SBML File Type
+We chose to use the Systems Biology Markup Language (SBML) [@sbmlLevel3Version2CoreRelease2] file type as our default file and the only file type on our `develop` branch.
+SBML is a file format and markup language encoded in the the eXtensible Markup Language (XML) which is used for storing, transmitting, and reconstructing data.
+SBML was specifically designed for representing computational models in a declarative form that different software tools can read, so one file type can be used for multiple scales.
+An extension to SBML, called the Flux Balance Constraints (fbc) package which adds the necessary attributes for FBA [@olivier2018fbc2].
+
+The major advantage of using SBML over other file types is that SBML is formally defined, so files can be validated.
+Note these specification only constrain the form of the file, not the biology they represent, so a totally valid SBML file could still be biologically incorrect.
+
+Importantly, SBML files are plain text,  so you can open it and read the raw file yourself (i.e., it's not binary), which also means it diffs cleanly.
+
+While most of the time, you don't need to read an SBML file directly, as you work with the model as an object loaded into a tool (e.g., COBRApy), it is very helpful to be comfortable reading it, e.g., for when you are looking at a diff and want to see what changed in the model.
+
+SBML looks can look intimidating at first, but the format is straight forward once you learn a few mechanics of the file.
+
+SBML, like all XML files is comprised of a series of tags. TODO: Is this true?
+A tag is contains a series of information and is bracketed by an opening and closing statement, defining the tags type.
+For example, a tag called "species" is written as `<species> ... </species>`
             * A tag can close itself: `<compartment id="c0" constant="true"/>`
                 * the `/>` means no children
         * Attributes live inside the opening tag
@@ -472,7 +480,6 @@ While this means the most up-to-date model will not be available in all file typ
 | `<fbc:listOfObjectives>` | what FBA maximizes |
 | `<fbc:listOfGeneProducts>` | genes |
 
-* some tags say `fbc:` because they are specifically from the Flux Balance Constraints package which adds the necessary attributes for FBA [@olivier2018fbc2]
 * Nothing really contains anything- they only point at each other
     * E.g., a reaction doesn't contain a metabolite, it points at the metabolite using its ID
 * Example
