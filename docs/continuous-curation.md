@@ -81,7 +81,7 @@ You will be actively working on your local repository, and periodically syncing 
 `commit` is done locally, to save your changes, along with a "commit message". Each commit has a hash, so you refer to the exact version of the code. Commits also track who makes the commit and when. So all changes are attributable.
 Because commits flag specific versions in the code, it is recommended to commit often (i.e., multiple times a day), and to leave a helpful commit message so if you are going back through your commit history you will know what version is which.
 
-![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.]()
+![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.]() TODO: Take screenshot and add path
 
 `push` syncs all of the commits that have been made to your local repository to the remote repository. Making all of your changes available on GitHub to other people. It is not necessary to push every commit individually, but you should push regularly, especially when working as a group so that your version is not significantly ahead of other people's copies. One maxim is to "Commit often, push daily".
 
@@ -125,7 +125,7 @@ A Pull Request is a request to merge two branches, that can be commented on or r
 ### Unit Tests
 It is a truth universally acknowledged that not all code is equally good.
 Code may have bugs, or have unexpected behaviors.
-One way to guard your code against bugs and to write and regularly run tests for your code.
+One way to guard your code against bugs is to write and regularly run tests for your code.
 
 Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome, and are considered critical to the success of any software development project.
 
@@ -269,7 +269,7 @@ Test should have a name that says what broke without opening the file.
 |Test that a script generate the correct data and saves a plot with the correct path | Generate a figure, that you need to look at |
 | | A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)|
 
-Here we showed tests being run manually, where a developer would need to run `TODO` on their own computer and verify that all the tests pass. To ensure that tests and never forgotten, or that a failure is missed, tests can also be run automatically (e.g., as part of a workflow on GitHub Actions).
+Here we showed tests being run manually, where a developer would need to run `python -m unittest` on their own computer and verify that all the tests pass. To ensure that tests and never forgotten, or that a failure is missed, tests can also be run automatically (e.g., as part of a workflow on GitHub Actions).
 
 ### Automation with GitHub Actions
 GitHub Actions is tool built in to GitHub that can run pre-defined workflows on GitHub servers. It is typically used in software development for Continuous Integration testing and for automated deployment.
@@ -371,7 +371,6 @@ Having established the pre-requisite knowledge of using GitHub, and writing/runn
 
 ### What's in a Name?: Choosing your Repository and Model Name
 To create a GitHub repository, you must select a name. The name must be unique to the GitHub account that owns the repository, and should be short yet descriptive.
-![Screenshot of the Create a Repo page]()
 
 standard-GEM requires that the repository and model file have the same name and that the name is a short name followed by "-GEM". The short name can be a common name, the KEGG organism, or taxonomy-derived short name (e.g., Human-GEM, yeast-GEM, MIT1002-GEM).
 
@@ -472,30 +471,30 @@ SBML looks can look intimidating at first, but the format is straight forward on
 
 SBML, like all XML files is comprised of a series of tags. TODO: Is this true?
 A tag is contains a series of information and is bracketed by an opening and closing statement, defining the tags type.
-For example, a tag called "species" is written as `<species> ... </species>`
-            * A tag can close itself: `<compartment id="c0" constant="true"/>`
-                * the `/>` means no children
-        * Attributes live inside the opening tag
-            * Like writing on the outside of the box
-            * Can only be one simple value, and can't contain anything
-            * What this looks like in the file
-            ```xml
-                <species id="M_cpd00443_c0" name="4-aminobenzoate" fbc:charge="-1"/>
-                         |-------- all three of these are attributes --------|
-            ```
-        * Children live between the tags
-            * Boxes inside of the box
-            * Can be multiple of something, or something with parts of its own
-            * What this looks like in the file
-            ```xml
-            <reaction id="R_octanoyl_xfer" reversible="false">   <-- attributes
-              <listOfReactants>                                  <-- a child element
-                <speciesReference species="M_cpd11470_c0"/>      <-- a child of that child
-              </listOfReactants>
-            </reaction>
-            ```
-        * indentation shows nesting
-* Elements relevant to GEMs
+For example, a tag called "species" is written as `<species> ... </species>`.
+Note that a small tag (i.e., one with no children) can close itself with `/>`, e.g., 
+`<compartment id="c0" constant="true"/>`.
+A tag can include two types of information: attributes, and children tags.
+
+Attributes are pieces of information that live inside the opening tag, and are restricted to simple values. You can think of attributes as writing on the outside of a box, it labels what is inside the box, but it doesn't actually contain anything.
+In an SBML file, attributes come immediately after the opening tag and are a series of keys and values, for example, in this `species` tag, the `id`, `name`, and `fbc:charge` are all attributes.
+```xml
+<species id="M_cpd00443_c0" name="4-aminobenzoate" fbc:charge="-1"/>
+            |-------- all three of these are attributes --------|
+```
+
+Children tags are tags within other tags, each bracketed by their own opening and closing statement. You can think of these as a box within a box.
+Whereas attributes were simple values stored in key-value pairs, a child tag can include multiple elements or something with parts of its own.
+In the SBML file, a `reaction` tag, has the child tag `listOfReactants` and that in turn has a child, `speciesReference`, with indentation showing the nesting of children within their parents.
+```xml
+<reaction id="R_octanoyl_xfer" reversible="false">   <-- attributes
+    <listOfReactants>                                  <-- a child element
+        <speciesReference species="M_cpd11470_c0"/>      <-- a child of that child
+    </listOfReactants>
+</reaction>
+```
+
+SBML files of GEMs have many different types of tags, the table below includes several key tags and the information they hold.
 
 | Element | Holds |
 |---|---|
@@ -507,42 +506,34 @@ For example, a tag called "species" is written as `<species> ... </species>`
 | `<fbc:listOfObjectives>` | what FBA maximizes |
 | `<fbc:listOfGeneProducts>` | genes |
 
-* Nothing really contains anything- they only point at each other
-    * E.g., a reaction doesn't contain a metabolite, it points at the metabolite using its ID
-* Example
-    * Reaction
-    ```xml
-    <reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
-        fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
-    <listOfReactants>
-        <speciesReference species="M_cpd11470_c0" stoichiometry="1" constant="true"/>
-    </listOfReactants>
-    <listOfProducts>
-        <speciesReference species="M_cpd11493_c0" stoichiometry="1" constant="true"/>
-        <speciesReference species="M_cpd14953_c0" stoichiometry="1" constant="true"/>
-    </listOfProducts>
-    <fbc:geneProductAssociation>
-        <fbc:geneProductRef fbc:geneProduct="G_WP_049588698__46__1"/>
-    </fbc:geneProductAssociation>
-    </reaction>
-    ```
-    * Species it points to:
-    ```xml
-    <species id="M_cpd00443_c0" name="Octanoyl-ACP" compartment="c0"
-        fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS" .../>
-    ```
-* A couple random points of clarification
-    * COBRApy adds prefixes to all the IDs because
-        * SBML IDs must begin with a letter or underscore
-        * SBML IDs have to unique across the whole document (i.e., not just within the metabolites or reactions), this ensures that even the same ID for a metabolite and a reaction are still different
-        * and strips them when actually reading the file
-        * `R_` for reactions
-        * `M_` for metabolites
-        * `G_` for genes
-    * `__46__` is an escaped period
-        * SBML IDs can't contain dots
-        * So COBRApy encodes them as `__` plus the ASCII code (46=`.`)
-        * So `G_WP_049588698__46__1` is really `WP_049588698.1`.
+To read and understand XML and SBML files, the key thing (TODO: find a better word) to understand is that tags do not contain all of their related information, instead they point at other tags. For example, in a GEM, a `reaction` tag will contain all of the `metabolite` tags that are involved in it, instead, `reaction` points at other `metabolite` objects. The `reaction` tag for "Octanoyl transferase" may look like:
+```xml
+<reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
+    fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
+<listOfReactants>
+    <speciesReference species="M_cpd11470_c0" stoichiometry="1" constant="true"/>
+</listOfReactants>
+<listOfProducts>
+    <speciesReference species="M_cpd11493_c0" stoichiometry="1" constant="true"/>
+    <speciesReference species="M_cpd14953_c0" stoichiometry="1" constant="true"/>
+</listOfProducts>
+<fbc:geneProductAssociation>
+    <fbc:geneProductRef fbc:geneProduct="G_WP_049588698__46__1"/>
+</fbc:geneProductAssociation>
+</reaction>
+```
+The metabolites involved in the reaction are included in `listOfReactants` and `listOfProducts`, but the metabolites themselves are not defined there, instead the chile tag `speciesReference` points to the metabolite definition, by using the same ID in `species` as a metabolite.
+For the "Octanoyl transferase", the `listOfReactants` has only one `speciesReference`, and its ID for `species` is "M_cpd11470_c0". Within `listOfSpecies`, one `species` tag has that ID, it's full definition is as follows:
+```xml TODO: Use cpd11470
+<species id="M_cpd00443_c0" name="Octanoyl-ACP" compartment="c0"
+    fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS" .../>
+```
+From this definition, we can see... TODO: repeat information from the metabolite definition
+
+These examples showed a few quirks of SBML files written by COBRApy, including ID prefixes and escaped characters.
+In the example reaction, the ID was `R_octanoyl_xfer` and the example metabolite's ID was `M_cpd00443_c0`. However if you were to read this model into COBRApy and look for the same IDs, you would not find them, instead you would find a reaction `octanoyl_xfer` and a metabolite `cpd00443_c0`. This is because COBRApy adds prefixes to each ID: `R_` for reactions, `M_` for metabolites, and `G_` for genes, and then strips them when actually reading the file.
+These prefixes are added to ensure that IDs will satisfy all requirements from SBML, mainly that SBML IDs must begin with a letter or underscore, and that SBML IDs have to unique across the whole document (i.e., not just within the metabolites or reactions). By adding `R_` or `M_` this ensures that even the same ID for a metabolite and a reaction are still different, and that they begin with a letter.
+In the example reaction, `R_octanoyl_xfer` is associated with the `geneProduct` "G_WP_049588698__46__1". The `__46__` may look malformed or like corrupted code, but it represents a period. SBML IDs can't contain periods, so COBRApy encodes them as `__` plus the ASCII code (46=`.`). `G_WP_049588698__46__1` is really `WP_049588698.1`.
 
 ## The Continuous Curation Loop
 
