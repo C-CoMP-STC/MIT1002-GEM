@@ -190,23 +190,43 @@ if __name__ == '__main__':
     unittest.main()
 ```
 
-TODO: How to run this test and what the output are
-To run our tests, we run the test file with python, e.g., from the directory where this test is saved, run:
+To run our tests, we run the test file with python:
 ```bash
-python test_hello.py
+python -m unittest
 ```
 
 And in the terminal we receive the following test output:
 ```
-TODO
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.000s
+
+OK
 ```
 
 In the case of a test failing, the test output would look like:
 ```
-TODO
-```
+F.
+======================================================================
+FAIL: test_helen (tests.test_hello.TestHello.test_helen)
+Test that hello prints the expected message for the name Helen
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/helenscott/Documents/PhD/Segre-lab/hello/tests/test_hello.py", line 16, in test_helen
+    self.assertEqual(message, 'Hello, Helen!')
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 'Hi, Helen!' != 'Hello, Helen!'
+- Hi, Helen!
+?  ^
++ Hello, Helen!
+?  ^^^^
 
-Once you have multiple tests, you can also set up TODO... so that all your tests run simultaneously, with jsut the command `TODO`, rather than needing to run each file individually. 
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.001s
+
+FAILED (failures=1)
+```
 
 #### Assert Statements
 
@@ -302,7 +322,6 @@ Since we are starting in a totally blank virtual machine, the first few steps ar
 
 First we muse check out the repository, so our virtual machine has all of the code on our repo. Because this is such a common task, there is a published action, `checkout`, that we can call that will handle all of the necessary sub-steps to checkout our repository.
 Then we install a specific version of Python to our virtual machine. Specifying the version of python, rather than using the latest version is good, because it won't drift as Python is updated, so things won't break.
-Then we can install our specific dependencies, in this case the python library `pytest`
 ```yaml
     steps:
       # Copy the repository onto that machine
@@ -312,32 +331,40 @@ Then we can install our specific dependencies, in this case the python library `
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-
-      # Install what the tests need
-      - name: Install dependencies
-        run: pip install pytest
 ```
 
 The final step is to actually run the tests as we did locally before:
 ```yaml
       # Run them
       - name: Run tests
-        run: pytest
+        run: python -m unittest
 ```
 
 When we push to our repository, and this test runs, we can see the workflow running in the Actions tab:
-![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively running.]()
 
-When we look at the individual run of the workflow, we can see our named job, `test`, in the case of a workflow with multiple jobs, this diagram would have more boxes.
-![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of thw workflow in the files job(s), in this case the single job, `test`.]()
+![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively running.](./figures/png/github-actions-names.png)
 
 And when the workflow is complete we get a clear if your test passed or failed:
-![The total run as a pass or a fail on the main Actions page. A green check indicates that the workflow did not encounter any errors. A red X would indicate that the workflow failed. Note the workflow could fail for reasons other than the tests failing, e.g., an error in setting up the virtual environment.]()
+
+![The total run as a pass or a fail on the main Actions page. A green check indicates that the workflow did not encounter any errors. A red X would indicate that the workflow failed. Note the workflow could fail for reasons other than the tests failing, e.g., an error in setting up the virtual environment.](./figures/png/github-action-jobs-pass.png)
+
+When we look at the individual run of the workflow, we can see our named job, `test`, in the case of a workflow with multiple jobs, this diagram would have more boxes.
+
+![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of thw workflow in the files job(s), in this case the single job, `test`.](./figures/png/github-action-jobs-fail.png)
 
 And can see the full test output:
-![The full test output (the same as what you see in the terminal when running tests locally) is shown in the logs for each run.]()
+
+![The full test output (the same as what you see in the terminal when running tests locally) is shown in the logs for each run.](./figures/png/github-action-steps-pass.png)
 
 Running tests as part of a workflow is very helpful, because your tests will run with every change, you never need to run the tests yourself, or count on other people running them.
+
+
+If our test were failing:
+![](./figures/png/github-test-failed.png)
+
+![](./figures/png/github-action-jobs-fail.png)
+
+![](./figures/png/github-action-steps-fail.png)
 
 ## Setting-Up a GEM Repository
 Having established the pre-requisite knowledge of using GitHub, and writing/running tests and workflows. This section will now walk you through how to set up a GitHub repository specifically for a "continuously curated" GEM.
