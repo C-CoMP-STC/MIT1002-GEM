@@ -108,7 +108,7 @@ def set_plot_style(g, color="gray"):
             text.set_color(color)
 
 
-def carbon_fates_bar(data, byproduct_colors=None, ax=None):
+def carbon_fates_bar(data, byproduct_colors=None, ax=None, legend_min_fraction=0.0):
     """Stacked bar plot of the fate of carbon: biomass, organic byproducts, CO2.
 
     By default `data` must have exactly the columns "biomass", "organic_c",
@@ -125,6 +125,12 @@ def carbon_fates_bar(data, byproduct_colors=None, ax=None):
 
     Pass `ax` to draw into an existing Axes (e.g. one from a figure with a
     custom size); by default pandas makes a new figure.
+
+    Pass `legend_min_fraction` to leave out of the legend any segment that is
+    too thin to see: a column is only listed if its largest value is at least
+    this fraction of the tallest bar. The segment is still drawn, so the bars
+    keep their true heights. Because the cutoff is relative to the tallest
+    bar, it works the same for raw and normalized fluxes.
     """
     if byproduct_colors is not None:
         # Check that the required columns are present
@@ -161,13 +167,22 @@ def carbon_fates_bar(data, byproduct_colors=None, ax=None):
         color=colors,
         ax=ax,
     )
+    # Only list the segments that are big enough to see somewhere in the plot
+    cutoff = legend_min_fraction * data.sum(axis=1).max()
+    handles = g.get_legend_handles_labels()[0]
+    visible = [
+        (handle, label)
+        for handle, label, col in zip(handles, custom_labels, data.columns)
+        if data[col].abs().max() >= cutoff
+    ]
     # Move the legend outside of the plot
     lgd = g.legend(
+        [handle for handle, _ in visible],
+        [label for _, label in visible],
         bbox_to_anchor=(1.25, 0.5),
         loc="center right",
         borderaxespad=0.0,
         ncol=1,
-        labels=custom_labels,
     )
     # Make the legend text gray too
     for text in lgd.get_texts():

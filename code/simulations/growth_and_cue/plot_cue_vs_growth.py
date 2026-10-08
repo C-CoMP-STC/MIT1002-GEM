@@ -106,6 +106,11 @@ OTHER_BYPRODUCT_COLOR = "#B0B0B0"
 # O2 uptake bounds to make the across-substrate carbon fates figures for
 ACROSS_SUBSTRATE_O2_BOUNDS = [20, 50]
 
+# Carbon fates segments thinner than this fraction of the tallest bar can't
+# be seen in the figure (0.5% is ~0.3 mmol C/gDW/h of a 60 mmol C bar), so
+# they are left out of the legend. They are still drawn.
+LEGEND_MIN_FRACTION = 0.005
+
 
 def build_ex_name_map(model) -> dict:
     """Map exchange reaction id -> readable metabolite name.
@@ -229,16 +234,20 @@ def main():
     # Plot the carbon fates (biomass, organic byproducts, CO2) of every
     # substrate side by side, one figure per O2 uptake bound. O2 = 50 is above
     # every substrate's saturating O2 uptake, so it stands in for unlimited O2;
-    # O2 = 20 is limiting for most of the panel.
+    # O2 = 20 is limiting for most of the panel. Each is made twice: as carbon
+    # flux, and normalized to each substrate's carbon uptake.
     for o2_bound in ACROSS_SUBSTRATE_O2_BOUNDS:
-        plot_carbon_fates_across_substrates(
-            merged_df,
-            o2_bound,
-            ex_name_map,
-            byproduct_palette,
-            OUT_PATH,
-            f"carbon_fates_across_substrates_o2_{o2_bound:g}",
-        )
+        for normalize in [False, True]:
+            suffix = "_normalized" if normalize else ""
+            plot_carbon_fates_across_substrates(
+                merged_df,
+                o2_bound,
+                ex_name_map,
+                byproduct_palette,
+                OUT_PATH,
+                f"carbon_fates_across_substrates_o2_{o2_bound:g}{suffix}",
+                normalize=normalize,
+            )
 
     # Make carbon fate plots for each substrate
     for met in pre_set_df["substrate"].unique():
@@ -259,7 +268,11 @@ def main():
         # Subset the columns needed for the plot
         met_df = pd.concat([met_df[["biomass"]], byp_df, met_df[["co2"]]], axis=1)
         # Make the plot
-        g = carbon_fates_bar(met_df, byproduct_colors=byproduct_palette)
+        g = carbon_fates_bar(
+            met_df,
+            byproduct_colors=byproduct_palette,
+            legend_min_fraction=LEGEND_MIN_FRACTION,
+        )
         # Set the title to be something specific to the metabolite
         g.set_title(f"Carbon Fates for {met}")
         # Set the x axis label to be more descriptive
@@ -294,7 +307,11 @@ def main():
         # Subset the columns needed for the plot
         met_df = pd.concat([met_df[["biomass"]], byp_df, met_df[["co2"]]], axis=1)
         # Make the plot
-        g = carbon_fates_bar(met_df, byproduct_colors=byproduct_palette)
+        g = carbon_fates_bar(
+            met_df,
+            byproduct_colors=byproduct_palette,
+            legend_min_fraction=LEGEND_MIN_FRACTION,
+        )
         # Set the title to be something specific to the metabolite
         g.set_title(f"Carbon Fates for {met}")
         # Set the x axis label to be more descriptive
@@ -397,6 +414,7 @@ def plot_carbon_fates_across_substrates(
     byproduct_palette: dict,
     out_path: Path,
     filename: str,
+    normalize: bool = False,
 ) -> None:
     """Stacked carbon fates bar for every substrate at one O2 uptake bound.
 
@@ -406,7 +424,15 @@ def plot_carbon_fates_across_substrates(
 
     Because total carbon uptake is fixed, each bar sums to the uptake, the
     biomass segment is proportional to growth rate, and CUE is everything
-    except the CO2 segment as a fraction of the bar."""
+    except the CO2 segment as a fraction of the bar.
+
+    With `normalize`, each bar is divided by its own total, so the y axis is
+    the fraction of that substrate's carbon uptake going to each fate. The
+    total is used as the uptake because carbon is balanced: across every
+    substrate and O2 level in growth_and_cue.csv the fates add up to the
+    uptake (from exchange_fluxes.csv) to within 0.05%, which is rounding. This matters at
+    limiting O2, where some substrates (e.g. Acetate, Tyrosine and Phenol at
+    O2 = 20) take up less than the 60 mmol C/gDW/h allowed."""
     # Subset to the requested O2 bound (bounds are floats, so don't use ==)
     df = summary_df[np.isclose(summary_df["o2_bound"], o2_bound)]
     if df.empty:
@@ -424,9 +450,16 @@ def plot_carbon_fates_across_substrates(
         ],
         axis=1,
     )
+    if normalize:
+        fates_df = fates_df.div(fates_df.sum(axis=1), axis=0)
 
     fig, ax = plt.subplots(figsize=(11, 5))
-    carbon_fates_bar(fates_df, byproduct_colors=byproduct_palette, ax=ax)
+    carbon_fates_bar(
+        fates_df,
+        byproduct_colors=byproduct_palette,
+        ax=ax,
+        legend_min_fraction=LEGEND_MIN_FRACTION,
+    )
     # Keep the legend entries carbon_fates_bar made, but move the legend in
     # closer since this figure is much wider than the per-substrate ones
     old_legend = ax.get_legend()
@@ -443,7 +476,11 @@ def plot_carbon_fates_across_substrates(
     ax.set_title(
         f"Carbon fates across substrates (Oxygen Uptake Bound = {o2_bound:g})"
     )
-    ax.set_ylabel("Carbon Flux (mmol C/gDW/h)")
+    if normalize:
+        ax.set_ylabel("Fraction of Carbon Uptake")
+        ax.set_ylim(0, 1)
+    else:
+        ax.set_ylabel("Carbon Flux (mmol C/gDW/h)")
     ax.set_xlabel("")
     ax.set_xticklabels(df.index, rotation=45, ha="right")
     ax.margins(x=0.01)
