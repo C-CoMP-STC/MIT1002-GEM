@@ -2,6 +2,7 @@ import ast
 import re
 import sys
 from pathlib import Path
+from typing import Optional
 
 import cobra
 import matplotlib
@@ -105,6 +106,10 @@ OTHER_BYPRODUCT_COLOR = "#B0B0B0"
 
 # O2 uptake bounds to make the across-substrate carbon fates figures for
 ACROSS_SUBSTRATE_O2_BOUNDS = [20, 50]
+# Every across-substrate figure orders the substrates by their growth rate at
+# this O2 bound (unlimited O2), so the bars line up between figures and the
+# effect of O2 limitation can be read bar by bar
+SUBSTRATE_ORDER_O2_BOUND = 50
 
 # Carbon fates segments thinner than this fraction of the tallest bar can't
 # be seen in the figure (0.5% is ~0.3 mmol C/gDW/h of a 60 mmol C bar), so
@@ -236,6 +241,10 @@ def main():
     # every substrate's saturating O2 uptake, so it stands in for unlimited O2;
     # O2 = 20 is limiting for most of the panel. Each is made twice: as carbon
     # flux, and normalized to each substrate's carbon uptake.
+    order_df = merged_df[np.isclose(merged_df["o2_bound"], SUBSTRATE_ORDER_O2_BOUND)]
+    substrate_order = order_df.sort_values("growth_rate", ascending=False)[
+        "substrate"
+    ].tolist()
     for o2_bound in ACROSS_SUBSTRATE_O2_BOUNDS:
         for normalize in [False, True]:
             suffix = "_normalized" if normalize else ""
@@ -246,6 +255,7 @@ def main():
                 byproduct_palette,
                 OUT_PATH,
                 f"carbon_fates_across_substrates_o2_{o2_bound:g}{suffix}",
+                substrate_order=substrate_order,
                 normalize=normalize,
             )
 
@@ -414,13 +424,15 @@ def plot_carbon_fates_across_substrates(
     byproduct_palette: dict,
     out_path: Path,
     filename: str,
+    substrate_order: Optional[list] = None,
     normalize: bool = False,
 ) -> None:
     """Stacked carbon fates bar for every substrate at one O2 uptake bound.
 
     Same segments, colours and stacking order as the per-substrate plots in
     figures/carbon_fates/ (biomass, then organic byproducts, then CO2). Bars
-    are sorted by growth rate, highest first.
+    follow `substrate_order` if given (so several figures can share one
+    order), otherwise they are sorted by growth rate, highest first.
 
     Because total carbon uptake is fixed, each bar sums to the uptake, the
     biomass segment is proportional to growth rate, and CUE is everything
@@ -437,8 +449,14 @@ def plot_carbon_fates_across_substrates(
     df = summary_df[np.isclose(summary_df["o2_bound"], o2_bound)]
     if df.empty:
         raise ValueError(f"No results for O2 uptake bound = {o2_bound}")
-    # Sort by growth rate, highest first, and index by substrate name
+    # Index by substrate name, in the requested order or by growth rate
     df = df.sort_values("growth_rate", ascending=False).set_index("substrate")
+    if substrate_order is not None:
+        missing = set(df.index) - set(substrate_order)
+        if missing:
+            raise ValueError(f"Substrates missing from substrate_order: {missing}")
+        # Substrates that didn't grow at this O2 bound are simply left out
+        df = df.loc[[sub for sub in substrate_order if sub in df.index]]
 
     # Build the carbon fates table the same way as the per-substrate plots
     byp_df = carbon_fates_byproduct_columns(df, ex_name_map, byproduct_palette)
