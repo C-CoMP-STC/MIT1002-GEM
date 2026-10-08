@@ -39,6 +39,10 @@ from tools.plot_styles import (
     summer_colors,
 )
 
+# The carbon uptake bound every substrate is given, from the simulation script
+# so the two can't drift apart
+from run_growth_cue import TOTAL_UPTAKE  # noqa: E402
+
 # Global figure style (font, sizes, vector text) -- must run before any
 # figure or axes is created, see set_manuscript_style's docstring.
 set_manuscript_style()
@@ -115,6 +119,15 @@ SUBSTRATE_ORDER_O2_BOUND = 50
 # be seen in the figure (0.5% is ~0.3 mmol C/gDW/h of a 60 mmol C bar), so
 # they are left out of the legend. They are still drawn.
 LEGEND_MIN_FRACTION = 0.005
+
+# On the normalized carbon fates figures every bar is 1.0, which hides that
+# some substrates don't take up all the carbon available (TOTAL_UPTAKE).
+# Substrates whose uptake is below this fraction of TOTAL_UPTAKE get
+# UPTAKE_LIMITED_MARK after their name, with a note explaining it. The
+# fully-supplied substrates sit at TOTAL_UPTAKE to within rounding (0.05%),
+# so 99% cleanly separates the two.
+UPTAKE_LIMITED_FRACTION = 0.99
+UPTAKE_LIMITED_MARK = "\u2020"  # dagger
 
 
 def build_ex_name_map(model) -> dict:
@@ -442,9 +455,11 @@ def plot_carbon_fates_across_substrates(
     the fraction of that substrate's carbon uptake going to each fate. The
     total is used as the uptake because carbon is balanced: across every
     substrate and O2 level in growth_and_cue.csv the fates add up to the
-    uptake (from exchange_fluxes.csv) to within 0.05%, which is rounding. This matters at
-    limiting O2, where some substrates (e.g. Acetate, Tyrosine and Phenol at
-    O2 = 20) take up less than the 60 mmol C/gDW/h allowed."""
+    uptake (from exchange_fluxes.csv) to within 0.05%, which is rounding.
+    This matters at limiting O2, where some substrates (e.g. Acetate,
+    Tyrosine and Phenol at O2 = 20) take up less than the TOTAL_UPTAKE
+    allowed. Normalizing hides that, so on the normalized figure those
+    substrates are marked with UPTAKE_LIMITED_MARK and a note."""
     # Subset to the requested O2 bound (bounds are floats, so don't use ==)
     df = summary_df[np.isclose(summary_df["o2_bound"], o2_bound)]
     if df.empty:
@@ -468,8 +483,12 @@ def plot_carbon_fates_across_substrates(
         ],
         axis=1,
     )
+    # Total carbon taken up by each substrate, and which ones take up less
+    # than they were given
+    uptake = fates_df.sum(axis=1)
+    uptake_limited = uptake < UPTAKE_LIMITED_FRACTION * TOTAL_UPTAKE
     if normalize:
-        fates_df = fates_df.div(fates_df.sum(axis=1), axis=0)
+        fates_df = fates_df.div(uptake, axis=0)
 
     fig, ax = plt.subplots(figsize=(11, 5))
     carbon_fates_bar(
@@ -500,8 +519,28 @@ def plot_carbon_fates_across_substrates(
     else:
         ax.set_ylabel("Carbon Flux (mmol C/gDW/h)")
     ax.set_xlabel("")
-    ax.set_xticklabels(df.index, rotation=45, ha="right")
+    # Mark the uptake-limited substrates, but only where normalizing hides it;
+    # on the raw flux figure the shorter bar already shows it
+    mark = normalize & uptake_limited
+    tick_labels = [
+        f"{sub}{UPTAKE_LIMITED_MARK}" if mark[sub] else sub for sub in df.index
+    ]
+    ax.set_xticklabels(tick_labels, rotation=45, ha="right")
     ax.margins(x=0.01)
+    if mark.any():
+        ax.text(
+            1.02,
+            0,
+            f"{UPTAKE_LIMITED_MARK} Takes up less than\n"
+            f"the {TOTAL_UPTAKE:g} mmol C/gDW/h\n"
+            "of carbon available",
+            transform=ax.transAxes,
+            ha="left",
+            va="bottom",
+            fontsize="small",
+            color="gray",
+        )
+        print(f"  Uptake-limited: {', '.join(df.index[mark])}")
 
     # Grey text to match the per-substrate carbon fates plots
     set_plot_style(ax)
