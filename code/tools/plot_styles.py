@@ -108,7 +108,7 @@ def set_plot_style(g, color="gray"):
             text.set_color(color)
 
 
-def carbon_fates_bar(data, byproduct_colors=None):
+def carbon_fates_bar(data, byproduct_colors=None, ax=None):
     """Stacked bar plot of the fate of carbon: biomass, organic byproducts, CO2.
 
     By default `data` must have exactly the columns "biomass", "organic_c",
@@ -122,6 +122,9 @@ def carbon_fates_bar(data, byproduct_colors=None):
     the same palette can be reused across substrates that release different
     byproducts). Passing the same `byproduct_colors` dict across multiple
     calls keeps a given byproduct's color consistent across figures.
+
+    Pass `ax` to draw into an existing Axes (e.g. one from a figure with a
+    custom size); by default pandas makes a new figure.
     """
     if byproduct_colors is not None:
         # Check that the required columns are present
@@ -156,9 +159,10 @@ def carbon_fates_bar(data, byproduct_colors=None):
         kind="bar",
         stacked=True,
         color=colors,
+        ax=ax,
     )
     # Move the legend outside of the plot
-    lgd = plt.legend(
+    lgd = g.legend(
         bbox_to_anchor=(1.25, 0.5),
         loc="center right",
         borderaxespad=0.0,
