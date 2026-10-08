@@ -474,7 +474,7 @@ def plot_carbon_fates_across_substrates(
         loc="upper left",
     )
     ax.set_title(
-        f"Carbon fates across substrates (Oxygen Uptake Bound = {o2_bound:g})"
+        f"Carbon Fates Across Substrates (Oxygen Uptake Bound = {o2_bound:g} mmol/gDW/h)"
     )
     if normalize:
         ax.set_ylabel("Fraction of Carbon Uptake")
