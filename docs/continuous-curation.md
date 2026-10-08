@@ -81,7 +81,7 @@ You will be actively working on your local repository, and periodically syncing 
 `commit` is done locally, to save your changes, along with a "commit message". Each commit has a hash, so you refer to the exact version of the code. Commits also track who makes the commit and when. So all changes are attributable.
 Because commits flag specific versions in the code, it is recommended to commit often (i.e., multiple times a day), and to leave a helpful commit message so if you are going back through your commit history you will know what version is which.
 
-![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.]() TODO: Take screenshot and add path
+![A screenshot of the MIT1002-GEM Commit history. You can see the commit message for each commit, along with the hash. From this page, you can browse the code at each commit, so you can see exactly what the code was at that time.](./figures/png/github-commits.png)
 
 `push` syncs all of the commits that have been made to your local repository to the remote repository. Making all of your changes available on GitHub to other people. It is not necessary to push every commit individually, but you should push regularly, especially when working as a group so that your version is not significantly ahead of other people's copies. One maxim is to "Commit often, push daily".
 
@@ -90,7 +90,9 @@ Because commits flag specific versions in the code, it is recommended to commit 
 Pushing and pulling frequently ensures that your local copy is never too far ahead or behind the remote repository.
 
 We will not discuss here the mechanics of how to make a repository or execute commands, for that see one of the many available Git tutorials, for your chosen platform, e.g.:
-* TODO
+* [GitHub Hello World Tutorial](https://docs.github.com/en/get-started/using-github/hello-world)
+* [GitHub Desktop Tutorial](https://docs.github.com/en/desktop/overview/getting-started-with-github-desktop)
+* [GitHub in VSCode](https://code.visualstudio.com/docs/sourcecontrol/github)
 
 #### Diffs
 A diff (short for difference) is a visual way to see the changes made to a file.
@@ -109,7 +111,7 @@ For example, if you edit one row in an excel file, and commit the change, the di
     * File types to avoid
         * Microsoft office files: e.g., xlsx
 
-![An example of diffs for an excel file (top), and a CSV file (bottom). ](./figures/png/diff-excel-vs-csv.png)
+![An example of diffs for an excel file (top), and a CSV file (bottom).](./figures/png/diff-excel-vs-csv.png)
 
 For a more in depth coverage, see [@chacon2014progit].
 
@@ -124,10 +126,13 @@ A Pull Request is a request to merge two branches, that can be commented on or r
 
 ### Unit Tests
 It is a truth universally acknowledged that not all code is equally good.
-Code may have bugs, or have unexpected behaviors.
-One way to guard your code against bugs is to write and regularly run tests for your code.
+Code may have bugs, or have unexpected behaviors, or may be written in such a way that it is inflexible to changes/additions, and difficult to maintain or use.
+One way to guard your code against such issues is to write and regularly run tests for your code.
 
 Unit tests are a common software development practice in which the smallest individual parts of the code (called units) are individually tested, to ensure each gives the expected outcome, and are considered critical to the success of any software development project.
+
+Far from being an after-thought or nice addition to code, unit tests should be thought of as equally important to your "production code" (your code that actually runs your new program or is run by end users). Tests should be clean, documented, and maintained.
+While there is a time and effort cost when it comes to designing, writing, and maintaining tests, the ability to find and diagnose problems is valuable enough to be worth it.
 
 #### Python Example
 Here we will show a step by step example for how to write a test for a python function.
@@ -244,30 +249,39 @@ This example used two different assert statements, `assertEqual` and `assertRais
 |`assertIsNone` | Checks that an object is `None` |
 |`assertRaises` | Checks that exception of specified class is raised |
 
-#### What makes a Good Unit Test?
-When writing tests for your code, keep in mind the following rules [@meszaros2007xunit,@martin2008clean].
-1. Tests must give a clear pass/fail.
-Your test should be self-validating, meaning that a human does not need to look at the output to decide if the fail passed or not. This results in each test giving a boolean (True/False) result.
-2. Tests should fail for one specific reason
-TODO: Check this
-Write your tests so that they fail for one reason only, if your test asserts multiple things, when the test fails you won't know which one failed, only that something did.
-3. Tests should be fast
-Tests are designed to be run often and running them should not be a burden. If a test is slow, there is a high likelihood that people will skip the test, and a test that doesn't get run is no good to anyone. If the function you are testing is designed to work on  large data types (e.g., sequencing data), you can make a mock smaller version of the data for the test rather than running on a real example.
-4. The outcome of a test must be repeatable
-Your test must work the same every time, regardless of who is running it, where or when they are running it. If your test or the code it is testing relies on randomness set a seed, so that the test will use the same number every time. A test that sometimes passes and sometimes fails for no real reason, will train people to ignore it or just keep rerunning it until it passes.
-5. Tests should be independent
-Each test should be able to pass or fail independently, and not depends on another's state or on run order.
-6. No logic in the test
-Conditionals and loops inside a test can themselves be buggy, and then you're debugging your test
-7. Test Behavior, not implementation
-You want your test to test the outcome of a function, not how the function is written. If you refactor or re-write the function, your test shouldn't break just because the function is different.
-8. Tests have clear names
-Test should have a name that says what broke without opening the file.
+#### Good Tests come F.I.R.S.T.
+When writing tests for your code, keep in mind the following acronym [@martin2008clean].
 
-| Example of good unit tests | Example of bad unit tests|
+**F: Fast**
+
+Tests are designed to be run often and running them should not be a burden. If a test is slow, there is a high likelihood that people will skip the test, and a test that doesn't get run is no good to anyone. If the function you are testing is designed to work on  large data types (e.g., sequencing data), you can make a mock smaller version of the data for the test rather than running on a real example.
+
+**I: Independent**
+
+Each test should be able to pass or fail independently, and not depends on another's state or on run order.
+
+**R: Repeatable**
+
+Your test must work the same every time, regardless of who is running it, where or when they are running it. If your test or the code it is testing relies on randomness set a seed, so that the test will use the same number every time. A test that sometimes passes and sometimes fails for no real reason, will train people to ignore it or just keep rerunning it until it passes.
+
+**S: Self-Validating**
+
+Your test should be self-validating, meaning that a human does not need to look at the output to decide if the fail passed or not. This results in each test giving a boolean (True/False) result.
+
+**T: Timely**
+Tests should be written in a "timely" manner, meaning that unit tests should be written immediately before writing the code/function they are testing.
+While writing a test before there is something to test seems counter intuitive, it is the core principle of Test-Driven Development (TDD) [@beck2003test].
+In this system, you initially write a test that **will** fail, because it has no function/code to actually call. And then write the minimal function needed to pass that test. Before adding any additional functionality to the function/code you must first write a test that could fail.
+
+While test-driven development has been long discussed, it is not universally used, and in the case of model curation it is not necessarily clear that you can write a test before model curation.
+
+You can think of the data your model is trying to recreate (e.g., growth phenotypes) as a form of TDD. In normal software engineering, the developer can define what the function/code should be doing, but for a model, the curator can not serve as an oracle, but instead requires validation data.
+
+| Example of bad unit tests | Example of unit unit tests|
 |----------------------------|--------------------------|
-|Test that a script generate the correct data and saves a plot with the correct path | Generate a figure, that you need to look at |
-| | A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)|
+| Generate a figure, that you need to look at | Test that a script generate the correct data and saves a plot with the correct path |
+| A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)| |
+| TODO | TODO |
 
 Here we showed tests being run manually, where a developer would need to run `python -m unittest` on their own computer and verify that all the tests pass. To ensure that tests and never forgotten, or that a failure is missed, tests can also be run automatically (e.g., as part of a workflow on GitHub Actions).
 
@@ -296,7 +310,7 @@ Then we define what will trigger this Action to run. For this example, we will s
 on: push
 ```
 
-Other possible triggers for a workflow are: `schedule`, to run on a specific schedule (e.g., every day, and `workflow_dispatch`, to run only manually triggered with a button. For a complete list of the workflow triggers see TODO.
+Other possible triggers for a workflow are: `schedule`, to run on a specific schedule (e.g., every day, and `workflow_dispatch`, to run only manually triggered with a button. For a complete list of the workflow triggers see the [GitHub Actions documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows).
 
 The next section in the workflow file, `jobs`, defines the actual work done in the workflow. There can be one or more jobs that can run sequentially or in parallel.
 
@@ -307,7 +321,7 @@ jobs:
 ```
 
 Within `test`, we first define the computer environment that this job will be run in.
-GitHub Actions run on a "Virtual Machine" on GitHub servers, TODO: what does this even mean
+GitHub Actions run on a "Virtual Machine" on GitHub servers that function like a completely fresh computer where you can install any tools or software you need isolated from the rest of the actual host hardware.
 This environment starts totally clean every time, so you can always test what it would be like to start on a totally new computer, this is good because you know exactly what needs to be done/installed (you never have a "well it runs on my machine" moment), but it does mean you need to set it up with every run.
 We will use a specific version of the Linux environment "ubuntu":
 ```yaml
@@ -350,21 +364,26 @@ And when the workflow is complete we get a clear if your test passed or failed:
 
 When we look at the individual run of the workflow, we can see our named job, `test`, in the case of a workflow with multiple jobs, this diagram would have more boxes.
 
-![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of thw workflow in the files job(s), in this case the single job, `test`.](./figures/png/github-action-jobs-fail.png)
+![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of the workflow in the files job(s), in this case the single job, `test`.](./figures/png/github-action-jobs-fail.png)
 
 And can see the full test output:
 
-![The full test output (the same as what you see in the terminal when running tests locally) is shown in the logs for each run.](./figures/png/github-action-steps-pass.png)
+![Screenshot of the full test output (the same as what you see in the terminal when running tests locally) shown in the logs for each run.](./figures/png/github-action-steps-pass.png)
 
 Running tests as part of a workflow is very helpful, because your tests will run with every change, you never need to run the tests yourself, or count on other people running them.
 
 
-If our test were failing:
-![](./figures/png/github-test-failed.png)
+If our test were failing, you would instead see a red "X" when the workflow is complete.
 
-![](./figures/png/github-action-jobs-fail.png)
+![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively having failed upon the new push to the repo "Demo: break hello() so the Test-Hello workflow fails. A failed workflow is marked with a Red "X" to the left of the commit message.](./figures/png/github-test-failed.png)
 
-![](./figures/png/github-action-steps-fail.png)
+And in the case of a workflow with multiple jobs, you can pinpoint which job was failing.
+
+![Screenshot of the display for the failing run of `Test-Hello` that shows that the job `test` has failed by marking it with a red "X".](./figures/png/github-action-jobs-fail.png)
+
+And as before, you can see the full test output, which will now show you which test was failing and why:
+
+![Screenshot of the test output for the failing run of `Test-Hello` shows that the `test_helen` function failed as it returned the string "Hi, Helen!" instead of "Hello, Helen!" ](./figures/png/github-action-steps-fail.png)
 
 ## Setting-Up a GEM Repository
 Having established the pre-requisite knowledge of using GitHub, and writing/running tests and workflows. This section will now walk you through how to set up a GitHub repository specifically for a "continuously curated" GEM.
@@ -382,7 +401,7 @@ Monk and Lloyd the two first authors of the related paper, and iJO1366 is by Jef
 
 While this naming is very descriptive, it is inherently a snapshot, and would have to be continuously updated as the model evolved. For example, every time you add or remove a gene you would need to change the number, and as new curators contribute to the model or take over, the author list may expand or change. It also does not capture how models are related. For example, from the name it is unclear if iML1515 is a revised and expanded version of iJO1366 or of it was a whole new *E. coli* that was built independently.
 
-With the standard-GEM format, the model name is now only organism specific, and so will remain accurate as the model is updated. Discrete versions of the model (e.g., Human-GEM TODO: get real numbers) can capture the snapshot of the model in time without losing track of how model versions are related.
+With the standard-GEM format, the model name is now only organism specific, and so will remain accurate as the model is updated. Discrete versions of the model (e.g., Human-GEM 2.0.0) can capture the snapshot of the model in time without losing track of how model versions are related.
 
 ### Branching Strategy
 By default GitHub will create a single branch called `main`. We will also immediately create a second branch, called `develop`.
@@ -469,6 +488,7 @@ While most of the time, you don't need to read an SBML file directly, as you wor
 
 SBML looks can look intimidating at first, but the format is straight forward once you learn a few mechanics of the file.
 
+TODO: I struggled a bit with the correct terminology- are things tags or elements? Are elements tags? Is the tag just the name of an element?
 SBML, like all XML files is comprised of a series of tags. TODO: Is this true?
 A tag is contains a series of information and is bracketed by an opening and closing statement, defining the tags type.
 For example, a tag called "species" is written as `<species> ... </species>`.
@@ -506,7 +526,7 @@ SBML files of GEMs have many different types of tags, the table below includes s
 | `<fbc:listOfObjectives>` | what FBA maximizes |
 | `<fbc:listOfGeneProducts>` | genes |
 
-To read and understand XML and SBML files, the key thing (TODO: find a better word) to understand is that tags do not contain all of their related information, instead they point at other tags. For example, in a GEM, a `reaction` tag will contain all of the `metabolite` tags that are involved in it, instead, `reaction` points at other `metabolite` objects. The `reaction` tag for "Octanoyl transferase" may look like:
+To read and understand XML and SBML files, the key thing to understand is that tags do not contain all of their related information, instead they point at other tags. For example, in a GEM, a `reaction` tag will contain all of the `metabolite` tags that are involved in it, instead, `reaction` points at other `metabolite` objects. The `reaction` tag for "Octanoyl transferase" may look like:
 ```xml
 <reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
     fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
@@ -524,11 +544,11 @@ To read and understand XML and SBML files, the key thing (TODO: find a better wo
 ```
 The metabolites involved in the reaction are included in `listOfReactants` and `listOfProducts`, but the metabolites themselves are not defined there, instead the chile tag `speciesReference` points to the metabolite definition, by using the same ID in `species` as a metabolite.
 For the "Octanoyl transferase", the `listOfReactants` has only one `speciesReference`, and its ID for `species` is "M_cpd11470_c0". Within `listOfSpecies`, one `species` tag has that ID, it's full definition is as follows:
-```xml TODO: Use cpd11470
-<species id="M_cpd00443_c0" name="Octanoyl-ACP" compartment="c0"
-    fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS" .../>
+```xml
+<species metaid="meta_M_cpd11470_c0" sboTerm="SBO:0000247" id="M_cpd11470_c0" name="Octanoyl-ACP" compartment="c0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false" fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS">
+</species>
 ```
-From this definition, we can see... TODO: repeat information from the metabolite definition
+From this definition, we can see that `M_cpd11470_c0` refers to "Octanoyl-ACP", and other attributes give the compartment, charge, and formula.
 
 These examples showed a few quirks of SBML files written by COBRApy, including ID prefixes and escaped characters.
 In the example reaction, the ID was `R_octanoyl_xfer` and the example metabolite's ID was `M_cpd00443_c0`. However if you were to read this model into COBRApy and look for the same IDs, you would not find them, instead you would find a reaction `octanoyl_xfer` and a metabolite `cpd00443_c0`. This is because COBRApy adds prefixes to each ID: `R_` for reactions, `M_` for metabolites, and `G_` for genes, and then strips them when actually reading the file.
@@ -889,6 +909,7 @@ This is a summary of established best practices, not new to us [@taschuk2017ten,
 * **Pull**: The process of integrating changes from one version of a repository to another (e.g. from a fork back to the original repo, or from a branch back to the main branch). There are two general use cases: 1) When the owner of a repository makes changes to it, you pull those changes into your local copy. 2) When you make changes to a forked repository or a branch of a repository and want to incorporate the changes back to the original repo or branch, you initiate a pull request, and then whoever is in charge of the original repository can pull those changes in  [^harvard].
 * **Pull Request**: Pull requests are proposed changes to a repository submitted by a user and accepted or rejected by a repository's collaborators [^gh-glossary].
 * **Push**: To push means to send your committed changes to a remote repository on GitHub.com. For instance, if you change something locally, you can push those changes so that others may access them [^gh-glossary].
+* **Production Code**:
 * **Release**:
   * *In software engineering*:
   * *In continuous curation*:
@@ -909,6 +930,7 @@ This is a summary of established best practices, not new to us [@taschuk2017ten,
 * **Test**:
   * *In software engineering*:
   * *In continuous curation*:
+* **Test-Driven Development**:
 * **Trunk-Based Development**:
 * **Version Control**: The process of tracking changes to files over time, allowing you to recall specific versions later [^harvard].
 * **XML**:
