@@ -87,6 +87,13 @@ summer_colors = {
 }
 
 
+# "CO2" with a real subscript 2. Uses the Unicode subscript character (U+2082)
+# rather than mathtext ("CO$_2$"): Source Sans 3 and Myriad Pro both draw
+# that glyph, so it matches the surrounding text, whereas mathtext would
+# typeset it in a different font unless mathtext.fontset is overridden.
+CO2_LABEL = "CO\u2082"
+
+
 # Define the style for the plots (gray axes, no top or right axis lines)
 def set_plot_style(g, color="gray"):
     # Make the axis lines the defined color
@@ -148,7 +155,7 @@ def carbon_fates_bar(data, byproduct_colors=None, ax=None, legend_min_fraction=0
             + [byproduct_colors[c] for c in byproduct_cols]
             + [summer_colors["yellow"]]
         )
-        custom_labels = ["Biomass"] + byproduct_cols + ["CO2"]
+        custom_labels = ["Biomass"] + byproduct_cols + [CO2_LABEL]
     else:
         # Check that the column names are correct
         assert set(data.columns) == set(["co2", "organic_c", "biomass"])
@@ -159,7 +166,7 @@ def carbon_fates_bar(data, byproduct_colors=None, ax=None, legend_min_fraction=0
             summer_colors["light_blue"],
             summer_colors["yellow"],
         ]
-        custom_labels = ["Biomass", "Organic C", "CO2"]
+        custom_labels = ["Biomass", "Organic C", CO2_LABEL]
     # Plot the stacked bar plot
     g = data.plot(
         kind="bar",
