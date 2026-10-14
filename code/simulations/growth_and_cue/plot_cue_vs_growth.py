@@ -2,6 +2,7 @@ import ast
 import re
 import sys
 from pathlib import Path
+from typing import Optional
 
 import cobra
 import matplotlib
@@ -37,6 +38,10 @@ from tools.plot_styles import (
     set_plot_style,
     summer_colors,
 )
+
+# The carbon uptake bound every substrate is given, from the simulation script
+# so the two can't drift apart
+from run_growth_cue import TOTAL_UPTAKE  # noqa: E402
 
 # Global figure style (font, sizes, vector text) -- must run before any
 # figure or axes is created, see set_manuscript_style's docstring.
@@ -102,6 +107,27 @@ BYPRODUCT_PALETTE_ANCHORS = [
     ccomp_colors["dark_blue"],
 ]
 OTHER_BYPRODUCT_COLOR = "#B0B0B0"
+
+# O2 uptake bounds to make the across-substrate carbon fates figures for
+ACROSS_SUBSTRATE_O2_BOUNDS = [20, 50]
+# Every across-substrate figure orders the substrates by their growth rate at
+# this O2 bound (unlimited O2), so the bars line up between figures and the
+# effect of O2 limitation can be read bar by bar
+SUBSTRATE_ORDER_O2_BOUND = 50
+
+# Carbon fates segments thinner than this fraction of the tallest bar can't
+# be seen in the figure (0.5% is ~0.3 mmol C/gDW/h of a 60 mmol C bar), so
+# they are left out of the legend. They are still drawn.
+LEGEND_MIN_FRACTION = 0.005
+
+# On the normalized carbon fates figures every bar is 1.0, which hides that
+# some substrates don't take up all the carbon available (TOTAL_UPTAKE).
+# Substrates whose uptake is below this fraction of TOTAL_UPTAKE get
+# UPTAKE_LIMITED_MARK after their name, with a note explaining it. The
+# fully-supplied substrates sit at TOTAL_UPTAKE to within rounding (0.05%),
+# so 99% cleanly separates the two.
+UPTAKE_LIMITED_FRACTION = 0.99
+UPTAKE_LIMITED_MARK = "\u2020"  # dagger
 
 
 def build_ex_name_map(model) -> dict:
@@ -223,9 +249,28 @@ def main():
     # Round the percent value first in case things are very slightly off
     percentile_df = merged_df[round(merged_df["o2_percent"], 2).mod(10) == 0]
 
-    # Plot the bar charts of growth rate and CUE, coloured by entry point into central metabolism
-    # Only for the "anchor level" (unlimited O2)
-    plot_growth_cue(anchor_df, OUT_PATH, "growth_and_cue")
+    # Plot the carbon fates (biomass, organic byproducts, CO2) of every
+    # substrate side by side, one figure per O2 uptake bound. O2 = 50 is above
+    # every substrate's saturating O2 uptake, so it stands in for unlimited O2;
+    # O2 = 20 is limiting for most of the panel. Each is made twice: as carbon
+    # flux, and normalized to each substrate's carbon uptake.
+    order_df = merged_df[np.isclose(merged_df["o2_bound"], SUBSTRATE_ORDER_O2_BOUND)]
+    substrate_order = order_df.sort_values("growth_rate", ascending=False)[
+        "substrate"
+    ].tolist()
+    for o2_bound in ACROSS_SUBSTRATE_O2_BOUNDS:
+        for normalize in [False, True]:
+            suffix = "_normalized" if normalize else ""
+            plot_carbon_fates_across_substrates(
+                merged_df,
+                o2_bound,
+                ex_name_map,
+                byproduct_palette,
+                OUT_PATH,
+                f"carbon_fates_across_substrates_o2_{o2_bound:g}{suffix}",
+                substrate_order=substrate_order,
+                normalize=normalize,
+            )
 
     # Make carbon fate plots for each substrate
     for met in pre_set_df["substrate"].unique():
@@ -246,7 +291,11 @@ def main():
         # Subset the columns needed for the plot
         met_df = pd.concat([met_df[["biomass"]], byp_df, met_df[["co2"]]], axis=1)
         # Make the plot
-        g = carbon_fates_bar(met_df, byproduct_colors=byproduct_palette)
+        g = carbon_fates_bar(
+            met_df,
+            byproduct_colors=byproduct_palette,
+            legend_min_fraction=LEGEND_MIN_FRACTION,
+        )
         # Set the title to be something specific to the metabolite
         g.set_title(f"Carbon Fates for {met}")
         # Set the x axis label to be more descriptive
@@ -281,7 +330,11 @@ def main():
         # Subset the columns needed for the plot
         met_df = pd.concat([met_df[["biomass"]], byp_df, met_df[["co2"]]], axis=1)
         # Make the plot
-        g = carbon_fates_bar(met_df, byproduct_colors=byproduct_palette)
+        g = carbon_fates_bar(
+            met_df,
+            byproduct_colors=byproduct_palette,
+            legend_min_fraction=LEGEND_MIN_FRACTION,
+        )
         # Set the title to be something specific to the metabolite
         g.set_title(f"Carbon Fates for {met}")
         # Set the x axis label to be more descriptive
@@ -377,47 +430,125 @@ def main():
     )
 
 
-def plot_growth_cue(summary_df: pd.DataFrame, out_path: Path, filename: str) -> None:
-    df = summary_df.sort_values("growth_rate", ascending=False).reset_index()
-    colors = [ENTRY_POINT_COLORS.get(c, "#9E9E9E") for c in df["entry_point"]]
-    x = np.arange(len(df))
+def plot_carbon_fates_across_substrates(
+    summary_df: pd.DataFrame,
+    o2_bound: float,
+    ex_name_map: dict,
+    byproduct_palette: dict,
+    out_path: Path,
+    filename: str,
+    substrate_order: Optional[list] = None,
+    normalize: bool = False,
+) -> None:
+    """Stacked carbon fates bar for every substrate at one O2 uptake bound.
 
-    fig, (ax_g, ax_c) = plt.subplots(2, 1, figsize=(13, 8), sharex=True)
+    Same segments, colours and stacking order as the per-substrate plots in
+    figures/carbon_fates/ (biomass, then organic byproducts, then CO2). Bars
+    follow `substrate_order` if given (so several figures can share one
+    order), otherwise they are sorted by growth rate, highest first.
 
-    ax_g.bar(x, df["growth_rate"], color=colors, edgecolor="white", linewidth=0.6)
-    ax_g.set_ylabel("Growth rate (h⁻¹)")
-    ax_g.set_title(
-        "MIT1002 growth rate and carbon-use efficiency across substrates",
-        fontsize=12,
-        pad=8,
+    Because total carbon uptake is fixed, each bar sums to the uptake, the
+    biomass segment is proportional to growth rate, and CUE is everything
+    except the CO2 segment as a fraction of the bar.
+
+    With `normalize`, each bar is divided by its own total, so the y axis is
+    the fraction of that substrate's carbon uptake going to each fate. The
+    total is used as the uptake because carbon is balanced: across every
+    substrate and O2 level in growth_and_cue.csv the fates add up to the
+    uptake (from exchange_fluxes.csv) to within 0.05%, which is rounding.
+    This matters at limiting O2, where some substrates (e.g. Acetate,
+    Tyrosine and Phenol at O2 = 20) take up less than the TOTAL_UPTAKE
+    allowed. Normalizing hides that, so on the normalized figure those
+    substrates are marked with UPTAKE_LIMITED_MARK and a note."""
+    # Subset to the requested O2 bound (bounds are floats, so don't use ==)
+    df = summary_df[np.isclose(summary_df["o2_bound"], o2_bound)]
+    if df.empty:
+        raise ValueError(f"No results for O2 uptake bound = {o2_bound}")
+    # Index by substrate name, in the requested order or by growth rate
+    df = df.sort_values("growth_rate", ascending=False).set_index("substrate")
+    if substrate_order is not None:
+        missing = set(df.index) - set(substrate_order)
+        if missing:
+            raise ValueError(f"Substrates missing from substrate_order: {missing}")
+        # Substrates that didn't grow at this O2 bound are simply left out
+        df = df.loc[[sub for sub in substrate_order if sub in df.index]]
+
+    # Build the carbon fates table the same way as the per-substrate plots
+    byp_df = carbon_fates_byproduct_columns(df, ex_name_map, byproduct_palette)
+    fates_df = pd.concat(
+        [
+            df[["biomass_c"]].rename(columns={"biomass_c": "biomass"}),
+            byp_df,
+            df[["co2_flux"]].rename(columns={"co2_flux": "co2"}),
+        ],
+        axis=1,
     )
-    ax_g.margins(x=0.01)
+    # Total carbon taken up by each substrate, and which ones take up less
+    # than they were given
+    uptake = fates_df.sum(axis=1)
+    uptake_limited = uptake < UPTAKE_LIMITED_FRACTION * TOTAL_UPTAKE
+    if normalize:
+        fates_df = fates_df.div(uptake, axis=0)
 
-    ax_c.bar(x, df["cue"], color=colors, edgecolor="white", linewidth=0.6)
-    ax_c.set_ylabel("Carbon-use efficiency")
-    ax_c.set_ylim(0, 1)
-    ax_c.set_xticks(x)
-    ax_c.set_xticklabels(df["substrate"], rotation=45, ha="right", fontsize=9)
-
-    handles = [
-        mpatches.Patch(facecolor=ENTRY_POINT_COLORS[lbl], edgecolor="white", label=lbl)
-        for lbl in ENTRY_POINT_ORDER
-        if lbl in df["entry_point"].values
-    ]
-    ax_g.legend(
-        handles=handles,
-        title="Entry point into\ncentral metabolism",
+    fig, ax = plt.subplots(figsize=(11, 5))
+    carbon_fates_bar(
+        fates_df,
+        byproduct_colors=byproduct_palette,
+        ax=ax,
+        legend_min_fraction=LEGEND_MIN_FRACTION,
+    )
+    # Keep the legend entries carbon_fates_bar made, but move the legend in
+    # closer since this figure is much wider than the per-substrate ones
+    old_legend = ax.get_legend()
+    fate_handles = old_legend.legend_handles
+    fate_labels = [t.get_text() for t in old_legend.get_texts()]
+    fate_legend = ax.legend(
+        fate_handles,
+        fate_labels,
+        title="Carbon fate",
         frameon=False,
         bbox_to_anchor=(1.01, 1),
         loc="upper left",
-        fontsize=9,
-        title_fontsize=9.5,
     )
+    ax.set_title(
+        f"Carbon Fates Across Substrates (Oxygen Uptake Bound = {o2_bound:g} mmol/gDW/h)"
+    )
+    if normalize:
+        ax.set_ylabel("Fraction of Carbon Uptake")
+        ax.set_ylim(0, 1)
+    else:
+        ax.set_ylabel("Carbon Flux (mmol C/gDW/h)")
+    ax.set_xlabel("")
+    # Mark the uptake-limited substrates, but only where normalizing hides it;
+    # on the raw flux figure the shorter bar already shows it
+    mark = normalize & uptake_limited
+    tick_labels = [
+        f"{sub}{UPTAKE_LIMITED_MARK}" if mark[sub] else sub for sub in df.index
+    ]
+    ax.set_xticklabels(tick_labels, rotation=45, ha="right")
+    ax.margins(x=0.01)
+    if mark.any():
+        ax.text(
+            1.02,
+            0,
+            f"{UPTAKE_LIMITED_MARK} Takes up less than\n"
+            f"the {TOTAL_UPTAKE:g} mmol C/gDW/h\n"
+            "of carbon available",
+            transform=ax.transAxes,
+            ha="left",
+            va="bottom",
+            fontsize="small",
+            color="gray",
+        )
+        print(f"  Uptake-limited: {', '.join(df.index[mark])}")
 
-    fig.tight_layout()
+    # Grey text to match the per-substrate carbon fates plots
+    set_plot_style(ax)
+    fate_legend.get_title().set_color("gray")
+
     fig.savefig(out_path / f"{filename}.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
-    print(f"  Saved: {out_path.name}")
+    print(f"  Saved: {filename}.png")
 
 
 def plot_growth_cue_correlation(
