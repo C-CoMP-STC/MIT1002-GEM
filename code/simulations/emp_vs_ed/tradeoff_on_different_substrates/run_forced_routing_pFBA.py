@@ -10,9 +10,9 @@ FILE_PATH = Path(__file__).resolve().parent
 import sys
 
 sys.path.insert(0, str(FILE_PATH.parents[2]))  # make `tools` importable
+from tools.media import MEDIA  # noqa: E402
 from tools.paths import CODE_DIR, MODEL_PATH  # noqa: E402
 
-from tools.media import MEDIA  # noqa: E402
 OUT_PATH = FILE_PATH / "results"
 OUT_PATH.mkdir(exist_ok=True)
 
@@ -38,10 +38,12 @@ substrate_df = pd.read_csv(
     CODE_DIR / "simulations" / "growth_and_cue" / "results" / "substrate_panel.csv"
 )
 
-# Subset the substrate panel to only include substrates whose entry points are
-# "Glycolysis" or "ED - KDPG"
+# Subset the substrate panel to only include the following substrates:
+# Glucose, Galactose, Mannuronic Acid, and Galacturonic Acid
 substrate_df = substrate_df[
-    substrate_df["entry_point"].isin(["Glycolysis", "ED - KDPG"])
+    substrate_df["name"].isin(
+        ["Glucose", "Galactose", "Mannuronic Acid", "Galacturonic Acid"]
+    )
 ]
 
 # Make a dictionary to store the results for each substrate
