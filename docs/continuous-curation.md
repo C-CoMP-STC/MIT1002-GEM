@@ -572,61 +572,80 @@ We used GitHub Actions to automate running tests, generating reports, and releas
 ### Step 1) Curate
 *NOTE: We do not discuss here how to make curation decisions, but rather how to implement them*
 
-* How big is one curation task?
-    * Definitely don't think of all of curation being a single monolithic task
-    * The point is to do many small curation tasks, and update the model with small changes frequently 
-    * Aim for things to take on the order of days (maybe a week max)
-    * Early on (e.g., the first round of gap filling)- don't just say gap fill on  glucose, instead go through the biomass components and gap fill for production of a given biomass component one by one
-    * Once all biomass components are producible, gap fill for growth on a new carbon source is probably small enough
+When curating a GEM in a continuous matter it is important to break curation up into small, discrete tasks, rather than treating all of model curation as a single monolithic task.
+The heart of Continuous Curation (like Continuous Integration) is to do many small curation tasks, and update the model with small changes frequently.
+
+This begs the question of exactly how big one task should be.
+While it is hard to say definitively how big a task may be a general guideline is to aim for a task to take on the order of days (up to a maximum of a week) to address.
+
+When curation focuses on matching growth phenotypes (i.e., gap-filling to make the model grow on certain media), an obvious unit is to address each media separately.
+However, early on in this process (i.e., for the first round of gap filling to grow on the very first medium) this tak may be unmanageably large.
+instead, you can break "growth" on a given media into the production of each individual biomass components and gap fill for production of a given biomass component one by one.
+Once all biomass components are producible, gap-filling for any additional carbon source is typically a small enough task to treat as one task- gap-filling for transporters and a catabolic pathway.
+
+TODO: Make a branch-name it
 
 #### Removing Reactions/Metabolites
-* Palsson said to do it [@thiele2010protocol]
-* What we took from Human-GEM: the table
-* What is new
-    * The standard vocabulary of reason
-    * The list of removed things in the model file itself
-        * And the test to make sure it does not drift
-    * The test that no old reactions are still in the model file
 
-In the model file, lists of the IDs of the removed reactions and metabolites are stored in the “notes” element, which survives the model being read and re-written by libSBML and COBRApy. Additional information about the removed reactions and metabolites is stored in the “deprecated_reactions.tsv” and “deprecated_metabolites.tsv” files respectively. This includes a reason for the removal, chosen from the following controlled vocabulary: duplicate, id_changed, no_genomic_evidence, no_experimental_evidence, mass_imbalance, infeasible_cycle, dead_end, orphaned, erroneous_annotation, out_of_scope, and unknown. Other information included in this file is the pull request of the removal (automatically added for all new entries when a pull request is opened) and the date. Note that the process of removing a reaction from the model is structured: a helper function was written to both remove an entity from the model and add it to both lists. Unit tests ensure that the TSV files are well-formed, that the list in the model mirrors the TSV files, and that entities in the deprecated lists are not present in the model (i.e., things that were removed were not re-added).
+It is an established best practice to keep a list of all reactions and metabolites removed from the model, as removing an element from the model is just as an important decision as adding something to the model.
+
+* Palsson said to do it [@thiele2010protocol]
+    * TODO: Actually I can't find it in this paper, is it from something else?
+
+And in the Human-GEM repository, curatiors maintain a tables for the [removed metabolites](https://github.com/SysBioChalmers/Human-GEM/blob/main/data/deprecatedIdentifiers/deprecatedMetabolites.tsv) and [removed reactions](https://github.com/SysBioChalmers/Human-GEM/blob/main/data/deprecatedIdentifiers/deprecatedReactions.tsv), and remind curators to use these tables by including a check-box list in the PR template.
+Whenever someone opens a PR, the final section of the PR is a series of statements the opener must "check off", one of which is "Any removed reactions and metabolites have been moved to the corresponding deprecated identifier lists".
+We took inspiration from these tables and the PR template, and added additional information and tooling to make the tables more informative and to enforce their use.
+
+In MIT1002-GEM the removed metabolite and reaction tables are saved in [`data/deprecated_identifiers/deprecated_metabolites.tsv`](https://github.com/C-CoMP-STC/MIT1002-GEM/blob/main/data/deprecated_identifiers/deprecated_metabolites.tsv) and [`data/deprecated_identifiers/deprecated_reactions.tsv`](https://github.com/C-CoMP-STC/MIT1002-GEM/blob/main/data/deprecated_identifiers/deprecated_reactions.tsv) respectively.
+The use of snakecase (e.g., `deprecated_identifiers` rather than Human-GEMs `deprecatedIdentifiers`) is purely a style choice and came from the MIT1002-GEM developers being python programmers.
+These tables were based on the `deprecatedIdentifiers` tables in Human-GEM, but do include several new rows, This includes a reason for the removal, chosen from the following controlled vocabulary: duplicate, id_changed, no_genomic_evidence, no_experimental_evidence, mass_imbalance, infeasible_cycle, dead_end, orphaned, erroneous_annotation, out_of_scope, and unknown. Other information included in this file is the pull request of the removal (automatically added for all new entries when a pull request is opened) and the date.
+
+One things we wanted to add was a list of the removed reactions within the model file itself.
+This was added to ensure that someone who downloads the model file without cloning the whole GitHub repo, still has this vital information.
+In the model file, lists of the IDs of the removed reactions and metabolites are stored in the “notes” element, which survives the model being read and re-written by libSBML and COBRApy. 
+
+ Note that the process of removing a reaction from the model is structured: a helper function was written to both remove an entity from the model and add it to both lists. Unit tests ensure that the TSV files are well-formed, that the list in the model mirrors the TSV files, and that entities in the deprecated lists are not present in the model (i.e., things that were removed were not re-added).
 
 #### Commits
-* Commit often- don't just wait until the end of all your changes
-* Use concise descriptive commit messages
-* Use semantic commits
-    * <type>[optional scope]: <description>
+While making your curation changes, you should commit your changes often.
+Don't just wait until the end of all your changes to make one single commit.
+When you make a commit, be sure to make your commit messages, concise and descriptive.
+You want your commit messages to remind you what you did at any given point, so if you ever need to revert changes or find a specific version of the model in the repo's commit history you can find it easily.
+Something like `curated model` or `update` do not tell you what you actually did, and also may be a sign that you have waiting to long to commit since you cannot say what you did concisely enough to fit in a commit message.
 
-    * We got this from standard-GEM
-    * type
-        * chore: updating toolbox, data files, etc.
-        * doc: updating documentation or explanatory comments in functions.
-        * feat: new feature added, e.g. new reaction / metabolite / function / etc.
-        * fix: something that was incorrect in the model and now has been corrected.
-        * refactor: see code refactoring.
-        * style: minor format changes of model, functions or data (spaces, semi-colons, etc., no code change)
-    * scope
-        * optional
-        * refers to the receiver of the action, i.e. what part of the model/data are you modifying
-    * description
-        * concise description of what you did
-    * some examples (direct copy from yeat-GEM contributing guidelines)
-        |commit|commit message|
-        |:---:|:---:|
-        |Add new rxns|`feat-rxn: methanol pathway`|
-        |Remove a metabolite|`fix-met: duplicated citrate`|
-        |Add metabolite formula|`feat-met.prop: carbohydrate formulas`|
-        |Fix rxn stoichiometry|`fix-rxn.prop: complex V stoich coeffs`|
-        |Update gene IDs|`fix-gene.annot: update IDs from SWISSPROT`|
-        |Format name of compartment|`style-comp.annot: remove uppercases`|
-        |Split a rxn in 2|`refactor-rxn: split isomerase in 2 steps`|
-        |Add some data|`feat-data: metabolomics data`|
-        |Update documentation of function|`doc: addDBnewRxn.m`|
-        |Update toolbox|`chore: update RAVEN version`|
+Following standard-GEM, you should use "semantic commits".
+In semantic commits, all commit messages are formatted as `<type>[optional scope]: <description>`.
+Where `<type>` is chosen from a controlled vocabulary:
+
+    * chore: updating toolbox, data files, etc.
+    * doc: updating documentation or explanatory comments in functions.
+    * feat: new feature added, e.g. new reaction / metabolite / function / etc.
+    * fix: something that was incorrect in the model and now has been corrected.
+    * refactor: see code refactoring.
+    * style: minor format changes of model, functions or data (spaces, semi-colons, etc., no code change)
+
+`scope` is an optional part of the message that refers to the receiver of the action, i.e. what part of the model/data are you modifying, such as "rxn" for a model reaction.
+
+Finally the `<description>`, is the most important part of the commit message, and is the concise description of what you did.
+
+Some examples of good semantic commit messages from the yeast-GEM repository are:
+|commit|commit message|
+|:---:|:---:|
+|Add new rxns|`feat-rxn: methanol pathway`|
+|Remove a metabolite|`fix-met: duplicated citrate`|
+|Add metabolite formula|`feat-met.prop: carbohydrate formulas`|
+|Fix rxn stoichiometry|`fix-rxn.prop: complex V stoich coeffs`|
+|Update gene IDs|`fix-gene.annot: update IDs from SWISSPROT`|
+|Format name of compartment|`style-comp.annot: remove uppercases`|
+|Split a rxn in 2|`refactor-rxn: split isomerase in 2 steps`|
+|Add some data|`feat-data: metabolomics data`|
+|Update documentation of function|`doc: addDBnewRxn.m`|
+|Update toolbox|`chore: update RAVEN version`|
 
 #### Pull Requests
 One critical component of the history of changes to the model is the “why”- why was a change to the model made (e.g., was a reaction found to have genomic evidence, was there a mistake in the biochemistry database, etc.). There are text fields in the model file itself where this information can be stored, and there have been cases in the past of defined “codes” used to represent different types of evidence that support each reaction [@thiele2010protocol] (they used numeric codes 4 = direct biochemical evidence, 3 = genetic evidence, 2 = sequence/homology evidence, 1 = physiological evidence, 0 = no evidence (included only because it improves modeling)) however we have found that these are not well used, lack standardization across the community, and are often not comprehensive enough to fully explain the reasoning behind each change. We instead elected to document these in issues and pull requests on the repository. Issues can be used as a sort of electronic lab notebook. To ensure that all curators (present and future) are reminded to document their reasoning, a pull request template was used.
 
-* Open a pull request, that starts the cycle
+The workflows set up with GitHub actions trigger upon the opening of a pull request, that starts the cycle with the automated testing and reporting.
 
 ### Step 2) Test
 * Testing code is important, testing the model is just as important
