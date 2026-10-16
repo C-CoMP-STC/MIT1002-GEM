@@ -617,12 +617,12 @@ Following standard-GEM, you should use "semantic commits".
 In semantic commits, all commit messages are formatted as `<type>[optional scope]: <description>`.
 Where `<type>` is chosen from a controlled vocabulary:
 
-    * chore: updating toolbox, data files, etc.
-    * doc: updating documentation or explanatory comments in functions.
-    * feat: new feature added, e.g. new reaction / metabolite / function / etc.
-    * fix: something that was incorrect in the model and now has been corrected.
-    * refactor: see code refactoring.
-    * style: minor format changes of model, functions or data (spaces, semi-colons, etc., no code change)
+* chore: updating toolbox, data files, etc.
+* doc: updating documentation or explanatory comments in functions.
+* feat: new feature added, e.g. new reaction / metabolite / function / etc.
+* fix: something that was incorrect in the model and now has been corrected.
+* refactor: see code refactoring.
+* style: minor format changes of model, functions or data (spaces, semi-colons, etc., no code change)
 
 `scope` is an optional part of the message that refers to the receiver of the action, i.e. what part of the model/data are you modifying, such as "rxn" for a model reaction.
 
