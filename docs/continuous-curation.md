@@ -659,34 +659,30 @@ The core things you want the tests to tell you is if your model is correct.
 This is hard because for the most part, we have no ground truth as to what a model should me
 
 Some examples include, testing that:
-* the model file is valid SBML (using `COBRApy`'s function) TODO: get the function name
+* the model file is valid SBML (using COBRApy's function `validate_sbml_model`)
 * the model cannot grow on no carbon
-* the model cannot produce ATP without carbon (using MEMOTE's function) TODO: get the function name
+* the model cannot produce ATP without carbon (using MEMOTE's function `detect_energy_generating_cycles`)
 
 Some of these tests use previously published tools, but we found that by implementing them with unit tests on a GitHub action it was possible to pass or fail a test, which can hlp curators recognize errors introduced into the model quickly.
 
 The obvious place where we had ground truth information for MIT1002-GEM was the growth phenotypes.
 So we wanted to unit test to check that the model was able to recreate the growth phenotypes, as that was our primary goal in model curation.
-However, this test posed a problem- if you implement a test to check that all model phenotpyes match early in the curation process it will continuously fail for a long time (MIT1002-GEM v4.0 would still fail this test today). However, if you wait to implement the test until all the growth phenotypes do match (i.e., late in the curation process), it might not help at all.
+However, this test posed a problem- if you implement a test to check that all model phenotypes match early in the curation process it will continuously fail for a long time (MIT1002-GEM v4.0 would still fail this test today). However, if you wait to implement the test until all the growth phenotypes do match (i.e., late in the curation process), it might not help at all.
 
 We instead implemented the test to make sure that the model never performed worse than it did before- e.g., that a growth phenotype where the model could grow before doesn't revert to no growth.
 This was implemented by tracking a "baseline performance" of how the growth phenotypes matched at the previous version of the model, and comparing against that. If the model performance stayed the same or got better (e.g., a false negative switched to a true positive) the test passed, however if the model performance got worse (e.g., a true positive switched to a false negative, or a true negative switched to a false positive), the test failed.
 
 
 #### GitHub Action
-* In MIT1002-GEM we run them all automatically in the CI-workflow `Test-and-Report`, finding and executing tests with `pytest`
+In MIT1002-GEM we run all our tests automatically in the CI-workflow `Test-and-Report`, which runs whenever a pull request is opened or changes are pushed to the PR branch
 
-* The beginning of the YAML file sets the worksflow's name and when it will run
+The YAML file below includes the preamble for `Test-and-Report` and the the `test` job:
 ```yaml
 name: Test-and-Report
 
 on:
   pull_request:
-```
-so that it runs whenever a pull request is opened or changes are pushed to the PR branch
-* Within the `test` block, `steps` represents a sequence of tasks that will be executed as part of the job. The steps of the `test` job are to: Check out the repository, so the job can access your files, install all required dependencies, and then run the tests.
-* ubuntu-22.04 is a specific version of the Linux runner, using a specific version is good because it will not change whenever the latest Linux runner is updated, so it is less fragile.
-```yaml
+
 jobs:
   test:
     runs-on: ubuntu-22.04
