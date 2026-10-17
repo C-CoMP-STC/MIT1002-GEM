@@ -356,6 +356,7 @@ The final step is to actually run the tests as we did locally before:
 
 When we push to our repository, and this test runs, we can see the workflow running in the Actions tab:
 
+TODO: This is the wrong picture
 ![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively running.](./figures/png/github-actions-names.png)
 
 And when the workflow is complete we get a clear if your test passed or failed:
@@ -648,15 +649,40 @@ One critical component of the history of changes to the model is the “why”- 
 The workflows set up with GitHub actions trigger upon the opening of a pull request, that starts the cycle with the automated testing and reporting.
 
 ### Step 2) Test
-* Testing code is important, testing the model is just as important
-* Typical software tools can be used, but some concepts need to generalized
-* We can differentiate the tests used in MIT1002-GEM by what they tested, the model, the data files, the helper tools, or consistency between two things. A single test file can contain multiple different kinds of tests, so some file names may repeat across the list.
-#### Examples of Unit Tests on the Model
-* In traditional software engineering, the unit being tested is often a function, however for the case of model curation, we are testing the model as a whole, but can write tests to focus on individual aspects of the model
-    * Why testing a model is not like testing a function [@kanewala2014testing]
-* The ones we present here are by no means an exhaustive list of everything that could or should be tested.
-* Many of these tests use previously published tools (e.g., MEMOTE), but we found that by implementing them with unit tests on a GitHub action it was easier to track model performance over time and recognize errors introduced into the model quickly.
-* Part of the MIT1002-GEM repo is helper functions (i.e. for setting the media, or running common simulations, or styling plots), these functions, just like any other functions in a python module should be tested.
+Just as testing code with unit tests is important, it is important to write and regularly run tests for a GEM.
+Typical software testing tools can be used, but some concepts need to generalized.
+In traditional software engineering, the unit being tested is often a function, however for the case of model curation, we are testing the model as a whole, but can write tests to focus on individual aspects of the model.
+
+* TODO: Why testing a model is not like testing a function [@kanewala2014testing]
+
+The core things you want the tests to tell you is if your model is correct.
+This is hard because for the most part, we have no ground truth as to what a model should me
+
+We can differentiate the tests used in MIT1002-GEM by what they tested, the model, the data files, the helper tools, or consistency between two things.
+
+#### Tests on the Model
+Some examples include, testing that:
+* the model file is valid SBML (using `COBRApy`'s function) TODO: get the function name
+* the model cannot grow on no carbon
+* the model cannot produce ATP without carbon (using MEMOTE's function) TODO: get the function name
+
+Some of these tests use previously published tools, but we found that by implementing them with unit tests on a GitHub action it was possible to pass or fail a test, which can hlp curators recognize errors introduced into the model quickly.
+
+The obvious place where we had ground truth information for MIT1002-GEM was the growth phenotypes.
+So we wanted to unit test to check that the model was able to recreate the growth phenotypes, as that was our primary goal in model curation.
+However, this test posed a problem- if you implement a test to check that all model phenotpyes match early in the curation process it will continuously fail for a long time (MIT1002-GEM v4.0 would still fail this test today). However, if you wait to implement the test until all the growth phenotypes do match (i.e., late in the curation process), it might not help at all.
+
+We instead implemented the test to make sure that the model never performed worse than it did before- e.g., that a growth phenotype where the model could grow before doesn't revert to no growth.
+This was implemented by tracking a "baseline performance" of how the growth phenotypes matched at the previous version of the model, and comparing against that. If the model performance stayed the same or got better (e.g., a false negative switched to a true positive) the test passed, however if the model performance got worse (e.g., a true positive switched to a false negative, or a true negative switched to a false positive), the test failed.
+
+#### Tests on the Data Files
+
+TODO
+
+#### Tests on the Helper Functions
+Part of the MIT1002-GEM repo is helper functions (i.e. for setting the media, or running common simulations, or styling plots), these functions, just like any other functions in a python module should be tested.
+
+#### Tests on Consistency
 
 #### GitHub Action
 * In MIT1002-GEM we run them all automatically in the CI-workflow `Test-and-Report`, finding and executing tests with `pytest`
