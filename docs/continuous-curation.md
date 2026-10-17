@@ -1,70 +1,36 @@
 # Continuous Curation: Best Practices for Model Curation Inspired by Software Development
 
-GEMs are, at their heart, a software product, and we took lessons from software development and applied them to the model curation process. We term this constant testing and iterative model improvement strategy “Continuous Curation”, inspired by Continuous Integration (CI) for traditional software. This included tracking all changes using version control, having multiple curators collaborate and propose changes by working on branches and opening pull requests, testing the model with defined pass/fail tests, and automatically generating artifacts for curator inspection.
+GEMs are, at their heart, a software product, and we took lessons from software development and applied them to the model curation process.
+We term this constant testing and iterative model improvement strategy “Continuous Curation”, inspired by Continuous Integration (CI) for traditional software.
+This included tracking all changes using version control, having multiple curators collaborate and propose changes by working on branches and opening pull requests, testing the model with defined pass/fail tests, and automatically generating artifacts for curator inspection.
 
-* None of this is really new
-    * we borrowed all of this from software engineering
-    * other groups do or are developing similar things
-        * we took some things directly from Human-GEM and standard-GEM
-    * the field is crystallizing
-    * but the field lacks a single reference point for guidelines
+Continuous Curation is not a pipeline or a workflow, you can't install it and hit run.
+It is a mindset and a series of practices, that can be tweaked to whatever type of GEM you are making with any sort of data.
+The practices we describe here were assembled from traditional software development and from the crystallizing field of GEM curation. There are many different groups of researchers making GEMs and asking themselves how do you make a GEM well.
+This document is aimed at a biologist making a GEM or inheriting an existing GEM, and unsure where to start. We hope this document can serve as the reference point for the evolving community practice of making models that are continuously tested and a curation process that is traceable and citable.
 
 ## Motivation
-### Why do we need this?
-* GEMs are important tools
-    * But their quality is often questioned
-* Manual curation is hard/messy
-    * Manual curation can be an overwhelming task- the typical advice of just go "pathway by pathway" can be paralyzingly large
-* Manual curation can last for a long time (including decades, spanning many people and projects)
-    * Often one group publishes a model, then another may find it, modify it, and publish a new paper, resulting in branching sets of models
+GEMs are valuable systems biology products and important tools in integration biology. However as GEMs evolve in their complexity, their management needs to evolve to.
+Typically, a GEM may be made by a small group of curators, who turn over frequently (e.g., graduate students or post-docs). After a model is published, other groups may download and modify the model, publishing their own updated versions, resulting in a branching set of models, each with their own curation decisions and assumptions.
 
+Even within a small curation team (even just a single student) working on a GEM fo a bacterium, manual curation is a can be an overwhelming task. The typical advice of just go "pathway by pathway" can be paralyzingly large.
 
-### What have people been doing before this?
-#### MEMOTE
-* MEMOTE exists [@lieven2020memote]
-    * but it's more of a benchmarking tool- a lot of things is just about the file
-        * TODO: Check what the custom tests ever did
-* They had a TRAVIS integration where it would run, but MEMOTE can never fail, it always required a human to read, understand, and evaluate the tests
+To address challenges in model curation different tools have been developed.
+MEMOTE [@lieven2020memote] is a widely used model benchmarking tool that generates a report on the model.
+And some coalition around standards to model structure has begun.
+standard-GEM is a set of requirements for the format of GEMs versioned with git [@anton2023standardgem].
+And groups have developed their own best practices, with certain models, like [Human-GEM](https://github.com/SysBioChalmers/Human-GEM/tree/main/data) and [yeast-GEM](https://github.com/SysBioChalmers/yeast-GEM/tree/main/code) serving as exemplars of model organization.
 
-#### standard-GEM
-* standard-GEM is a set of requirements for the format of GEMs versioned with git [@anton2023standardgem]
-* no tests
-    * they show running MACAW in a workflow, and they call it `macawTests.py` but it's not a test, it doesn't assert anything, equivalent to a "script"
-    * code/test and MEMOTE are only possibility/capability, not a requirement or even a recommendation
-* technically just because it's on git doesn't mean you're regularly pushing- you could upload everything once and meet standard-GEM requirements, even if not in spirit
+However, the model file or the structure of the folder containing cannot capture the dynamic process of curation that scientists are actually doing.
 
-#### Human-GEM and yeast-GEM
-* Human-GEM
-    * 2023: check-metabolictasks.yml
-        * "metabolic tasks" on push and PR
-        * using a self-hosted MATLAB runner
-    * 2024: Gene essentiality workflow
-    * 2026: model-qc.yml
-* yeast-GEM
-    * 2018: automated benchmarking MEMOTE + Travis CI 
-    * 2020: MEMOTE on GitHub actions + YAML-validation
-    * 2026: model-qc.yml
-* A lot of things were not enforced, just reminders and check boxes
+We are aware that many of scientists making GEMs are biologists, and that computer scientists telling them the "best" way to do things can be overly complicated.
+However, we do want to stress that the GEM curation team will benefit from the increased flexibility of being able to write their own code, regardless of however alluring a walled garden of pretty-looking pre-made functionality may be. Everyone will have different data, every model has its own quirks, it's worth writing your own to really get full coverage of your model.
+We hope that templates, and libraries of importable code can help the process, 
 
-### What's new here
-* Continuous curation is really more of an ethos than any single pipeline
-* Concurrent independent development of similar procedures across organizations/models
-* We began running automated tests and scripts on GitHub actions in XXX
-    * not really clear who go to running it as CI first...
-* Our specific unit tests
-* Biomass component producibility heatmaps
-* Improved tracking removed reactions/metabolites
-
-### Why can't you just make it for me?
-* Can't you just make an installable tool that makes all of this for me?
-* It is very possible to make a template- i.e. Standard-GEM
-* And very possible to have packages with importable tests and shared functions
-* Everyone will have different data, every model has its own quirks, it's worth writing your own to really get full coverage of your model
-* Beware walled-gardens
-
-### What's the cost?
-* Requires set up and maintenance
-* Requires learning more about Git and automation than someone with a biology background may currently have
+These systems do have a cost.
+They requires set up and maintenance, and are another thing to handle, in an already long curation to do list.
+We hope that this document can convince of their benefit and break down what is needed to begin Continuous Curation with your own model.
+In particular, this document aim to address one barrier to entry that has kept some GEM curators for using a system such as this: and unfamiliarity with traditional software engineering tools like Git and automation.
 
 ## Background: Primer on Version Control and Automation with GitHub
 
