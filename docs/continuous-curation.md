@@ -658,9 +658,6 @@ In traditional software engineering, the unit being tested is often a function, 
 The core things you want the tests to tell you is if your model is correct.
 This is hard because for the most part, we have no ground truth as to what a model should me
 
-We can differentiate the tests used in MIT1002-GEM by what they tested, the model, the data files, the helper tools, or consistency between two things.
-
-#### Tests on the Model
 Some examples include, testing that:
 * the model file is valid SBML (using `COBRApy`'s function) TODO: get the function name
 * the model cannot grow on no carbon
@@ -675,14 +672,6 @@ However, this test posed a problem- if you implement a test to check that all mo
 We instead implemented the test to make sure that the model never performed worse than it did before- e.g., that a growth phenotype where the model could grow before doesn't revert to no growth.
 This was implemented by tracking a "baseline performance" of how the growth phenotypes matched at the previous version of the model, and comparing against that. If the model performance stayed the same or got better (e.g., a false negative switched to a true positive) the test passed, however if the model performance got worse (e.g., a true positive switched to a false negative, or a true negative switched to a false positive), the test failed.
 
-#### Tests on the Data Files
-
-TODO
-
-#### Tests on the Helper Functions
-Part of the MIT1002-GEM repo is helper functions (i.e. for setting the media, or running common simulations, or styling plots), these functions, just like any other functions in a python module should be tested.
-
-#### Tests on Consistency
 
 #### GitHub Action
 * In MIT1002-GEM we run them all automatically in the CI-workflow `Test-and-Report`, finding and executing tests with `pytest`
