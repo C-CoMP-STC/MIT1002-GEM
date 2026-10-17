@@ -802,106 +802,138 @@ This may change based on your needs and the stage of model curation.
 We generated this reports automatically only upon pushes to the main branch (i.e., upon "Release"), for examples of the YAML workflow to generate them within a GitHub action, see the following section.
 
 ### Step 4) Release
-* What is semantic versioning
-    * [Semantic Versioning](https://semver.org) is a way to define your program's version based on the type of changes you've introduced. It's defined as a three-number string (separated with a period) in the format of MAJOR.MINOR.PATCH.
-    * MAJOR version when you make incompatible API changes
-    * MINOR version when you add functionality in a backward compatible manner
-    * PATCH version when you make backward compatible bug fixes
-* What counts as a major/minor/patch change for a GEM
-    * major: an ID or file layout breaks, or any growth call flips
-    * minor: the model file changes without flipping a call
-    * patch: the model file is unchanged
-* What counts as a new version
-    * With continuous curation (as in continuous integration) the `develop` branch is always tested (there shouldn't be anything broken on the `develop` branch), so a release isn't any better quality
-    * A release is really just a fixed point that someone can point at and cite
-    * Possible triggers of when to make a release
-        * When the model leaves the lab
-            * i.e., when you publish a paper, give a talk, or send the model to a collaborator for them to use
-            * So that no one outside the lab/curators is ever pointing to the `develop` branch
-        * When the model needs a major bump
-            * Whenever you have a growth call flipped or a broken ID
-        * Time-based
-            * e.g. every week, or every month
-            * Keeps changes from piling up, and from `develop` getting too far ahead of `main`, but some of the changes may be so small (patches), that they are meaningless on their own
-        * Every merged model change (continuous delivery)
-            * Every change to the model (i.e., every merge to `develop`) gets its own release
-            * now every version is a very small change
-            * This is continuous delivery in software engineering, and since releases are automated, there is no real cost to doing this, but most of the releases aren't really useful
-    * We sit somewhere between a & b, with multiple releases before publication as major changes in the model occurred
-        * trigger a (publication) is the hard rule
+Release is the process of making an official new version of the model, which on the GitHub repo is equivalent of merging changes from the `develop` branch to the `main` branch.
+With continuous curation (as in continuous integration) the `develop` branch is always tested (there shouldn't be anything broken on the `develop` branch), so a release isn't any better quality.
+A release is really just a fixed point that someone can point at and cite.
+Versions of the model on the `main` branch have an official version number and are citable with a DOI.
+
+While we have automated a lot of the process of making a release and getting a DOI, it is still up to the curators to decide when the make a release, and there is no one definitive rule as to when you should make a release (versus just letting your changes live on `develop`).
+
+Because it is up to the curators to decide when to make a release, below are some possible triggers of when to make a release:
+
+* **When the model leaves the lab**: When you publish a paper, give a talk, or send the model to a collaborator for them to use, you make a major release so that other people can always use a citable version of the model. This strategy keeps a clean history of releases on `main` but changes to the model may "pile up" on `develop` as it may be multiple years between publications.
+* **When a specified about of time has passed**: When a given amount of time (e.g., a week or a month) has passed, all of the changes on `develop` that have accumulated in that time get released as a new version. This strategy keeps changes from piling up, and from `develop` getting too far ahead of `main`, but some of the changes may be so small that they are meaningless on their own
+* **When any change is made to the model (continuous delivery)**: Whenever any changes is made to the model and pushed to `develop` it could automatically be pushed to `main` as well (or even remove the `develop` branch, and merge directly into `main`). In this case every change to the model (i.e., every merge to `develop`) gets its own release, and now every version is a very small change. This ensures that users of the model always have the most up to date version of it, but the changes can come quickly and be overwhelming, and not that helpful to most users. This is continuous delivery in software engineering, and since releases are automated, there is no real cost to doing this, but most of the releases aren't really useful
+* **When automation code changes**: Certain features of GitHub automation rely on the code that lives on `main` branch, e.g., GitHub actions only use the workflow files on the `main` branch. In MIT1002-GEM as curators actively made changes to the workflows and things like PR templates the changes had to merged to `main` to take effect. While users of the model may not care about these changes, they still require the model to be released.
+
+MIT1002-GEM had no one single rule as to when to make a release.
+There were multiple releases before a publication as major changes in the model occurred, and as automatic changes required to be pushed to main.
+While much of the release decisions are up to the curators, our only hard rule (and concrete recommendation to others) is that the version of the model used in a publication should be a release so the model itself is citable.
+
+#### Semantic Versioning
+As we have said previously, each released version of the model is a specific "version" of the model, e.g., model version 1 vs model version 2.
+
+[Semantic Versioning](https://semver.org) is a way to define your program's version based on the type of changes you've introduced. It's defined as a three-number string (separated with a period) in the format of MAJOR.MINOR.PATCH, e.g., 1.0.0 is the first major release, and version 1.0.1, has had one additional patch released. 
+For software, a major version change when you make incompatible API changes, where someone who had written code for version 1.0.0 could not run it on version 2.0.0. 
+A minor version when you add functionality in a backward compatible manner, so someone who had written code for version 1.0.0 can still use 1.1.0, but they might not be aware of the latest functions.
+And a patch version when you make backward compatible bug fixes, so someone who had written code for version 1.0.0 can still use 1.0.1 and there are no new functions they don't know about.
+
+Semantic versioning was made for software, but analogies can be drawn to what major, minor, and patch, changes mean to a GEM repository.
+
+| Version Change | GEM Meaning |
+|:---:|:---:|
+| Major | an ID or file layout breaks, or any growth call flips |
+| Minor | the model file changes without flipping a call |
+| Patch | the model file is unchanged |
+
+#### How to make a release
+As a part of MIT1002-GEM we wrote helper function and three GitHub Action workflows to aid in the release process. To make a GitHub release on MIT1002-GEM:
+
 1. Decide what size bump is required
     * Run locally: `PYTHONPATH=code python -m tools.release check`
-2. On GitHub -> Actions -> Prepare-Release -> Run Workflow
-    * Branch: develop
-    * Kind: whatever size bump you decided on in 1
-3. Prepare-Release runs
-    * It commits changes to develop with the message `release: {new version number}`
-        * Updates version.txt
-        * Updates the CHANGELOG.md entry
+2. Manually trigger the `Prepare-Release` workflow to run
+    * On GitHub -> Actions -> Prepare-Release -> Run Workflow
+        * Branch: develop
+        * Kind: whatever size bump you decided on in 1
+        * TODO: Get a screenshot
+3. The `Prepare-Release` workflow runs
+    * It commits changes to `develop` with the message `release: {new version number}`
+        * Updates `version.txt`
+        * Updates the `CHANGELOG.md` entry
     * And opens a PR from `develop` into `main` called `release: {new version number}`
-4. Upon the release PR being opened, Release-Checks runs
-    * MEMOTE report [@lieven2020memote]
-    * MACAW [@moyer2025macaw]
-5. Wait for Release-Checks to finish
+4. Upon the release PR being opened, `Release-Checks` runs
+    * Generate the MEMOTE report [@lieven2020memote]
+    * Runs MACAW [@moyer2025macaw]
+5. Wait for `Release-Checks` to finish
     * Can take ~15 min because of MACAW
-6. Then merge the PR into main
-7. The merge triggers the Publish workflow to run
-    * Exports model to all formats
+6. Merge the PR into main
+7. The merge triggers the `Publish` workflow to run
+    * Exports model to all file formats
     * Make a tag for the new release
     * Creates the GitHub release
         * Zenodo integration makes the DOI
-    * Deploys MEMOTE to Pages
+    * Deploys MEMOTE to Pages, so the MEMOTE report is live on the web
 
 ### Step 5) Run
-* This is the fun part, where you, or others, actually try to use the model
-* Who might be using the model
-    * Yourself- as the person making the model- you probably have questions you are interested in and simulations you would like to run
-    * Your collaborators
-    * Strangers- people who read your paper and want to use your model- potentially years after initial publication
-* Making the model available to run throughout the curation process is what makes our curation "continuous", we aren't trying to finish the model before every using it, but will update the model as issues are found in use
-* This means that you can curate the model in order of scientific questions- curating the pathways relevant to specific questions first, rather than in an arbitrary order
-    * This means that the model will be better in regions of the metabolic network of previous interest
-* This helps discover unexpected problems in the model- tests can only catch expected problems
-* For tutorials on how to use a GEM to run FBA, see COBRA tutorials
-    * MATLAB: https://opencobra.github.io/cobratoolbox/stable/tutorials/
-    * COBRApy: https://cobrapy.readthedocs.io/en/latest/
+This is the fun part, where you, or others, actually try to use the model to run simulations and you may run into problems had not idea about.
+This helps discover unexpected problems in the model.
+Our unit tests, while incredibly valuable, can only catch expected problems, they can't discover new ones before they arise.
+
+This means that you can curate the model in order of scientific questions, curating the pathways relevant to specific questions first, rather than in an arbitrary order.
+This means that the model will be better in regions of the metabolic network of previous interest.
+
+Making the model available to run throughout the curation process is what makes our curation "continuous", we aren't trying to finish the model before every using it, but will update the model as issues are found in use.
+
+For tutorials on how to use a GEM to run FBA, see COBRA tutorials for the programming language of your choice, e.g.:
+* MATLAB: https://opencobra.github.io/cobratoolbox/stable/tutorials/
+* COBRApy: https://cobrapy.readthedocs.io/en/latest/
 
 ### Step 6) Monitor
-* Typically there is limited feedback after publication- someone might try to recreate your results or use your model, but if it fails, they have no where to turn
-* GitHub issues can be used to plan, discuss, and track work
-* anyone can open an issue
-* Use issues to keep track of bugs, enhancements, or other requests
-* When to open an issue
-    * You find something wrong
-    * Bug/weird simulation results
-    * New data to add
-    * Missing feature you would like the model to have
-    * Documentation confusing or unclear
-    * Any type of feedback
-* Open an issue
-    * How to open an issue
-        1. Go to the main page of the repository
-        2. Click Issues
-        3. Click New Issue
-    * GitHub issues are written in [GitHub Flavored Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
-* What belongs in an issue
-    * A concise and descriptive title
-        * e.g. model does not grow on glucose, not model wrong, or "I tried to simulate growth on glucose, and got 0.00"
-    * In the description
-        * Detailed description
-        * Provide context- including what you expected to happen versus what actually occurred
-        * Step-by-step instructions for replicating the bug
-            * include code, logs, or screenshots
-        * Environment details
-            * What OS are you using, what version of tools (e.g., COBRApy) are you using, what version of the model are you using, did you start from a release, from the main branch, from the develop branch
-    * Note your issue is public, so don't include anything you don't want shared
-    * Other repos (Human-GEM) have templates for reporting bugs, which can be helpful to ensure that someone gives all of the information needed to recreate and investigate the bug
-* Anyone can comment on issues
-* Unlike in traditional software this is a more human-dependent step- we aren't just getting crash reports, we require people to really run the model and manually open issues
-* While this might seem trivial, this is a critical step, because without opening issues curation becomes a straight line, not a loop, and can't be continuous any more- so all issues are welcome!
+Think of what normally happens with a scientific publication, someone might try to recreate your results or use your model, but if it fails, they could e-mail the corresponding author, or more likely just give up. Or if one person does e-mail the corresponding author and get help fixing a bug or using the model, 10 other people may run into the same issue, but not pluck up the courage to e-mail the author for help or not hear back.
+
+We don't want that to happen.
+As people use your model and run into problems they need a place to report their issues or suggestions.
+Ideally where others can see it, so if multiple people run into the same problem they can communicate directly, or if leadership on the project changes (e.g., a student graduates or a new model curator joins the team) they don't need a new e-mail to reach everyone.
+
+[GitHub issues](https://github.com/features/issues) can be used to plan, discuss, and track work.
+Anyone can open an issue, view the discussions and can comment on them.
+
+We hope that users of MIT1002-GEM (and your model) open issues for any problem they have, no matter how small.
+Some reasons a user might open an issue:
+* Something's wrong in the model
+* There's a bug, or weird simulation results
+* They have new data to add (e.g., they have growth phenotype data you don't)
+* Missing feature you would like the model to have
+* Documentation confusing or unclear
+* Any type of feedback
+
+Unlike in traditional software this is a more human-dependent step. We aren't just getting crash reports, we require people to really run the model and manually open issues
+While this might seem trivial, this is a critical step, because without opening issues curation becomes a straight line, not a loop, and can't be continuous any more, so all issues are welcome!
+
+Issues aren't just for other people running your model, you can open your own issues to maintain your to do list for the model.
+Keeping these as issues (rather than in your own private to do list) is helpful because it lets people know what you know (e.g., if you know there is a problem, you just haven't had the time to address it), what you are currently working on or plan to work on, and someone might even be able to contribute by doing something for you (this is especially true if you are working as part of a team!).
+
+To open an issue:
+
+1. Go to the main page of the repository
+
+TODO: Get a picture
+
+2. Click Issues
+
+TODO: Get a picture
+
+3. Click New Issue
+
+TODO: Get a picture
+
+Give your issue a concise and descriptive title, e.g. model does not grow on glucose, not "model wrong", or "I ran FBA and got 0.00", and write a detailed description of the issue.
+
+In your description:
+
+* Provide context- including what you expected to happen versus what actually occurred
+* Step-by-step instructions for replicating the bug
+    * include code, logs, or screenshots
+* Environment details
+    * What OS are you using, what version of tools (e.g., COBRApy) are you using, what version of the model are you using, did you start from a release, from the main branch, from the develop branch
+* Remember your issue is public, so don't include anything you don't want shared
+* *Note:* GitHub issues are written in [GitHub Flavored Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+
+MIT1002-GEM, and other repos (Human-GEM) have templates for reporting bugs, which can be helpful to ensure that someone gives all of the information needed to recreate and investigate the bug.
 
 ## Develop Good Code/GitHub Habits
-This is a summary of established best practices, not new to us [@taschuk2017ten,@wilson2017good]
+This is a summary of established best practices, not new to us [@taschuk2017ten,@wilson2017good]:
+
 * If it isn't pushed, it doesn't exist
     * Commit often, push daily
     * One commit- one reasons
