@@ -708,11 +708,25 @@ jobs:
 ### Step 3) Report
 The report phase automatically runs scripts stored in `code/scripts` to generate artifacts (e.g., plots or reports) for human inspection.
 
-#### Examples of Scripts Used for Model Curation
-* Using the same underlying code as the growth test, we generated a plot of which experimentally known growth phenotypes the model matched or not. The heatmap visualization was useful for sharing results.
-* While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
+Several of the key reports used by curators were the growth phenotype report and the biomass component producibility report.
+
+The growth phenotype report is heatmap visualization of the model results for the experimental growth phenotypes, useful for sharing results:
+
+TODO: Add the growth heatmap
+
+While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
+
+TODO: Add the biomass heatmap
+
 #### GitHub Action Workflow
-The following job, `report` does the "Report" steps of the Continuous Curation pipeline.
+The scripts to generate report were run automatically upon the opening of a PR as part of the `Test-and-Report` workflow.
+In that workflow, the job `report`, following the job `test`, does the "Report" steps of the Continuous Curation pipeline.
+
+In addition to running the report scripts, it also collects two of the resulting report figures and comments them directly on the PR, so that a curator or reviewer does not have to go looking for the report.
+
+TODO: Screenshot of the PR comments
+
+The following YAML file completes the YAML file started above in the Test section.
 ```yaml
   report:
     runs-on: ubuntu-22.04
@@ -781,6 +795,11 @@ The following job, `report` does the "Report" steps of the Continuous Curation p
           GH_ACTION_RUN: ${{github.run_id}}
           COMMIT_SHA: ${{ env.COMMIT_SHA }}
 ```
+
+Note the reports included in this workflow does NOT include a MEMOTE report or running MACAW.
+We found these reports incredibly valuable but not needed to be regenerated as frequently as the growth and biomass component producibility report.
+This may change based on your needs and the stage of model curation.
+We generated this reports automatically only upon pushes to the main branch (i.e., upon "Release"), for examples of the YAML workflow to generate them within a GitHub action, see the following section.
 
 ### Step 4) Release
 * What is semantic versioning
