@@ -243,11 +243,13 @@ While test-driven development has been long discussed, it is not universally use
 
 You can think of the data your model is trying to recreate (e.g., growth phenotypes) as a form of TDD. In normal software engineering, the developer can define what the function/code should be doing, but for a model, the curator can not serve as an oracle, but instead requires validation data.
 
+<!-- TODO: Fill in the table
 | Example of bad unit tests | Example of unit unit tests|
 |----------------------------|--------------------------|
 | Generate a figure, that you need to look at | Test that a script generate the correct data and saves a plot with the correct path |
 | A test you know will fail, and you will just ignore it (skip the test or mark it a known failure instead)| |
 | TODO | TODO |
+-->
 
 Here we showed tests being run manually, where a developer would need to run `python -m unittest` on their own computer and verify that all the tests pass. To ensure that tests and never forgotten, or that a failure is missed, tests can also be run automatically (e.g., as part of a workflow on GitHub Actions).
 
@@ -549,14 +551,16 @@ instead, you can break "growth" on a given media into the production of each ind
 Once all biomass components are producible, gap-filling for any additional carbon source is typically a small enough task to treat as one task- gap-filling for transporters and a catabolic pathway.
 
 Once a task has been decided upon, create a feature branch off of the `develop` branch with a brief yet descriptive name of what it is you are trying to address.
-TODO: name like a semantic commit?
+For MIT1002-GEM we named our feature branches much like commits (see below), with a prefix followed by a slash and more descriptive name, similar to the style used by the git-flow tools. For example the branch `feat/gapfill-for-glucose` could be used for adding the ability of the model to grow on glucose.
 
 #### Removing Reactions/Metabolites
 
 It is an established best practice to keep a list of all reactions and metabolites removed from the model, as removing an element from the model is just as an important decision as adding something to the model.
 
+<!-- TODO: Fill in
 * Palsson said to do it [@thiele2010protocol]
     * TODO: Actually I can't find it in this paper, is it from something else?
+-->
 
 And in the Human-GEM repository, curatiors maintain a tables for the [removed metabolites](https://github.com/SysBioChalmers/Human-GEM/blob/main/data/deprecatedIdentifiers/deprecatedMetabolites.tsv) and [removed reactions](https://github.com/SysBioChalmers/Human-GEM/blob/main/data/deprecatedIdentifiers/deprecatedReactions.tsv), and remind curators to use these tables by including a check-box list in the PR template.
 Whenever someone opens a PR, the final section of the PR is a series of statements the opener must "check off", one of which is "Any removed reactions and metabolites have been moved to the corresponding deprecated identifier lists".
@@ -618,7 +622,9 @@ Just as testing code with unit tests is important, it is important to write and 
 Typical software testing tools can be used, but some concepts need to generalized.
 In traditional software engineering, the unit being tested is often a function, however for the case of model curation, we are testing the model as a whole, but can write tests to focus on individual aspects of the model.
 
+<!--TODO: Fill In
 * TODO: Why testing a model is not like testing a function [@kanewala2014testing]
+-->
 
 The core things you want the tests to tell you is if your model is correct.
 This is hard because for the most part, we have no ground truth as to what a model should me
