@@ -548,7 +548,8 @@ However, early on in this process (i.e., for the first round of gap filling to g
 instead, you can break "growth" on a given media into the production of each individual biomass components and gap fill for production of a given biomass component one by one.
 Once all biomass components are producible, gap-filling for any additional carbon source is typically a small enough task to treat as one task- gap-filling for transporters and a catabolic pathway.
 
-TODO: Make a branch-name it
+Once a task has been decided upon, create a feature branch off of the `develop` branch with a brief yet descriptive name of what it is you are trying to address.
+TODO: name like a semantic commit?
 
 #### Removing Reactions/Metabolites
 
@@ -676,11 +677,13 @@ Several of the key reports used by curators were the growth phenotype report and
 
 The growth phenotype report is heatmap visualization of the model results for the experimental growth phenotypes, useful for sharing results:
 
-TODO: Add the growth heatmap
+For example, for an early version of the the MIT1002-GEM, we had a the following growth report.
+With colors for the binary results of growth and no growth for both experimental data and the FBA simulations with the model.
+![A heatmap where each row represents a carbon source and the colors of the rows indicate growth or no growth in experiments (left) and simulations with the model (right).](./figures/png/growth-heatmap.png)
 
 While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
 
-TODO: Add the biomass heatmap
+![A heatmap where each column represents an experimentally-verified growth-supporting medium condition, and the rows are each of the biomass components in the model's biomass reactions. The colors of the heatmap indicate the ability to produce the component (green) or not (red).](../code/scripts/results/MIT1002_GEM_biomass_producibility_heatmap_all_sinks.png)
 
 #### GitHub Action Workflow
 The scripts to generate report were run automatically upon the opening of a PR as part of the `Test-and-Report` workflow.
@@ -688,7 +691,7 @@ In that workflow, the job `report`, following the job `test`, does the "Report" 
 
 In addition to running the report scripts, it also collects two of the resulting report figures and comments them directly on the PR, so that a curator or reviewer does not have to go looking for the report.
 
-TODO: Screenshot of the PR comments
+![A screenshot of the automated comment left by the `Test-and-Report` workflow on PR #292. The comment includes the growth report heatmap, and the biomass component producibility heatmap (not pictured).](./figures/png/github-pr-comment.png)
 
 The following YAML file completes the YAML file started above in the Test section.
 ```yaml
@@ -809,7 +812,9 @@ As a part of MIT1002-GEM we wrote helper function and three GitHub Action workfl
     * On GitHub -> Actions -> Prepare-Release -> Run Workflow
         * Branch: develop
         * Kind: whatever size bump you decided on in 1
-        * TODO: Get a screenshot
+
+![The "button" to trigger to `Prepare-Release` workflow is found on the top right of the workflow's page.](./figures/png/github-release-trigger.png)
+
 3. The `Prepare-Release` workflow runs
     * It commits changes to `develop` with the message `release: {new version number}`
         * Updates `version.txt`
@@ -870,16 +875,8 @@ Keeping these as issues (rather than in your own private to do list) is helpful 
 To open an issue:
 
 1. Go to the main page of the repository
-
-TODO: Get a picture
-
 2. Click Issues
-
-TODO: Get a picture
-
 3. Click New Issue
-
-TODO: Get a picture
 
 Give your issue a concise and descriptive title, e.g. model does not grow on glucose, not "model wrong", or "I ran FBA and got 0.00", and write a detailed description of the issue.
 
@@ -890,8 +887,9 @@ In your description:
     * include code, logs, or screenshots
 * Environment details
     * What OS are you using, what version of tools (e.g., COBRApy) are you using, what version of the model are you using, did you start from a release, from the main branch, from the develop branch
-* Remember your issue is public, so don't include anything you don't want shared
-* *Note:* GitHub issues are written in [GitHub Flavored Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
+
+Remember your issue is public, so don't include anything you don't want shared
+*Note:* GitHub issues are written in [GitHub Flavored Markdown](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax)
 
 MIT1002-GEM, and other repos (Human-GEM) have templates for reporting bugs, which can be helpful to ensure that someone gives all of the information needed to recreate and investigate the bug.
 
