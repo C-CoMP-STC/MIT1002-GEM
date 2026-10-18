@@ -599,6 +599,7 @@ Where `<type>` is chosen from a controlled vocabulary:
 Finally the `<description>`, is the most important part of the commit message, and is the concise description of what you did.
 
 Some examples of good semantic commit messages from the yeast-GEM repository are:
+
 |commit|commit message|
 |:---:|:---:|
 |Add new rxns|`feat-rxn: methanol pathway`|
@@ -630,6 +631,7 @@ The core things you want the tests to tell you is if your model is correct.
 This is hard because for the most part, we have no ground truth as to what a model should me
 
 Some examples include, testing that:
+
 * the model file is valid SBML (using COBRApy's function `validate_sbml_model`)
 * the model cannot grow on no carbon
 * the model cannot produce ATP without carbon (using MEMOTE's function `detect_energy_generating_cycles`)
@@ -642,7 +644,6 @@ However, this test posed a problem- if you implement a test to check that all mo
 
 We instead implemented the test to make sure that the model never performed worse than it did before- e.g., that a growth phenotype where the model could grow before doesn't revert to no growth.
 This was implemented by tracking a "baseline performance" of how the growth phenotypes matched at the previous version of the model, and comparing against that. If the model performance stayed the same or got better (e.g., a false negative switched to a true positive) the test passed, however if the model performance got worse (e.g., a true positive switched to a false negative, or a true negative switched to a false positive), the test failed.
-
 
 #### GitHub Action
 In MIT1002-GEM we run all our tests automatically in the CI-workflow `Test-and-Report`, which runs whenever a pull request is opened or changes are pushed to the PR branch
@@ -685,6 +686,7 @@ The growth phenotype report is heatmap visualization of the model results for th
 
 For example, for an early version of the the MIT1002-GEM, we had a the following growth report.
 With colors for the binary results of growth and no growth for both experimental data and the FBA simulations with the model.
+
 ![A heatmap where each row represents a carbon source and the colors of the rows indicate growth or no growth in experiments (left) and simulations with the model (right).](./figures/png/growth-heatmap.png)
 
 While this graph is useful to grasp model performance at a glance, it was not the most instructive when gap-filling the model (just knowing that the model does not grow does not help you find a gap). Instead we checked the model’s ability to produce each individual biomass component (i.e., we added a demand/sink reaction for each biomass component that take the metabolite and removes it from the system (similar to an exchange reaction), and looped through the list of biomass components and set each as the objective, maximizing the flux through that sink reaction. A positive value indicated that the model was capable of producing that biomass component. This helped narrow down searches for gaps (e.g., could say that a subset of amino acids was not producible, therefore there must be a gap in that pathway). When using an objective other than the biomass, we considered if there should be free transport/exchange/sinks for all biomass components simultaneously or if only the one being maximized should have a sink. Theoretically, there could be components whose production is tied and without flux through the biomass reaction, dead ends could appear that block flux.
@@ -865,6 +867,7 @@ Anyone can open an issue, view the discussions and can comment on them.
 
 We hope that users of MIT1002-GEM (and your model) open issues for any problem they have, no matter how small.
 Some reasons a user might open an issue:
+
 * Something's wrong in the model
 * There's a bug, or weird simulation results
 * They have new data to add (e.g., they have growth phenotype data you don't)
@@ -929,44 +932,45 @@ This is a summary of established best practices, not new to us [@taschuk2017ten,
     * If you have to, have a test to ensure that they don't drift
         * e.g., my removed reactions list
 
+<!-- TODO: Keep as a comment until completing
 ## Glossary
 * **Artifact**:
   * *In software engineering*:
   * *In continuous curation*:
-* **Branch**: A branch is a parallel version of a repository. It is contained within the repository, but does not affect the primary or main branch allowing you to work freely without disrupting the "live" version. [^gh-glossary].
-* **Commit**: A commit, or "revision", is an individual change to a file (or set of files). When you make a commit to save your work, Git creates a unique ID (a.k.a. the "SHA" or "hash") that allows you to keep record of the specific changes committed along with who made them and when. Commits usually contain a commit message which is a brief description of what changes were made. [^gh-glossary].
-* **Commit Message**: Short, descriptive text that accompanies a commit and communicates the change the commit is introducing [^gh-glossary].
-* **Conflict**: A situation where two branches have changes in a file that Git cannot automatically merge, requiring manual resolution [^harvard].
-* **Continuous Integration (CI)**: A development practice where team members frequently integrate their code into a shared repository, often multiple times a day. Each integration is verified by automated builds and tests to detect errors early [^agile].
-* **Continuous Delivery**: A software development practice where teams keep their product in a deployable state at all times, but deployment still requires a manual decision [^agile].
-* **Continuous Deployment**: A software development practice where every change that passes all automated tests is released to production automatically [^agile].
+* **Branch**: A branch is a parallel version of a repository. It is contained within the repository, but does not affect the primary or main branch allowing you to work freely without disrupting the "live" version. TODO: Rewrite, this is a direct copy from an internet resource
+* **Commit**: A commit, or "revision", is an individual change to a file (or set of files). When you make a commit to save your work, Git creates a unique ID (a.k.a. the "SHA" or "hash") that allows you to keep record of the specific changes committed along with who made them and when. Commits usually contain a commit message which is a brief description of what changes were made. TODO: Rewrite, this is a direct copy from an internet resource
+* **Commit Message**: Short, descriptive text that accompanies a commit and communicates the change the commit is introducing. TODO: Rewrite, this is a direct copy from an internet resource
+* **Conflict**: A situation where two branches have changes in a file that Git cannot automatically merge, requiring manual resolution. TODO: Rewrite, this is a direct copy from an internet resource
+* **Continuous Integration (CI)**: A development practice where team members frequently integrate their code into a shared repository, often multiple times a day. Each integration is verified by automated builds and tests to detect errors early. TODO: Rewrite, this is a direct copy from an internet resource
+* **Continuous Delivery**: A software development practice where teams keep their product in a deployable state at all times, but deployment still requires a manual decision. TODO: Rewrite, this is a direct copy from an internet resource
+* **Continuous Deployment**: A software development practice where every change that passes all automated tests is released to production automatically. TODO: Rewrite, this is a direct copy from an internet resource
 * **Curation**:
   * *In continuous curation*:
-* **Diff**: A diff is the difference in changes between two commits, or saved changes. The diff will visually describe what was added or removed from a file since its last commit [^gh-glossary].
-* **Feature Branch**: A branch used to experiment with a new feature or fix an issue that is not in production. Also called a topic branch [^gh-glossary].
-* **Git**: Git is an open source program for tracking changes in text files [^gh-glossary].
+* **Diff**: A diff is the difference in changes between two commits, or saved changes. The diff will visually describe what was added or removed from a file since its last commit. TODO: Rewrite, this is a direct copy from an internet resource
+* **Feature Branch**: A branch used to experiment with a new feature or fix an issue that is not in production. Also called a topic branch. TODO: Rewrite, this is a direct copy from an internet resource
+* **Git**: Git is an open source program for tracking changes in text files. TODO: Rewrite, this is a direct copy from an internet resource
 * **GitFlow**:
-* **GitHub**: A web-based platform that facilitates Git's use for collaboration between individuals. Other web-based platforms include GitLab  and BitBucket [^harvard].
+* **GitHub**: A web-based platform that facilitates Git's use for collaboration between individuals. Other web-based platforms include GitLab  and BitBucket. TODO: Rewrite, this is a direct copy from an internet resource
 * **GitHub Actions**:
-* **Issue**: Issues are suggested improvements, tasks or questions related to the repository. Issues can be created by anyone (for public repositories), and are moderated by repository collaborators. Each issue contains its own discussion thread. You can also categorize an issue with labels and assign it to someone [^gh-glossary].
+* **Issue**: Issues are suggested improvements, tasks or questions related to the repository. Issues can be created by anyone (for public repositories), and are moderated by repository collaborators. Each issue contains its own discussion thread. You can also categorize an issue with labels and assign it to someone. TODO: Rewrite, this is a direct copy from an internet resource
 * **JSON**:
 * **Local**: 
-* **Merge**: Merging takes the changes from one branch (in the same repository or from a fork), and applies them into another. This often happens as a "pull request" (which can be thought of as a request to merge), or via the command line [^harvard].
+* **Merge**: Merging takes the changes from one branch (in the same repository or from a fork), and applies them into another. This often happens as a "pull request" (which can be thought of as a request to merge), or via the command line. TODO: Rewrite, this is a direct copy from an internet resource
 * **Monitor**:
   * *In software engineering*:
   * *In continuous curation*:
-* **Pull**: The process of integrating changes from one version of a repository to another (e.g. from a fork back to the original repo, or from a branch back to the main branch). There are two general use cases: 1) When the owner of a repository makes changes to it, you pull those changes into your local copy. 2) When you make changes to a forked repository or a branch of a repository and want to incorporate the changes back to the original repo or branch, you initiate a pull request, and then whoever is in charge of the original repository can pull those changes in  [^harvard].
-* **Pull Request**: Pull requests are proposed changes to a repository submitted by a user and accepted or rejected by a repository's collaborators [^gh-glossary].
-* **Push**: To push means to send your committed changes to a remote repository on GitHub.com. For instance, if you change something locally, you can push those changes so that others may access them [^gh-glossary].
+* **Pull**: The process of integrating changes from one version of a repository to another (e.g. from a fork back to the original repo, or from a branch back to the main branch). There are two general use cases: 1) When the owner of a repository makes changes to it, you pull those changes into your local copy. 2) When you make changes to a forked repository or a branch of a repository and want to incorporate the changes back to the original repo or branch, you initiate a pull request, and then whoever is in charge of the original repository can pull those changes in. TODO: Rewrite, this is a direct copy from an internet resource
+* **Pull Request**: Pull requests are proposed changes to a repository submitted by a user and accepted or rejected by a repository's collaborators. TODO: Rewrite, this is a direct copy from an internet resource
+* **Push**: To push means to send your committed changes to a remote repository on GitHub.com. For instance, if you change something locally, you can push those changes so that others may access them. TODO: Rewrite, this is a direct copy from an internet resource
 * **Production Code**:
 * **Release**:
   * *In software engineering*:
   * *In continuous curation*:
-* **Remote Repository**: This is the version of a repository or branch that is hosted on a server, most likely GitHub.com [^gh-glossary].
+* **Remote Repository**: This is the version of a repository or branch that is hosted on a server, most likely GitHub.com. TODO: Rewrite, this is a direct copy from an internet resource
 * **Report**:
   * *In software engineering*:
   * *In continuous curation*:
-* **Repository/Repo**: A repository is the most basic element of GitHub. They're easiest to imagine as a project's folder. A repository contains all of the project files (including documentation), and stores each file's revision history. Repositories can have multiple collaborators and can be either public or private [^gh-glossary].
+* **Repository/Repo**: A repository is the most basic element of GitHub. They're easiest to imagine as a project's folder. A repository contains all of the project files (including documentation), and stores each file's revision history. Repositories can have multiple collaborators and can be either public or private. TODO: Rewrite, this is a direct copy from an internet resource
 * **Run**:
   * *In software engineering*:
   * *In continuous curation*:
@@ -981,11 +985,8 @@ This is a summary of established best practices, not new to us [@taschuk2017ten,
   * *In continuous curation*:
 * **Test-Driven Development**:
 * **Trunk-Based Development**:
-* **Version Control**: The process of tracking changes to files over time, allowing you to recall specific versions later [^harvard].
+* **Version Control**: The process of tracking changes to files over time, allowing you to recall specific versions later TODO: Rewrite, this is a direct copy from an internet resource
 * **XML**:
-
-[^harvard]: https://informatics.fas.harvard.edu/resources/glossary/#git-terms
-[^agile]: https://www.agile-academy.com/en/agile-dictionary/
-[^gh-glossary]: https://docs.github.com/en/get-started/learning-about-github/github-glossary
+-->
 
 # References
