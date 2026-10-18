@@ -322,8 +322,7 @@ The final step is to actually run the tests as we did locally before:
 
 When we push to our repository, and this test runs, we can see the workflow running in the Actions tab:
 
-TODO: This is the wrong picture
-![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively running.](./figures/png/github-actions-names.png)
+![Screenshot of the Actions tab of the hello repository, showing our action `Test-Hello` actively running.](./figures/png/github-test-running.png)
 
 And when the workflow is complete we get a clear if your test passed or failed:
 
@@ -455,13 +454,12 @@ While most of the time, you don't need to read an SBML file directly, as you wor
 
 SBML looks can look intimidating at first, but the format is straight forward once you learn a few mechanics of the file.
 
-TODO: I struggled a bit with the correct terminology- are things tags or elements? Are elements tags? Is the tag just the name of an element?
-SBML, like all XML files is comprised of a series of tags. TODO: Is this true?
-A tag is contains a series of information and is bracketed by an opening and closing statement, defining the tags type.
-For example, a tag called "species" is written as `<species> ... </species>`.
-Note that a small tag (i.e., one with no children) can close itself with `/>`, e.g., 
+SBML, like all XML files is comprised of a series of elements.
+A element is contains a series of information and is bracketed by a start-tag and end-tag.
+For example, a element of the type "species" is written as `<species> ... </species>`.
+Note that an empty element (i.e., one with no children) can close itself with `/>`, e.g., 
 `<compartment id="c0" constant="true"/>`.
-A tag can include two types of information: attributes, and children tags.
+A element can include two types of information: attributes, and child elements.
 
 Attributes are pieces of information that live inside the opening tag, and are restricted to simple values. You can think of attributes as writing on the outside of a box, it labels what is inside the box, but it doesn't actually contain anything.
 In an SBML file, attributes come immediately after the opening tag and are a series of keys and values, for example, in this `species` tag, the `id`, `name`, and `fbc:charge` are all attributes.
@@ -470,9 +468,9 @@ In an SBML file, attributes come immediately after the opening tag and are a ser
             |-------- all three of these are attributes --------|
 ```
 
-Children tags are tags within other tags, each bracketed by their own opening and closing statement. You can think of these as a box within a box.
-Whereas attributes were simple values stored in key-value pairs, a child tag can include multiple elements or something with parts of its own.
-In the SBML file, a `reaction` tag, has the child tag `listOfReactants` and that in turn has a child, `speciesReference`, with indentation showing the nesting of children within their parents.
+Child elements are elements within other elemtns, each bracketed by their own start- and end-tags. You can think of these as a box within a box.
+Whereas attributes were simple values stored in key-value pairs, a child element can include multiple elements or something with parts of its own.
+In the SBML file, a `reaction` element, has the child element `listOfReactants` and that in turn has a child, `speciesReference`, with indentation showing the nesting of children within their parents.
 ```xml
 <reaction id="R_octanoyl_xfer" reversible="false">   <-- attributes
     <listOfReactants>                                  <-- a child element
@@ -481,7 +479,7 @@ In the SBML file, a `reaction` tag, has the child tag `listOfReactants` and that
 </reaction>
 ```
 
-SBML files of GEMs have many different types of tags, the table below includes several key tags and the information they hold.
+SBML files of GEMs have many different types of elements, the table below includes several key elements and the information they hold.
 
 | Element | Holds |
 |---|---|
@@ -493,7 +491,7 @@ SBML files of GEMs have many different types of tags, the table below includes s
 | `<fbc:listOfObjectives>` | what FBA maximizes |
 | `<fbc:listOfGeneProducts>` | genes |
 
-To read and understand XML and SBML files, the key thing to understand is that tags do not contain all of their related information, instead they point at other tags. For example, in a GEM, a `reaction` tag will contain all of the `metabolite` tags that are involved in it, instead, `reaction` points at other `metabolite` objects. The `reaction` tag for "Octanoyl transferase" may look like:
+To read and understand XML and SBML files, the key thing to understand is that elements do not contain all of their related information, instead they point at other elements. For example, in a GEM, a `reaction` element will not contain all of the `metabolite` elements that are involved in it, instead, `reaction` points at other `metabolite` elements. The `reaction` element for "Octanoyl transferase" may look like:
 ```xml
 <reaction id="R_octanoyl_xfer" name="Octanoyl transferase" reversible="false"
     fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
@@ -509,8 +507,8 @@ To read and understand XML and SBML files, the key thing to understand is that t
 </fbc:geneProductAssociation>
 </reaction>
 ```
-The metabolites involved in the reaction are included in `listOfReactants` and `listOfProducts`, but the metabolites themselves are not defined there, instead the chile tag `speciesReference` points to the metabolite definition, by using the same ID in `species` as a metabolite.
-For the "Octanoyl transferase", the `listOfReactants` has only one `speciesReference`, and its ID for `species` is "M_cpd11470_c0". Within `listOfSpecies`, one `species` tag has that ID, it's full definition is as follows:
+The metabolites involved in the reaction are included in `listOfReactants` and `listOfProducts`, but the metabolites themselves are not defined there, instead the child element `speciesReference` points to the metabolite definition, by using the same ID in `species` as a metabolite.
+For the "Octanoyl transferase", the `listOfReactants` has only one `speciesReference`, and its ID for `species` is "M_cpd11470_c0". Within `listOfSpecies`, one `species` element has that ID, it's full definition is as follows:
 ```xml
 <species metaid="meta_M_cpd11470_c0" sboTerm="SBO:0000247" id="M_cpd11470_c0" name="Octanoyl-ACP" compartment="c0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false" fbc:charge="-1" fbc:chemicalFormula="C19H35N2O8PRS">
 </species>
