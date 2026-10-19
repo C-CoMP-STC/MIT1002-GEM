@@ -328,11 +328,11 @@ When we push to our repository, and this test runs, we can see the workflow runn
 
 And when the workflow is complete we get a clear if your test passed or failed:
 
-![The total run as a pass or a fail on the main Actions page. A green check indicates that the workflow did not encounter any errors. A red X would indicate that the workflow failed. Note the workflow could fail for reasons other than the tests failing, e.g., an error in setting up the virtual environment.](./figures/png/github-action-jobs-pass.png)
+![The total run as a pass or a fail on the main Actions page. A green check indicates that the workflow did not encounter any errors. A red X would indicate that the workflow failed. Note the workflow could fail for reasons other than the tests failing, e.g., an error in setting up the virtual environment.](./figures/png/github-test-passed.png)
 
 When we look at the individual run of the workflow, we can see our named job, `test`, in the case of a workflow with multiple jobs, this diagram would have more boxes.
 
-![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of the workflow in the files job(s), in this case the single job, `test`.](./figures/png/github-action-jobs-fail.png)
+![Screenshot of the display for the run of `Test-Hello` that shows the breakdown of the workflow in the files job(s), in this case the single job, `test`.](./figures/png/github-action-jobs-pass.png)
 
 And can see the full test output:
 
