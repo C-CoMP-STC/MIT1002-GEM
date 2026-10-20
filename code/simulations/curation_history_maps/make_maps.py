@@ -7,9 +7,10 @@ HTML page and rendered in headless Chromium (needs ``playwright``; see
 README). The HTML is a temporary intermediate; pass ``--keep-html`` to also
 save it next to the PNG for interactive inspection.
 
-The colour scale is fixed (``REACTION_SCALE`` below) rather than min/max, so
-the same flux gets the same colour and width in every panel. Width carries the
-same information as colour, so the maps still read without colour vision.
+The before and after maps of one change share a colour scale (see
+``reaction_scale``): pink is the largest absolute flux drawn on either map, so
+the two panels can be compared directly. Width carries the same information as
+colour, so the maps still read without colour vision.
 
     python code/simulations/curation_history_maps/make_maps.py [--keep-html]
 """
@@ -33,18 +34,13 @@ RESULTS_DIR = HERE / "results"
 FIGURES_DIR = HERE / "figures"
 MAP_DIR = CODE_DIR / "escher"
 
-# Teal and pink from the manuscript's summer palette. Stops are absolute flux
-# values (mmol/gDW/h) because of "abs" below; tune these to the figures.
-REACTION_SCALE = [
-    {"type": "value", "value": 0, "color": "#BBBBBB", "size": 8},
-    {"type": "value", "value": 10, "color": summer_colors["teal"], "size": 16},
-    {"type": "value", "value": 1000, "color": summer_colors["pink"], "size": 30},
-]
+#: Absolute flux (mmol/gDW/h) drawn in teal; typical central-carbon flux at a
+#: 10 mmol/gDW/h glucose uptake. Pink is set per change by reaction_scale().
+TEAL_FLUX = 10
 
 BUILDER_OPTIONS = {
     # "abs": colour/size by |flux|, so a +-1000 loop shows as large either way
     "reaction_styles": ["color", "size", "text", "abs"],
-    "reaction_scale": REACTION_SCALE,
     "reaction_no_data_color": "#EEEEEE",
     "reaction_no_data_size": 6,
     "never_ask_before_quit": True,
@@ -77,16 +73,41 @@ def relabel_map(escher_map: list) -> list:
     return escher_map
 
 
-def build_map(row: pd.Series, out_dir: Path) -> Path:
-    """Write the Escher map for one row of versions.tsv as standalone HTML."""
-    stem = f"{row['change']}_{row['label']}"
-    with open(RESULTS_DIR / f"{stem}_fluxes.json") as f:
+def load_inputs(row: pd.Series) -> tuple[dict, list]:
+    """The fluxes and the (relabelled) Escher map for one row of versions.tsv."""
+    with open(RESULTS_DIR / f"{row['change']}_{row['label']}_fluxes.json") as f:
         fluxes = json.load(f)
     with open(MAP_DIR / row["escher_map"]) as f:
         escher_map = relabel_map(json.load(f))
+    return fluxes, escher_map
+
+
+def max_drawn_flux(fluxes: dict, escher_map: list) -> float:
+    """Largest absolute flux among the reactions drawn on the map."""
+    drawn = {r["bigg_id"] for r in escher_map[1]["reactions"].values()}
+    return max(abs(v) for k, v in fluxes.items() if k in drawn)
+
+
+def reaction_scale(max_flux: float) -> list[dict]:
+    """Grey at 0, teal at TEAL_FLUX, pink at ``max_flux`` (all absolute)."""
+    # If nothing on the maps exceeds TEAL_FLUX, put teal halfway so the
+    # stops stay in increasing order.
+    teal = min(TEAL_FLUX, max_flux / 2)
+    return [
+        {"type": "value", "value": 0, "color": "#BBBBBB", "size": 8},
+        {"type": "value", "value": teal, "color": summer_colors["teal"], "size": 16},
+        {"type": "value", "value": max_flux, "color": summer_colors["pink"], "size": 30},
+    ]
+
+
+def build_map(row: pd.Series, scale: list[dict], out_dir: Path) -> Path:
+    """Write the Escher map for one row of versions.tsv as standalone HTML."""
+    stem = f"{row['change']}_{row['label']}"
+    fluxes, escher_map = load_inputs(row)
     builder = Builder(
         map_json=json.dumps(escher_map),
         reaction_data=fluxes,
+        reaction_scale=scale,
         **BUILDER_OPTIONS,
     )
     out = out_dir / f"{stem}.html"
@@ -129,10 +150,17 @@ def main() -> None:
 
     FIGURES_DIR.mkdir(exist_ok=True)
     versions = pd.read_csv(VERSIONS_PATH, sep="\t", dtype=str)
+    # One scale per change, so its before and after maps are comparable
+    max_flux = {
+        change: max(max_drawn_flux(*load_inputs(row)) for _, row in group.iterrows())
+        for change, group in versions.groupby("change", sort=False)
+    }
     with tempfile.TemporaryDirectory() as tmp:
         html_dir = FIGURES_DIR if args.keep_html else Path(tmp)
         for _, row in versions.iterrows():
-            html = build_map(row, html_dir)
+            scale = reaction_scale(max_flux[row["change"]])
+            print(f"{row['change']}: pink = |flux| {max_flux[row['change']]:.3g}")
+            html = build_map(row, scale, html_dir)
             png = html_to_png(html, FIGURES_DIR / f"{html.stem}.png")
             print(f"wrote {png.relative_to(HERE)}")
             if args.keep_html:

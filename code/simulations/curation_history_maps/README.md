@@ -23,7 +23,7 @@ python code/simulations/curation_history_maps/make_maps.py
 |---|---|
 | `versions.tsv` | One row per map: git ref, growth condition, Escher map. Edit this to add or change panels. |
 | `run_pfba_at_versions.py` | Reads the model at each ref from git (no checkout), runs pFBA, writes `results/`. |
-| `make_maps.py` | Draws each map with a fixed colour/width scale and renders it to `figures/` as PNG (`--keep-html` also saves the interactive map). |
+| `make_maps.py` | Draws each map with a colour/width scale shared by the change's before and after maps, and renders it to `figures/` as PNG (`--keep-html` also saves the interactive map). |
 | `results/<change>_<label>_fluxes.json` | Fluxes in the format Escher takes as reaction data. |
 | `results/<change>_<label>_meta.json`, `results/summary.tsv` | Full commit SHA, model path at that commit, cobra version, growth rate, O2/CO2 exchange. |
 | `figures/<change>_<label>.png` | Rendered map. |
@@ -38,9 +38,11 @@ python code/simulations/curation_history_maps/make_maps.py
 - **Labels.** Reactions are labelled with their ModelSEED ID (swapped in
   memory; the map files in `code/escher/` are not changed) and metabolites with
   the descriptive names stored in the map files.
-- **Fixed colour scale.** `REACTION_SCALE` in `make_maps.py` uses absolute flux
-  values, not min/max, so a flux gets the same colour and width in every panel.
-  Colours are the teal and pink from the summer palette in
+- **Colour scale per change.** Colour and width follow absolute flux: grey at
+  0, teal at 10 mmol/gDW/h (`TEAL_FLUX`), and pink at the largest flux drawn on
+  either the before or the after map of that change. The two panels of a
+  change share one scale, so they can be compared directly; different changes
+  have different scales. Colours are the teal and pink from the summer palette in
   `tools/plot_styles.py`, shared with the other manuscript figures. Width
   carries the same information as colour.
 - **Offline rendering.** The HTML loads Escher's JavaScript from unpkg. Rendering
