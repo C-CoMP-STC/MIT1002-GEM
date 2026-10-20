@@ -49,6 +49,9 @@ BUILDER_OPTIONS = {
     "never_ask_before_quit": True,
     "menu": "zoom",
     "enable_editing": False,
+    # Label every node by its "name". relabel_map() sets each reaction's name
+    # to its ModelSEED ID; metabolites keep the names stored in the map.
+    "identifiers_on_map": "name",
 }
 
 # Escher's own colour legend, menus and buttons are HTML laid over the map;
@@ -60,13 +63,28 @@ svg:has(g.reaction), svg:has(g.reaction) * { visibility: visible !important; }
 """
 
 
+def relabel_map(escher_map: list) -> list:
+    """Label reactions by ModelSEED ID; metabolites keep their stored names.
+
+    Escher labels both reactions and metabolites from the same field
+    (``identifiers_on_map``), so to mix the two, each reaction's ``name`` is
+    overwritten with its ID. Metabolite names are the ones saved in the map.
+    """
+    _, body = escher_map
+    for reaction in body["reactions"].values():
+        reaction["name"] = reaction["bigg_id"]
+    return escher_map
+
+
 def build_map(row: pd.Series, out_dir: Path) -> Path:
     """Write the Escher map for one row of versions.tsv as standalone HTML."""
     stem = f"{row['change']}_{row['label']}"
     with open(RESULTS_DIR / f"{stem}_fluxes.json") as f:
         fluxes = json.load(f)
+    with open(MAP_DIR / row["escher_map"]) as f:
+        escher_map = relabel_map(json.load(f))
     builder = Builder(
-        map_json=str(MAP_DIR / row["escher_map"]),
+        map_json=json.dumps(escher_map),
         reaction_data=fluxes,
         **BUILDER_OPTIONS,
     )

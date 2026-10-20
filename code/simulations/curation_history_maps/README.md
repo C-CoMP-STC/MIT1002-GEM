@@ -35,6 +35,9 @@ python code/simulations/curation_history_maps/make_maps.py
   before the standard-GEM rename). Media come from the current `tools.media`,
   and the carbon source is added at a fixed carbon uptake (60 mmol C/gDW/h,
   the same convention as `simulations/pFBA`).
+- **Labels.** Reactions are labelled with their ModelSEED ID (swapped in
+  memory; the map files in `code/escher/` are not changed) and metabolites with
+  the descriptive names stored in the map files.
 - **Fixed colour scale.** `REACTION_SCALE` in `make_maps.py` uses absolute flux
   values, not min/max, so a flux gets the same colour and width in every panel.
   Colours are from the Okabe-Ito palette. Width carries the same information as
