@@ -10,3 +10,5 @@ git+https://github.com/segrelab/GEM2CUE.git@remove-classes
 git+https://github.com/segrelab/GEM-utilities.git@dev
 python-docx
 scipy
+escher==1.8.1
+playwright
