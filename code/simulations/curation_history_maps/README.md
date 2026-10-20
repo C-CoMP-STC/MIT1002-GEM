@@ -45,6 +45,11 @@ python code/simulations/curation_history_maps/make_maps.py
   have different scales. Colours are the teal and pink from the summer palette in
   `tools/plot_styles.py`, shared with the other manuscript figures. Width
   carries the same information as colour.
+- **Metabolite colour.** Escher has no option for metabolite-circle colour
+  without metabolite data, so `escher_css()` takes Escher's default stylesheet
+  from the installed package and swaps only that rule (tan from the summer
+  palette instead of orange). It stops with an error if a different Escher
+  version changes the stylesheet.
 - **Offline rendering.** The HTML loads Escher's JavaScript from unpkg. Rendering
   answers that request from the copy inside the installed `escher` package,
   so rendering needs no network and matches the Python package's version.

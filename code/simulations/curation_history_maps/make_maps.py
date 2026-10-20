@@ -17,10 +17,12 @@ colour, so the maps still read without colour vision.
 
 import argparse
 import json
+import re
 import sys
 import tempfile
 from pathlib import Path
 
+import escher
 import pandas as pd
 from escher import Builder
 
@@ -37,6 +39,11 @@ MAP_DIR = CODE_DIR / "escher"
 #: Absolute flux (mmol/gDW/h) drawn in teal; typical central-carbon flux at a
 #: 10 mmol/gDW/h glucose uptake. Pink is set per change by reaction_scale().
 TEAL_FLUX = 10
+
+#: Metabolite circles: tan from the summer palette, with a darker tan outline
+#: (Escher's default is orange).
+METABOLITE_FILL = summer_colors["dark_tan"]
+METABOLITE_STROKE = "#8C7F5E"
 
 BUILDER_OPTIONS = {
     # "abs": colour/size by |flux|, so a +-1000 loop shows as large either way
@@ -71,6 +78,29 @@ def relabel_map(escher_map: list) -> list:
     for reaction in body["reactions"].values():
         reaction["name"] = reaction["bigg_id"]
     return escher_map
+
+
+def escher_css() -> str:
+    """Escher's default map stylesheet with the metabolite circles recoloured.
+
+    Escher has no option for the colour of metabolite circles when there is no
+    metabolite data; it comes from the map's stylesheet. The ``embedded_css``
+    option replaces that whole stylesheet, so this starts from the default one
+    built into the installed escher.min.js and changes only the
+    metabolite-circle rule. It raises rather than silently drawing orange
+    circles if a different Escher version lays the stylesheet out differently.
+    """
+    js = (Path(escher.__file__).parent / "static" / "escher.min.js").read_text()
+    match = re.search(r'"(svg\.escher-svg #mouse-node \{.*?)",this\.map_data', js, re.S)
+    if match is None:
+        raise RuntimeError("default stylesheet not found in escher.min.js")
+    css = json.loads(f'"{match.group(1)}"')  # undo the JS string escaping
+    default = (".metabolite-circle {\n  stroke: rgb(162, 69, 16);\n"
+               "  fill: rgb(224, 134, 91);\n}")
+    if css.count(default) != 1:
+        raise RuntimeError("metabolite-circle rule not found in Escher's stylesheet")
+    return css.replace(default, (f".metabolite-circle {{\n  stroke: {METABOLITE_STROKE};\n"
+                                 f"  fill: {METABOLITE_FILL};\n}}"))
 
 
 def load_inputs(row: pd.Series) -> tuple[dict, list]:
@@ -108,6 +138,7 @@ def build_map(row: pd.Series, scale: list[dict], out_dir: Path) -> Path:
         map_json=json.dumps(escher_map),
         reaction_data=fluxes,
         reaction_scale=scale,
+        embedded_css=escher_css(),
         **BUILDER_OPTIONS,
     )
     out = out_dir / f"{stem}.html"
