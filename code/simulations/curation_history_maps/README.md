@@ -40,8 +40,9 @@ python code/simulations/curation_history_maps/make_maps.py
   the descriptive names stored in the map files.
 - **Fixed colour scale.** `REACTION_SCALE` in `make_maps.py` uses absolute flux
   values, not min/max, so a flux gets the same colour and width in every panel.
-  Colours are from the Okabe-Ito palette. Width carries the same information as
-  colour.
+  Colours are the teal and pink from the summer palette in
+  `tools/plot_styles.py`, shared with the other manuscript figures. Width
+  carries the same information as colour.
 - **Offline rendering.** The HTML loads Escher's JavaScript from unpkg. Rendering
   answers that request from the copy inside the installed `escher` package,
   so rendering needs no network and matches the Python package's version.

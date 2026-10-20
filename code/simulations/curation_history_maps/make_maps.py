@@ -26,18 +26,19 @@ from escher import Builder
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1]))  # make `tools` importable
 from tools.paths import CODE_DIR  # noqa: E402
+from tools.plot_styles import summer_colors  # noqa: E402
 
 VERSIONS_PATH = HERE / "versions.tsv"
 RESULTS_DIR = HERE / "results"
 FIGURES_DIR = HERE / "figures"
 MAP_DIR = CODE_DIR / "escher"
 
-# Okabe-Ito colours (colour-blind safe). Stops are absolute flux values
-# (mmol/gDW/h) because of "abs" below; tune these to the figures.
+# Teal and pink from the manuscript's summer palette. Stops are absolute flux
+# values (mmol/gDW/h) because of "abs" below; tune these to the figures.
 REACTION_SCALE = [
     {"type": "value", "value": 0, "color": "#BBBBBB", "size": 8},
-    {"type": "value", "value": 10, "color": "#0072B2", "size": 16},
-    {"type": "value", "value": 1000, "color": "#D55E00", "size": 30},
+    {"type": "value", "value": 10, "color": summer_colors["teal"], "size": 16},
+    {"type": "value", "value": 1000, "color": summer_colors["pink"], "size": 30},
 ]
 
 BUILDER_OPTIONS = {
