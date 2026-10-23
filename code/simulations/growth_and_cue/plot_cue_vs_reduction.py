@@ -141,11 +141,6 @@ def main():
     ax.set_ylabel("CUE")
     ax.set_xlim(2.75, 5.45)
 
-    # NOSC on the top axis for readers from the DOM / ecology side.
-    top = ax.secondary_xaxis("top", functions=(lambda g: 4 - g, lambda n: 4 - n))
-    top.set_xlabel("Nominal oxidation state of carbon (NOSC)")
-    top.spines["top"].set_visible(True)  # set_manuscript_style hides top spines
-
     ax.text(0.02, 0.98,
             f"Spearman ρ = {rho_all:.2f} (all {len(df)})\n"
             f"ρ = {rho_rest:.2f} excluding aromatics",
