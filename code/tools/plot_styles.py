@@ -12,6 +12,10 @@ FONT_DIR = Path(__file__).resolve().parent / "fonts"
 
 _FONTS_REGISTERED = False
 
+# Default colour for all text and axis lines in manuscript figures, the same
+# gray `set_plot_style` applies per axes.
+TEXT_COLOR = "gray"
+
 
 def _register_fonts():
     """Add the vendored font files to matplotlib's font manager (idempotent)."""
@@ -34,7 +38,7 @@ def set_manuscript_style(font_size=12):
     drawn. The two functions are deliberately different scopes -- this one
     is global and runs first, `set_plot_style` is per-axes and runs last.
 
-    Sets three things that used to be copy-pasted (inconsistently) across
+    Sets four things that used to be copy-pasted (inconsistently) across
     the plotting scripts:
 
     1. Font family. Source Sans 3, vendored under code/tools/fonts/. It is the
@@ -46,7 +50,13 @@ def set_manuscript_style(font_size=12):
        the figure is scaled to column width, so in-figure text sits close
        to the ~7.5 pt of the journal's typeset caption. Pass `font_size` to
        override for a figure that is scaled unusually.
-    3. Vector text output. `pdf.fonttype`/`ps.fonttype` 42 embeds TrueType
+    3. Text and axis colour. Gray for every label, tick, spine and free
+       text (ax.text, fig.text), matching what `set_plot_style` does per
+       axes. Setting it globally also covers artists `set_plot_style` never
+       sees: secondary axes (`secondary_xaxis`), twin axes (`twinx`), and
+       annotations, which otherwise fall back to black. Pass an explicit
+       `color=` to an artist to override.
+    4. Vector text output. `pdf.fonttype`/`ps.fonttype` 42 embeds TrueType
        rather than converting text to Type 3 subsets, which keeps the text
        selectable and editable in Illustrator and avoids the Type 3
        rejections some journals issue at submission.
@@ -60,6 +70,13 @@ def set_manuscript_style(font_size=12):
             "axes.linewidth": 0.8,
             "axes.spines.top": False,
             "axes.spines.right": False,
+            "text.color": TEXT_COLOR,
+            "axes.labelcolor": TEXT_COLOR,
+            "axes.titlecolor": TEXT_COLOR,
+            "axes.edgecolor": TEXT_COLOR,
+            "xtick.color": TEXT_COLOR,
+            "ytick.color": TEXT_COLOR,
+            "legend.labelcolor": TEXT_COLOR,
             "pdf.fonttype": 42,  # editable text in Illustrator
             "ps.fonttype": 42,
         }
