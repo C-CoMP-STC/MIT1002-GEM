@@ -13,10 +13,10 @@ known growth phenotypes moved over the course of curation.
 | `plot_match_over_time.py` | Draws figure 2B from `growth_match_summary.csv`. |
 | `match_over_time.png` | The rendered panel. |
 
-The confusion matrices shown in figure 2A are two rows of
-`phenotype_confusion_over_time.csv` — the first PR and the current release.
-Read them off the file; do not count them by hand. Counting them by hand is what
-produced the version that did not add up.
+Figure 2A (the draft vs current confusion matrices) has been replaced by a
+table built from the release tags, not from this folder: see
+`code/scripts/generate_release_stats_table.py`. The CSVs here are keyed by PR
+and can lag behind a release.
 
 ## Regenerating
 

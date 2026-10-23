@@ -11,6 +11,8 @@ Current callers:
   mismatch baseline.
 * ``code/curation_process/run_tests_on_prs.py`` -- the same evaluation replayed
   across every merged PR, which is what figure 2B of the manuscript plots.
+* ``code/tools/release_stats.py`` -- the same evaluation on every tagged
+  release, for the manuscript table of draft vs current model.
 * ``code/scripts/generate_growth_report.py`` -- the supplementary table and the
   experimental-vs-predicted heatmap. Migrated 2026-09-17; it previously
   carried its own inlined copy of this loop, with all three bugs below.
