@@ -1,5 +1,5 @@
 change	label	git_ref	medium	carbon_met	c_uptake_mmolC	escher_map	notes
 gapdhn-loop	before	3e5c456^1	minimal	cpd00027	60	MIT1002_glycolysis_escher-map.json	GAPDH loop present; parent of PR #344 merge
-gapdhn-loop	after	3e5c456	minimal	cpd00027	60	MIT1002_glycolysis-tca-etc_escher-map.json	PR #344 merged (fix/gapd-loop)
+gapdhn-loop	after	3e5c456	minimal	cpd00027	60	MIT1002_glycolysis_escher-map.json	PR #344 merged (fix/gapd-loop)
 sucd	before	cf3cfad^1	minimal	cpd00027	60	MIT1002_glycolysis_and_tca_escher-map.json	succinate dehydrogenase not lumped; parent of PR #392 merge
 sucd	after	cf3cfad	minimal	cpd00027	60	MIT1002_glycolysis_and_tca_escher-map.json	PR #392 merged (fix/lump-SUCD)
