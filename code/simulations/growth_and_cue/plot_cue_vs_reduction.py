@@ -108,13 +108,14 @@ def spearman(x, y) -> float:
     return pd.Series(x).rank().corr(pd.Series(y).rank())
 
 
-def main():
-    df = load_data()
+def draw_scatter(ax, df):
+    """Draw the CUE vs degree-of-reduction scatter into `ax`.
+
+    Shared with plot_fig6.py, which puts this next to the carbon fates bars.
+    Returns (rho_all, rho_excluding_aromatics)."""
     rest = df[~df["aromatic"]]
     rho_all = spearman(df["gamma"], df["cue"])
     rho_rest = spearman(rest["gamma"], rest["cue"])
-
-    fig, ax = plt.subplots(figsize=(5.5, 4.2))
 
     # Least-squares line through the non-aromatic substrates only.
     slope, intercept = np.polyfit(rest["gamma"], rest["cue"], 1)
@@ -148,6 +149,13 @@ def main():
     ax.legend(loc="upper left", bbox_to_anchor=(0, 0.89), frameon=False,
               fontsize=7.5, handletextpad=0.3, borderaxespad=0.3)
     set_plot_style(ax)
+    return rho_all, rho_rest
+
+
+def main():
+    df = load_data()
+    fig, ax = plt.subplots(figsize=(5.5, 4.2))
+    rho_all, rho_rest = draw_scatter(ax, df)
 
     for ext in ("png", "svg"):
         fig.savefig(OUT_PATH / f"cue_vs_degree_of_reduction.{ext}",
