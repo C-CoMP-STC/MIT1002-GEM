@@ -301,7 +301,8 @@ def beautify_table(exp_pred_table: pd.DataFrame):
     # And rename the columns to be more descriptive
     exp_pred_table = exp_pred_table.rename(
         columns={
-            "minimal_media": "Minimal Media",
+            "minimal_media": "Base Medium",
+            "Medium N Source(s)": "N Source(s) in Base Medium",
             "c_source": "Added Metabolite(s)",
             "growth": "Experimental Growth",
             "reference": "Reference",

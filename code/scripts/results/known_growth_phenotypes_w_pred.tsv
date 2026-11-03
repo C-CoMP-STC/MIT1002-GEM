@@ -1,4 +1,4 @@
-Minimal Media	Medium N Source(s)	Added Metabolite(s)	Experimental Growth	Reference	Reason for Exclusion	FBA Predicted Growth Rate	Result
+Base Medium	N Source(s) in Base Medium	Added Metabolite(s)	Experimental Growth	Reference	Reason for Exclusion	FBA Predicted Growth Rate	Result
 Kratzl Base Medium		Ammonium, Succinate	No	(Kratzl, 2026)		0.0	True Negative
 Kratzl Base Medium		Nitrate, Succinate	No	(Kratzl, 2026)		0.0	True Negative
 Kratzl Base Medium		Urea, Succinate	No	(Kratzl, 2026)		0.0	True Negative
