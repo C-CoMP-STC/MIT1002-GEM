@@ -17,6 +17,11 @@ main() also draws the same plot at two O2-limited conditions, for comparison
 with the saturating case (see O2_CONDITIONS): a fixed bound of 20 for every
 substrate, and 50% of each substrate's own saturating O2 uptake. Under O2
 limitation the CUE caveat above applies, so read those as supplementary.
+
+Every condition is also drawn for GGE (biomass C / C uptake, see
+run_growth_cue.py) in place of CUE. GGE does not count secreted organic
+carbon as used, so the two only differ where something besides CO2 and
+biomass leaves the cell. Outputs are {metric}_vs_degree_of_reduction{suffix}.
 """
 
 import sys
@@ -56,6 +61,9 @@ O2_CONDITIONS = [
     ("o2_percent", 50, "_o2_50pct_saturation",
      "O$_2$ = 50% of each substrate's saturating uptake"),
 ]
+
+# Efficiency metrics plotted by main(): results column -> axis label.
+METRICS = {"cue": "CUE", "gge": "GGE"}
 
 # Float tolerance for matching a level against the results file (o2_percent
 # is level / saturation * 100, so 50 can land as 49.99999999999999).
@@ -113,9 +121,9 @@ LABEL_OFFSET = {
 }
 
 # Points move under O2 limitation, so some labels need re-placing. Keyed by
-# the O2_CONDITIONS file suffix; entries override LABEL_OFFSET.
+# (metric, O2_CONDITIONS file suffix); entries override LABEL_OFFSET.
 LABEL_OFFSET_OVERRIDES = {
-    "_o2_20": {
+    ("cue", "_o2_20"): {
         "Glycerol-3-P": (-5, 3, "right"),
         "DHPS": (5, -2, "left"),
         "3-Hydroxybutyrate": (-5, -5, "right"),
@@ -125,7 +133,21 @@ LABEL_OFFSET_OVERRIDES = {
         "3-Methyl-2-oxobutanoate": (-5, -4, "right"),
         "Valine": (5, -4, "left"),
     },
-    "_o2_50pct_saturation": {
+    ("gge", "_o2_20"): {
+        "Arginine": (0, 8, "center"),
+        "3-Methyl-2-oxobutanoate": (-5, -3, "right"),
+        "Lysine": (-5, -4, "right"),
+        "Valine": (5, 0, "left"),
+    },
+    ("gge", "_o2_50pct_saturation"): {
+        "Proline": (5, -4, "left"),
+        "Mannuronate\nGalacturonate": (5, -9, "left"),
+        "Aspartate": (5, -5, "left"),
+        "Lysine": (5, 2, "left"),
+        "3-Hydroxybutyrate": (-5, 3, "right"),
+        "Valine": (0, -9, "center"),
+    },
+    ("cue", "_o2_50pct_saturation"): {
         "Glucose": (-5, 4, "right"),
         "Galactose": (5, 2, "left"),
         "Alanine": (-5, -3, "right"),
@@ -159,19 +181,19 @@ def spearman(x, y) -> float:
     return pd.Series(x).rank().corr(pd.Series(y).rank())
 
 
-def draw_scatter(ax, df, label_offset=None):
-    """Draw the CUE vs degree-of-reduction scatter into `ax`.
+def draw_scatter(ax, df, label_offset=None, metric="cue"):
+    """Draw the CUE (or `metric`) vs degree-of-reduction scatter into `ax`.
 
     Shared with plot_fig6.py, which puts this next to the carbon fates bars.
     `label_offset` overrides entries of LABEL_OFFSET for this plot.
     Returns (rho_all, rho_excluding_aromatics)."""
     offsets = {**LABEL_OFFSET, **(label_offset or {})}
     rest = df[~df["aromatic"]]
-    rho_all = spearman(df["gamma"], df["cue"])
-    rho_rest = spearman(rest["gamma"], rest["cue"])
+    rho_all = spearman(df["gamma"], df[metric])
+    rho_rest = spearman(rest["gamma"], rest[metric])
 
     # Least-squares line through the non-aromatic substrates only.
-    slope, intercept = np.polyfit(rest["gamma"], rest["cue"], 1)
+    slope, intercept = np.polyfit(rest["gamma"], rest[metric], 1)
     xs = np.array([df["gamma"].min() - 0.1, df["gamma"].max() + 0.1])
     ax.plot(xs, slope * xs + intercept, ls="--", lw=0.8, color="gray", zorder=1)
 
@@ -180,19 +202,19 @@ def draw_scatter(ax, df, label_offset=None):
         (True, AROMATIC_COLOR, AROMATIC_MARKER, 24, "Aromatic (oxygenase-dependent)"),
     ]:
         sub = df[df["aromatic"] == aromatic]
-        ax.scatter(sub["gamma"], sub["cue"], s=size, color=color, marker=marker,
+        ax.scatter(sub["gamma"], sub[metric], s=size, color=color, marker=marker,
                    edgecolor="white", linewidth=0.5, zorder=3, label=name)
 
     for _, row in df.iterrows():
         if row["label"] is None:
             continue
         dx, dy, ha = offsets.get(row["label"], (5, 0, "left"))
-        ax.annotate(row["label"], (row["gamma"], row["cue"]),
+        ax.annotate(row["label"], (row["gamma"], row[metric]),
                     xytext=(dx, dy), textcoords="offset points",
                     ha=ha, va="center", fontsize=7)
 
     ax.set_xlabel("Substrate degree of reduction, γ (e⁻ per C)")
-    ax.set_ylabel("CUE")
+    ax.set_ylabel(METRICS[metric])
     ax.set_xlim(2.75, 5.45)
 
     ax.text(0.02, 0.98,
@@ -206,19 +228,21 @@ def draw_scatter(ax, df, label_offset=None):
 
 
 def main():
-    for column, level, suffix, title in O2_CONDITIONS:
-        df = load_data(column, level)
-        fig, ax = plt.subplots(figsize=(5.5, 4.2))
-        rho_all, rho_rest = draw_scatter(
-            ax, df, LABEL_OFFSET_OVERRIDES.get(suffix))
-        ax.set_title(title, fontsize=8)
+    for metric in METRICS:
+        for column, level, suffix, title in O2_CONDITIONS:
+            df = load_data(column, level)
+            fig, ax = plt.subplots(figsize=(5.5, 4.2))
+            rho_all, rho_rest = draw_scatter(
+                ax, df, LABEL_OFFSET_OVERRIDES.get((metric, suffix)), metric)
+            ax.set_title(title, fontsize=8)
 
-        for ext in ("png", "svg"):
-            fig.savefig(OUT_PATH / f"cue_vs_degree_of_reduction{suffix}.{ext}",
-                        dpi=300, bbox_inches="tight")
-        plt.close(fig)
-        print(f"{column} = {level}: rho all = {rho_all:.3f}, "
-              f"rho excluding aromatics = {rho_rest:.3f}, n = {len(df)}")
+            for ext in ("png", "svg"):
+                fig.savefig(
+                    OUT_PATH / f"{metric}_vs_degree_of_reduction{suffix}.{ext}",
+                    dpi=300, bbox_inches="tight")
+            plt.close(fig)
+            print(f"{metric}, {column} = {level}: rho all = {rho_all:.3f}, "
+                  f"rho excluding aromatics = {rho_rest:.3f}, n = {len(df)}")
 
 
 if __name__ == "__main__":
