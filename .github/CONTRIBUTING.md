@@ -1,4 +1,4 @@
-The reasoning behind these rules is in docs/continuous-curation.md.
+The reasoning behind these rules is in the continuous curation manuscript, now in its own repository: [segrelab/continuous-curation](https://github.com/segrelab/continuous-curation).
 
 # Contributing Guidelines
 

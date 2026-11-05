@@ -57,6 +57,11 @@ each kept together with its own inputs and results:
 `data/` holds only external inputs -- things received or downloaded, sometimes
 with the small script that fetched or cleaned them.
 
+The continuous curation manuscript that used this repository as its worked example
+used to live in `docs/`. It now has its own repository,
+[segrelab/continuous-curation](https://github.com/segrelab/continuous-curation),
+with its history preserved.
+
 The layout follows [standard-GEM](https://github.com/MetabolicAtlas/standard-GEM).
 `code/` is a plain folder, not a Python package, because a package named `code`
 would shadow a standard-library module. `pytest.ini` puts `code/` on the path for
