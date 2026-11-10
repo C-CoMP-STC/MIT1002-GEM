@@ -1,0 +1,50 @@
+substrate,carbon_mM_C,n_replicates,last_time_h,increase_mean,increase_min,increase_max,provisional_call
+(rac)-sn-Glycerol 3-phosphate,6,4,49.0,0.002,0.001,0.003,No
+(rac)-sn-Glycerol 3-phosphate,12,3,73.0,0.005,0.003,0.007,No
+"2,3-dihydroxypropane-1-sulfonate (DHPS)",12,3,72.0,0.035,0.033,0.039,Unsure
+3-hydroxybutyrate,6,4,49.0,0.074,0.07,0.079,Yes
+6-phosphogluconic acid,6,4,49.0,0.002,0.0,0.006,No
+6-phosphogluconic acid,12,3,72.0,0.022,0.015,0.027,Unsure
+Acetate,12,4,24.0,0.132,0.127,0.136,Yes
+Acetoin,12,3,73.0,0.011,0.009,0.013,No
+Alanine,6,4,49.0,0.063,0.062,0.063,Yes
+Alginate,8,3,47.0,0.0,0.0,0.001,No
+Allantoin,12,3,73.0,0.001,0.001,0.001,No
+Asparagine,6,4,49.0,0.095,0.085,0.112,Yes
+Choline,6,4,49.0,0.131,0.128,0.138,Yes
+Citrate,8,4,48.0,0.009,0.009,0.009,No
+DL-glyceraldehyde 3-phosphate,6,4,49.0,0.011,0.005,0.015,No
+Ectoine,6,3,48.0,0.107,0.105,0.108,Yes
+Formate,8,4,48.0,0.005,0.004,0.006,No
+Fructose,6,3,24.0,0.113,0.095,0.128,Yes
+Fumarate,8,4,48.0,0.01,0.008,0.012,No
+Galactose,6,4,24.0,0.078,0.075,0.081,Yes
+Galacturonic acid,6,4,49.0,0.071,0.07,0.072,Yes
+Gluconate,8,4,48.0,0.055,0.053,0.055,Yes
+Glucose,12,4,24.0,0.199,0.196,0.201,Yes
+Glucuronic acid,6,3,72.0,0.009,0.008,0.01,No
+Glutamate,6,4,49.0,0.087,0.085,0.092,Yes
+Glutamate,12,3,47.0,0.107,0.104,0.112,Yes
+Glycerol,6,4,49.0,0.09,0.085,0.1,Yes
+Glycerol,8,4,48.0,0.044,0.043,0.044,Unsure
+Glycerol 3-phosphate,,3,72.0,0.086,0.084,0.088,Yes
+Glycine,6,4,49.0,0.022,0.018,0.025,Unsure
+Glycolate,8,4,48.0,0.005,0.005,0.007,No
+Glyoxylate,12,3,47.0,0.002,0.002,0.002,No
+Lactate,8,4,48.0,0.073,0.072,0.075,Yes
+Leucine,6,4,49.0,0.104,0.1,0.108,Yes
+Lysine,6,3,49.0,0.073,0.064,0.085,Yes
+Mannuronic acid,,3,24.0,0.06,0.059,0.06,Yes
+Phenylalanine,12,4,72.0,0.209,0.197,0.216,Yes
+Phosphoenolpyruvate,6,4,49.0,0.004,0.002,0.007,No
+Phosphoenolpyruvate,12,3,72.0,0.027,0.019,0.034,Unsure
+Proline,6,4,49.0,0.095,0.091,0.099,Yes
+Putrescine,6,4,49.0,0.127,0.108,0.148,Yes
+Pyruvate,6,4,49.0,0.076,0.074,0.081,Yes
+Succinate,8,4,48.0,0.009,0.008,0.01,No
+Sucrose,6,4,24.0,0.085,0.08,0.088,Yes
+Tyrosine,6,4,49.0,0.024,0.023,0.025,Unsure
+Valine,6,4,49.0,0.061,0.059,0.064,Yes
+Xylose,8,4,48.0,0.006,0.005,0.006,No
+rac-Glycerol 1-phosphate,6,4,49.0,0.004,0.002,0.005,No
+rac-Glycerol 1-phosphate,12,3,73.0,0.073,0.052,0.084,Yes

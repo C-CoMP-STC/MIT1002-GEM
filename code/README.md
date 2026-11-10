@@ -24,5 +24,6 @@ One folder per piece of work, kept together with its inputs and results.
 | `blast/` | BLAST searches used as gene evidence for curation decisions |
 | `gene_essentiality/` | Single-gene knockouts compared against the mutant library in `data/mutant_library/` |
 | `escher/` | Hand-built Escher maps of MIT1002 pathways |
+| `growth_curves/` | Cleaning, plotting and provisional growth calls for the Moran lab growth curves in `data/growth_curves/` |
 | `kegg_maps/` | KEGG pathway maps coloured by model coverage |
 | `pangenome/` | Adding reactions from the *Alteromonas* pangenome. A record of how it was done; not runnable as-is (see the commit that moved it) |
