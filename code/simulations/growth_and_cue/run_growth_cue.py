@@ -1,12 +1,15 @@
 """MIT1002 growth rate and carbon-use efficiency (CUE) across a broad substrate panel.
 
 Runs pFBA on a curated single-substrate panel at fixed total carbon uptake
-(60 mmol C / gDW / hr) and reports, per substrate:
+(60 mmol C / gDW / hr) and non-limiting O2 (uptake bound 50 mmol / gDW / hr,
+above every substrate's saturating O2 uptake) and reports, per substrate:
   - growth rate (biomass flux)
-  - CUE = 1 - CO2_secreted / C_taken_up
+  - CUE = 1 - CO2_secreted / C_taken_up, GGE and BGE
+  - the carbon fates (biomass, CO2, organic byproducts) and exchange fluxes
 
-The results are plotted by plot_cue_vs_growth.py. Self-contained: re-runs the simulations, no dependence
-on the (retired) PCA analysis.
+The results are plotted by plot_fig6.py (Fig. 6) and plot_exchanges.py
+(Fig. 7 and Fig. S6). The O2-limitation sweep that used to live here moved to
+the theory-cue-simulations repo.
 """
 
 import re
@@ -35,11 +38,9 @@ FLUX_PATH.mkdir(exist_ok=True)
 # Set the total carbon uptake to use
 TOTAL_UPTAKE = 60  # mmol C / gDW / hr
 
-# Define the O2 levels to test
-# "SET_LEVELS" are the fixes lower bounds to set
-O2_SET_LEVELS = [50, 40, 30, 20, 10, 1]
-# "PERCENTAGE_LEVELS" are the percentage of the satureating O2 levels to test
-O2_PERCENTAGE_LEVLS = range(0, 110, 10)
+# O2 uptake bound (mmol / gDW / hr). Non-limiting: every substrate's saturating
+# O2 uptake (O2 = 1000) is below 42, so 50 leaves O2 unconstrained.
+O2_BOUND = 50
 
 # Exchange metabolites whose max |flux| across substrates is below this are
 # lumped into a single grey "Other" segment (keeps the trace-ion colours out).
@@ -73,14 +74,14 @@ def main():
     summary_df, ex_records = run_pfba(model, media_defs, substrate_df)
     print(
         f"\nSuccessful: {summary_df.index.nunique()}/{len(substrate_df)} substrates"
-        f" ({len(summary_df)} substrate x O2-level simulations)"
+
     )
 
     # Save the results (rounded, so re-running gives clean diffs)
     round_summary(summary_df).to_csv(OUT_PATH / "growth_and_cue.csv")
 
     # Extract the exchange fluxes
-    # Order the (substrate, O2 level) records by descending growth rate
+    # Order the (substrate, O2 bound) records by descending growth rate
     sorted_summary = summary_df.sort_values("growth_rate", ascending=False)
     order = list(zip(sorted_summary.index, sorted_summary["o2_bound"]))
     ex_df = build_exchange_df(model, ex_records, order, EX_FLUX_THRESHOLD)
@@ -108,22 +109,14 @@ def run_pfba(
         # Get the name of the substrate being tested
         name = row["name"]
 
-        # Get the saturating o2 level for the substrate
-        o2_sat = row["o2_saturation"]
-        # Convert the percentage levels to actual O2 levels
-        O2_LEVELS = [o2_sat * p / 100 for p in O2_PERCENTAGE_LEVLS] + O2_SET_LEVELS
-
         # Make a copy of the minimal media, and remove any metabolites not in the model
         media = media_utils.clean_media(model, media_defs["minimal"])
         # Add the carbon source to the media
         media[row["exchange_id"]] = TOTAL_UPTAKE / row["n_c"]
 
-        # Loop through all of the O2 levels to test
-        for o2_level in O2_LEVELS:
-            # Get the percentage of the saturating O2 level
-            o2_percent = o2_level / o2_sat * 100 if o2_sat else 0
-
-            # Change the oxygen level to be the current O2 level
+        # Set the (non-limiting) oxygen level. Kept as a one-item loop so the
+        # results stay keyed by (substrate, O2 bound) for the plotting scripts.
+        for o2_level in [O2_BOUND]:
             media["EX_cpd00007_e0"] = o2_level
 
             # Run the pFBA simulation
@@ -207,7 +200,6 @@ def run_pfba(
                             "substrate": name,
                             "met_id": row["met_id"],
                             "o2_bound": o2_level,
-                            "o2_percent": o2_percent,
                             "o2_flux": sol.fluxes["EX_cpd00007_e0"],
                             "growth_rate": growth,
                             "biomass_c": biomass_c,
@@ -231,9 +223,9 @@ def run_pfba(
 def round_summary(summary_df):
     """Round the simulated values so that re-running gives clean diffs.
 
-    Only the solver outputs are rounded. `o2_bound` and `o2_percent` are exact
-    inputs derived from the substrate panel, so they are left at full precision
-    and stay reliable as keys for joining to the exchange fluxes.
+    Only the solver outputs are rounded. `o2_bound` is an exact input, so it
+    is left as is and stays reliable as a key for joining to the exchange
+    fluxes.
     """
     out = summary_df.copy()
     flux_cols = [

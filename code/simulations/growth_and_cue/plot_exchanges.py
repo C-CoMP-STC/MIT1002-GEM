@@ -70,10 +70,9 @@ def main():
     # Load the exchange fluxes (indexed by substrate and O2 level)
     ex_df = pd.read_csv(IN_PATH / "exchange_fluxes.csv", index_col=[0, 1])
 
-    # Keep only the "anchor" O2 level: the highest bound tested, which is
-    # saturating for every substrate in the panel. This is the same anchor
-    # level used in plot_cue_vs_growth.py, so all the figures in this
-    # directory describe the same condition.
+    # Keep only the highest O2 bound in the file (run_growth_cue.O2_BOUND = 50),
+    # which is saturating for every substrate in the panel, so all the figures
+    # in this directory describe the same condition.
     anchor_level = ex_df.index.get_level_values("o2_bound").max()
     ex_df = ex_df.xs(anchor_level, level="o2_bound")
     print(f"Plotting exchange fluxes at the anchor O2 bound ({anchor_level:g})")

@@ -9,9 +9,8 @@ substrate is O2-limited. Drawn as one figure so the panels share a size,
 font scale and substrate names. At 11 in wide with set_manuscript_style()'s
 12 pt default, scaling to the ~7 in ASM page width gives ~7.5 pt text.
 
-The standalone panels made by plot_cue_vs_growth.py
-(carbon_fates_across_substrates_o2_50_normalized) and plot_cue_vs_reduction.py
-are kept for exploration; this is the version for the paper.
+Inputs come from run_growth_cue.py (results/growth_and_cue.csv) and
+define_substrate_panel.py (results/substrate_panel.csv).
 """
 
 import matplotlib.pyplot as plt
@@ -43,7 +42,7 @@ FATE_COLORS = {
     CO2_LABEL: summer_colors["yellow"],
 }
 # Fates thinner than this everywhere are drawn but left out of the legend
-# (same rule as plot_cue_vs_growth.LEGEND_MIN_FRACTION). At O2 = 50 this
+# (the same 0.5% rule the other carbon fates plots used). At O2 = 50 this
 # hides organic C, whose largest share is ~0.1% of uptake.
 LEGEND_MIN_FRACTION = 0.005
 

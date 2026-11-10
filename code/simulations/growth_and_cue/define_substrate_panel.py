@@ -1,10 +1,8 @@
-import json
 from pathlib import Path
 from typing import Optional
 
 import cobra
 import pandas as pd
-from gem_utilities import media as media_utils
 
 FILE_PATH = Path(__file__).resolve().parent
 
@@ -13,7 +11,6 @@ import sys
 sys.path.insert(0, str(FILE_PATH.parents[1]))  # make `tools` importable
 from tools.paths import DATA_DIR, MODEL_PATH  # noqa: E402
 
-from tools.media import MEDIA  # noqa: E402
 OUT_PATH = FILE_PATH / "results"
 OUT_PATH.mkdir(exist_ok=True)
 
@@ -43,45 +40,9 @@ ENTRY_POINT = {
     "cpd00280": "ED - KDPG",  # D-Galacturonate → KDPG
 }
 
-# Define the biomass precurosors and their weights in the pool reaction
-PRECURSORS = {
-    "cpd00079_c0": 1.0,  # G6P
-    "cpd00072_c0": 1.0,  # F6P
-    "cpd00101_c0": 1.0,  # R5P
-    "cpd00236_c0": 1.0,  # E4P
-    "cpd00102_c0": 1.0,  # GAP / triose-P
-    "cpd00169_c0": 1.0,  # 3PG
-    "cpd00061_c0": 1.0,  # PEP
-    "cpd00020_c0": 1.0,  # pyruvate
-    "cpd00022_c0": 1.0,  # acetyl-CoA
-    "cpd00032_c0": 1.0,  # OAA
-    "cpd00024_c0": 1.0,  # alpha-KG
-    "cpd00078_c0": 1.0,  # succinyl-CoA
-}
-COA = "cpd00010_c0"
-THIOESTERS = {
-    "cpd00022_c0",  # Acetyl-CoA
-    "cpd00078_c0",  # succinyl-CoA
-}
-
-# Paramaters for that atp_cost function
-NTP = [
-    "cpd00002_c0",  # ATP
-    "cpd00038_c0",  # GTP
-]
-ATP_SYNTHASE = "rxn08173_c0"
-ATPM = "rxn00062_c0"
-BIOMASS_RXN = "bio1_biomass"
-POOL_RATE = 0.01  # fixed precursor-pool draw
-TOTAL_UPTAKE = 60  # mmol C / gDW / hr
-
-
 def main():
     # Load the model
     model = cobra.io.read_sbml_model(MODEL_PATH)
-
-    # Load the media definitions
-    media_defs = MEDIA
 
     # Load the known growth phenotypes table with predicted results
     df = pd.read_csv(DATA_DIR / "known_growth_phenotypes.tsv", sep="\t")
@@ -152,27 +113,8 @@ def main():
         n_c = met.elements.get("C", 0)
         model_name = met.name[:-5]  # drop " [e0]" suffix
 
-        # Build the media (minimal + substrate)
-        media = media_utils.clean_media(model, media_defs["minimal"])
-        # Set the substrate uptake to be the total uptake divided by the number of carbons
-        # So that every substrate has the same amount of carbon available
-        media[ex_id] = TOTAL_UPTAKE / n_c
-        # Make the oxygen level unlimited
-        media["EX_cpd00007_e0"] = 1000
-        # Set the media for the model
-        model.medium = media
-
         # Calculate the NOSC
         nosc = calculate_nosc(met.elements, met.charge)
-
-        # Run pFBA
-        sol = cobra.flux_analysis.pfba(model)
-        # Get the oxygen uptake rate
-        o2_uptake = abs(sol.fluxes.get("EX_cpd00007_e0", 0.0))
-
-        # Calculate the ATP cost of using this substrate
-        print(f"Running the ATP Cost calculation for {c_source} ({met_id})...")
-        atp_cost = calculate_atp_cost(model, ex_id, pool_rate=POOL_RATE)
 
         # Add the record for this substrate to the list of records
         records.append(
@@ -184,8 +126,6 @@ def main():
                 "n_c": n_c,
                 "entry_point": ENTRY_POINT.get(met_id, "Other"),
                 "nosc": nosc,
-                "o2_saturation": o2_uptake,
-                "atp_cost": atp_cost,
             }
         )
 
@@ -208,40 +148,6 @@ def calculate_nosc(elements: dict, charge: float) -> Optional[float]:
     # Calulate NOSC
     nosc = 4 - ((4 * C) + H - (3 * N) - (2 * O) + (5 * P) - (2 * S) - charge) / C
     return nosc
-
-
-def net_ntp(model, sol, met_ids, exclude=()):
-    """Net high-energy phosphate produced (negative = net consumed),
-    excluding reactions in `exclude` (e.g. the ATP synthase)."""
-    total = 0.0
-    for mid in met_ids:
-        m = model.metabolites.get_by_id(mid)
-        for r in m.reactions:
-            if r.id not in exclude:
-                total += sol.fluxes[r.id] * r.metabolites[m]
-    return total
-
-
-def calculate_atp_cost(model, c_source_ex_rxn, pool_rate):
-    with model:
-        # Minimise substrate uptake to force the most carbon-efficient route
-        # Max of a negative uptake flux => least uptake
-        model.objective = c_source_ex_rxn
-        model.objective_direction = "max"
-
-        # run pFBA
-        sol = cobra.flux_analysis.pfba(model)
-
-        # For debugging
-        # Save the fluxes as a JSON file
-        # fluxes = sol.fluxes.to_dict()
-        # with open(OUT_PATH / f"{c_source_ex_rxn}_atp_cost_flux.json", "w") as f:
-        #     json.dump(fluxes, f, indent=2)
-
-        # Calculate the net NTP production
-        net = net_ntp(model, sol, NTP, exclude={ATP_SYNTHASE})
-
-    return -net / pool_rate  # negative net => consumed => positive cost
 
 
 if __name__ == "__main__":

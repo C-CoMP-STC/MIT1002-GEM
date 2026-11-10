@@ -7,21 +7,10 @@ carbon) shows how much of that ranking substrate chemistry explains and which
 substrates deviate because of pathway-specific costs (aromatic ring cleavage
 by oxygenases).
 
-Uses the O2 bound shared with the carbon fates bars (SUBSTRATE_ORDER_O2_BOUND
-= 50), where no substrate is O2-limited and carbon goes only to biomass or CO2.
-Do not pool across O2 levels: under O2 limitation CUE = 1 - CO2/uptake counts
-secreted acetate as efficiently used carbon, which swamps the pattern
-(calculate_regressions.py pools all levels and gets R^2 = 0.07).
-
-main() also draws the same plot at two O2-limited conditions, for comparison
-with the saturating case (see O2_CONDITIONS): a fixed bound of 20 for every
-substrate, and 50% of each substrate's own saturating O2 uptake. Under O2
-limitation the CUE caveat above applies, so read those as supplementary.
-
-Every condition is also drawn for GGE (biomass C / C uptake, see
-run_growth_cue.py) in place of CUE. GGE does not count secreted organic
-carbon as used, so the two only differ where something besides CO2 and
-biomass leaves the cell. Outputs are {metric}_vs_degree_of_reduction{suffix}.
+Panel B of plot_fig6.py, which imports load_data and draw_scatter from here.
+Uses O2 bound = 50, where no substrate is O2-limited and carbon goes only to
+biomass or CO2. (The O2-limited versions of this plot, and the GGE versions,
+moved to the theory-cue-simulations repo with the rest of the O2 sweep.)
 """
 
 import sys
@@ -49,24 +38,10 @@ OUT_PATH.mkdir(exist_ok=True)
 # Same O2 bound as panel A (carbon_fates_across_substrates_o2_50).
 O2_BOUND = 50
 
-# O2 conditions plotted by main(): (results column to match, level, output
-# file suffix, title). "o2_bound" is a fixed uptake bound shared by every
-# substrate; "o2_percent" is a percentage of each substrate's own saturating
-# O2 uptake (run_growth_cue.O2_PERCENTAGE_LEVLS), so the bound differs per
-# substrate but the degree of limitation is the same. The O2 = 50 plot keeps
-# its original file name.
-O2_CONDITIONS = [
-    ("o2_bound", O2_BOUND, "", "O$_2$ bound = 50 (saturating)"),
-    ("o2_bound", 20, "_o2_20", "O$_2$ bound = 20"),
-    ("o2_percent", 50, "_o2_50pct_saturation",
-     "O$_2$ = 50% of each substrate's saturating uptake"),
-]
+# Efficiency metric plotted: results column -> axis label.
+METRICS = {"cue": "CUE"}
 
-# Efficiency metrics plotted by main(): results column -> axis label.
-METRICS = {"cue": "CUE", "gge": "GGE"}
-
-# Float tolerance for matching a level against the results file (o2_percent
-# is level / saturation * 100, so 50 can land as 49.99999999999999).
+# Float tolerance for matching the O2 bound against the results file.
 LEVEL_TOL = 1e-6
 
 # NOSC correction for sulfonates. define_substrate_panel.calculate_nosc uses
@@ -120,51 +95,13 @@ LABEL_OFFSET = {
     "Isoleucine": (5, 0, "left"),
 }
 
-# Points move under O2 limitation, so some labels need re-placing. Keyed by
-# (metric, O2_CONDITIONS file suffix); entries override LABEL_OFFSET.
-LABEL_OFFSET_OVERRIDES = {
-    ("cue", "_o2_20"): {
-        "Glycerol-3-P": (-5, 3, "right"),
-        "DHPS": (5, -2, "left"),
-        "3-Hydroxybutyrate": (-5, -5, "right"),
-        "Alanine": (-5, 5, "right"),
-        "Glucose": (5, 2, "left"),
-        "Galactose": (-5, -5, "right"),
-        "3-Methyl-2-oxobutanoate": (-5, -4, "right"),
-        "Valine": (5, -4, "left"),
-    },
-    ("gge", "_o2_20"): {
-        "Arginine": (0, 8, "center"),
-        "3-Methyl-2-oxobutanoate": (-5, -3, "right"),
-        "Lysine": (-5, -4, "right"),
-        "Valine": (5, 0, "left"),
-    },
-    ("gge", "_o2_50pct_saturation"): {
-        "Proline": (5, -4, "left"),
-        "Mannuronate\nGalacturonate": (5, -9, "left"),
-        "Aspartate": (5, -5, "left"),
-        "Lysine": (5, 2, "left"),
-        "3-Hydroxybutyrate": (-5, 3, "right"),
-        "Valine": (0, -9, "center"),
-    },
-    ("cue", "_o2_50pct_saturation"): {
-        "Glucose": (-5, 4, "right"),
-        "Galactose": (5, 2, "left"),
-        "Alanine": (-5, -3, "right"),
-        "3-Methyl-2-oxobutanoate": (-5, -4, "right"),
-        "Arginine": (-5, -3, "right"),
-    },
-}
-
-
 def load_data(column: str = "o2_bound", level: float = O2_BOUND) -> pd.DataFrame:
     """One row per substrate at the given O2 condition (default: bound = 50,
     which is what plot_fig6.py uses)."""
     results = pd.read_csv(IN_PATH / "growth_and_cue.csv")
     panel = pd.read_csv(IN_PATH / "substrate_panel.csv")
     selected = results[np.isclose(results[column], level, rtol=0, atol=LEVEL_TOL)]
-    # Each substrate should appear once; a duplicate would mean a fixed bound
-    # happened to coincide with a percentage level (or vice versa).
+    # Each substrate should appear once.
     dupes = selected["met_id"].duplicated(keep=False)
     if dupes.any():
         raise ValueError(f"{column} = {level} matches more than one row for "
@@ -225,25 +162,3 @@ def draw_scatter(ax, df, label_offset=None, metric="cue"):
               fontsize=7.5, handletextpad=0.3, borderaxespad=0.3)
     set_plot_style(ax)
     return rho_all, rho_rest
-
-
-def main():
-    for metric in METRICS:
-        for column, level, suffix, title in O2_CONDITIONS:
-            df = load_data(column, level)
-            fig, ax = plt.subplots(figsize=(5.5, 4.2))
-            rho_all, rho_rest = draw_scatter(
-                ax, df, LABEL_OFFSET_OVERRIDES.get((metric, suffix)), metric)
-            ax.set_title(title, fontsize=8)
-
-            for ext in ("png", "svg"):
-                fig.savefig(
-                    OUT_PATH / f"{metric}_vs_degree_of_reduction{suffix}.{ext}",
-                    dpi=300, bbox_inches="tight")
-            plt.close(fig)
-            print(f"{metric}, {column} = {level}: rho all = {rho_all:.3f}, "
-                  f"rho excluding aromatics = {rho_rest:.3f}, n = {len(df)}")
-
-
-if __name__ == "__main__":
-    main()
