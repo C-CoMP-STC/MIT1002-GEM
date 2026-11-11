@@ -3,7 +3,7 @@
 This replaces the two confusion matrices that used to sit in figure 2A. The
 numbers are measured from the model as committed at each release tag, scored
 with the shared scorer in :mod:`tools.phenotypes` against the *current*
-phenotype table, so every release is judged on the same 52 conditions.
+phenotype table, so every release is judged on the same conditions.
 
 Why score the tags rather than read ``code/curation_process/
 phenotype_confusion_over_time.csv``: that file is keyed by PR, not release,

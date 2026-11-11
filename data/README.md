@@ -12,6 +12,7 @@ which asks that it carry a README describing how it is organised.
 | `media_sources/` | Primary documents for the growth media — published recipes and lab protocols. Provenance for the definitions in `code/tools/media.py`. |
 | `deprecated_identifiers/` | Reactions and metabolites removed from the model, and why. See the README there. |
 | `genome/` | MIT1002 genome sequences, the four sets of gene calls (RefSeq, RAST via KBase, Michelle's 4106 and Zac's 4116) and eggNOG annotations, with the scripts that produced or cleaned them. The model uses the RefSeq (`WP_`) protein IDs. |
+| `growth_curves/` | OD600 growth curves from the Moran lab on single carbon sources, with the scripts that clean, plot and summarise them: the primary data behind the "This study" growth calls, and a manuscript supplementary file. See the README there. |
 | `mutant_library/` | Mutant library tables from the Moran lab, compared against model gene essentiality in `code/gene_essentiality/`. See the README there. |
 | `pangenome/` | Provenance for the *Alteromonas* pangenome files used by `code/pangenome/`. The files themselves are not in git. See the README there. |
 
@@ -81,9 +82,8 @@ produce a spurious *negative*. Those three conditions had nitrogen and still did
 not grow, so they remain valid evidence that succinate is not a usable carbon
 source, which is what `rxn05654_c0` was deprecated on.
 
-Other rows worth considering for exclusion, left alone for now: `homarine` in
-`mbm` (the notes flag an uncertain metabolite ID) and `proline`, which is scored
-`Yes` in L1, `Unsure` in MBM and `No` in marine broth.
+Another row worth considering for exclusion, left alone for now: `proline`,
+which is scored `Yes` in MBM and `No` in marine broth.
 
 ## Expected mismatches
 
@@ -134,7 +134,7 @@ similar means writing it fresh against `tools.media.MEDIA`.
 ## A note on two key mismatches
 
 `code/biomass/check_producibility.py` looks up media under the names `"mbm_media"` and
-`"l1_media"`, but the registry keys — and the values in the `minimal_media`
-column of `known_growth_phenotypes.tsv` — are `"mbm"` and `"l1"`. That lookup
+`"l1_media"`, but the registry keys are `"mbm"` and `"l1"` (and `"mbm"` is what
+the `minimal_media` column of `known_growth_phenotypes.tsv` uses). That lookup
 could not have been matching before this refactor either; those names were never
 in the pickle. Flagged rather than changed, since fixing it alters behaviour.
