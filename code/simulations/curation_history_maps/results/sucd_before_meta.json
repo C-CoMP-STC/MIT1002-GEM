@@ -1,0 +1,15 @@
+{
+  "change": "sucd",
+  "label": "before",
+  "git_ref": "cf3cfad^1",
+  "commit_sha": "7900cb8b175a9d42f1df9bb3d3df3641bf3e52ed",
+  "model_path_at_commit": "model.xml",
+  "cobra_version": "0.32.1",
+  "medium": "minimal",
+  "carbon_met": "cpd00027",
+  "c_uptake_mmolC": 60.0,
+  "objective": "bio1_biomass",
+  "growth_rate": 0.8423,
+  "EX_o2": -20.0,
+  "EX_co2": 23.7973
+}
