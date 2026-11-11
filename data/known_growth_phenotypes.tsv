@@ -30,7 +30,7 @@ marine_broth_wo_yeast_and_peptone	Lysine	cpd00039			Yes		(Kratzl, 2026)
 marine_broth_wo_yeast_and_peptone	Lysine, Pyruvate	cpd00039,cpd00020			Yes		(Kratzl, 2026)	
 marine_broth_wo_yeast_and_peptone	Methionine	cpd00060			No		(Kratzl, 2026)	
 marine_broth_wo_yeast_and_peptone	Methionine, Pyruvate	cpd00060,cpd00020			Yes		(Kratzl, 2026)	
-marine_broth_wo_yeast_and_peptone	Proline	cpd00129			No		(Kratzl, 2026)	
+marine_broth_wo_yeast_and_peptone	Proline	cpd00129			No	conflicting_reports	(Kratzl, 2026)	Conflicts with the MBM growth curves (Yes, data/growth_curves).
 marine_broth_wo_yeast_and_peptone	Proline, Pyruvate	cpd00129,cpd00020			Yes		(Kratzl, 2026)	
 marine_broth_wo_yeast_and_peptone_no_n	Ammonium, Glucose	cpd00013,cpd00027			Yes	control_failed	(Kratzl, 2026)	no-nitrogen control grew; strain grows on glucose with no N source added (Kratzl, pers. comm.)
 marine_broth_wo_yeast_and_peptone_no_n	Nitrate, Glucose	cpd00209,cpd00027			Yes	control_failed	(Kratzl, 2026)	no-nitrogen control grew; strain grows on glucose with no N source added (Kratzl, pers. comm.)
@@ -50,3 +50,27 @@ mbm	Galacturonic Acid	cpd00280			Yes		This study	"Growth curves (data/growth_cur
 mbm	Alginate	cpd11949			No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.000.
 mbm	Phosphoenolpyruvate	cpd00061			Unsure		This study	Growth curves (data/growth_curves): strongest of 6 mM C (No, 0.004) and 12 mM C (Unsure, 0.027). Earlier call: Yes (from Mary Ann, Slack 01/14/2026, medium unconfirmed).
 mbm	6-Phosphogluconate	cpd00284			Unsure		This study	Growth curves (data/growth_curves): strongest of 6 mM C (No, 0.002) and 12 mM C (Unsure, 0.022). Earlier call: Yes (from Mary Ann, Slack 01/14/2026, medium unconfirmed).
+mbm	Asparagine	cpd00132			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.095.
+mbm	Glutamate	cpd00023			Yes		This study	Growth curves (data/growth_curves): strongest of 6 mM C (Yes, 0.087) and 12 mM C (Yes, 0.107).
+mbm	Glycerol	cpd00100			Yes		This study	Growth curves (data/growth_curves): strongest of 6 mM C (Yes, 0.090) and 8 mM C (Unsure, 0.044).
+mbm	Lactate	cpd00159			Yes		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.073. Christa's reagent was not specified as L- or D-lactate; using L-lactate for now (see GitHub issue).
+mbm	Leucine	cpd00107			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.104.
+mbm	Lysine	cpd00039			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.073.
+mbm	Pyruvate	cpd00020			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.076.
+mbm	Valine	cpd00156			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.061.
+mbm	Gluconate	cpd00222			Yes		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.055.
+mbm	Phenylalanine	cpd00066			Yes		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.209.
+mbm	Putrescine	cpd00118			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.127.
+mbm	DHPS (dihydroxypropanesulfonate)	cpd23538			Unsure		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.035.
+mbm	Glycine	cpd00033			Unsure		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.022.
+mbm	Tyrosine	cpd00069			Unsure		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.024.
+mbm	Allantoin	cpd01092			No		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.001.
+mbm	Formate	cpd00047			No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.005.
+mbm	Fumarate	cpd00106			No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.010.
+mbm	Xylose	cpd00154			No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.006.
+mbm	Acetoin	cpd00361			No		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.011. Stereoisomer not specified; cpd00361 is the (S)-acetoin already in the model.
+mbm	Citrate	cpd00137			No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.009.
+mbm	Glyceraldehyde 3-phosphate	cpd00102			No		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.011. Tested as DL-glyceraldehyde 3-phosphate; cpd00102 is the form in the model.
+mbm	Glyoxylate	cpd00040			No		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.002.
+mbm	Succinate	cpd00036			No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.009.
+mbm	Glycerol-3-phosphate	cpd00080			Unsure		This study	Growth curves (data/growth_curves): three glycerol phosphate reagents disagreed: 'Glycerol 3-phosphate' unknown amount Yes (0.086); '(rac)-sn-Glycerol 3-phosphate' 6 mM C No (0.002), 12 mM C No (0.005); 'rac-Glycerol 1-phosphate' 6 mM C No (0.004), 12 mM C Yes (0.073). The racemic reagents contain sn-glycerol 3-phosphate, so all three map to cpd00080.
