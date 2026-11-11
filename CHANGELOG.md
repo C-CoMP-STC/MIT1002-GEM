@@ -4,6 +4,25 @@ All notable changes to MIT1002-GEM, newest first. The versioning rules are in
 [`.github/CONTRIBUTING.md`](.github/CONTRIBUTING.md). Each entry is generated
 by `python -m tools.release prepare` when the release is prepared.
 
+## 4.0.2 - 2026-11-11
+
+Compared with 4.0.1: **patch** release.
+
+### Other changes
+
+- **feat**: Moran lab growth curves and updated growth phenotypes (#480)
+- **fix**: Label every medium and use colour-blind-safe colours in the biomass producibility heatmap (#475)
+- **feat**: Publication figures and pre-submission clean-up (#474)
+- **chore**: move continuous curation manuscript to segrelab/continuous-cur… (#473)
+- **refactor**: remove glycerol-3-phosphate from ed vs emp sim (#467)
+- **feat**: growth cue carbon fates (#466)
+- **refactor**: simplify SMF dissipation sweep to growth vs. dissipation (#465)
+- **fix**: change name of Franzi's medium from "Marine Broth" (#464)
+- **chore**: name the workflows after the curation steps (#463)
+- **fix**: show the release tag exactly, without a v, in the version badge (#462)
+- **feat**: add doi badge (#461)
+- **feat**: add issue template (#457)
+
 ## 4.0.1 - 2026-09-25
 
 Compared with 4.0.0: **patch** release.
