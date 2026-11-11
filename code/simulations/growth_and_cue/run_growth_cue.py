@@ -5,8 +5,7 @@ Runs pFBA on a curated single-substrate panel at fixed total carbon uptake
   - growth rate (biomass flux)
   - CUE = 1 - CO2_secreted / C_taken_up
 
-Bars are coloured by the substrate's entry point into central metabolism and
-sorted by growth rate. Self-contained: re-runs the simulations, no dependence
+The results are plotted by plot_cue_vs_growth.py. Self-contained: re-runs the simulations, no dependence
 on the (retired) PCA analysis.
 """
 

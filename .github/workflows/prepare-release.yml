@@ -1,6 +1,6 @@
-name: Prepare-Release
+name: "Release: Prepare"
 
-# Run by hand: Actions tab -> Prepare-Release -> Run workflow, on `develop`,
+# Run by hand: Actions tab -> Release: Prepare -> Run workflow, on `develop`,
 # choosing the kind of release. See "Versioning and releases" in
 # .github/CONTRIBUTING.md.
 #
@@ -41,7 +41,7 @@ jobs:
       - name: Only run on develop
         if: github.ref != 'refs/heads/develop'
         run: |
-          echo "::error::Run Prepare-Release on develop, not on ${GITHUB_REF_NAME}."
+          echo "::error::Run Release: Prepare on develop, not on ${GITHUB_REF_NAME}."
           exit 1
 
       # RELEASE_TOKEN (a fine-grained personal access token with Contents and

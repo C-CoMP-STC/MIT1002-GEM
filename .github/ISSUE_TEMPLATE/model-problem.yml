@@ -1,0 +1,26 @@
+name: Report a problem with the model
+description: A wrong prediction, a reaction or annotation that looks off, or a file that won't load.
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What's wrong?
+      description: What did you see, and what did you expect instead?
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Model version
+      description: From the release you downloaded, or `version.txt`.
+      placeholder: e.g. 4.0.1
+    validations:
+      required: false
+  - type: textarea
+    id: how
+    attributes:
+      label: How you ran it
+      description: The medium or bounds you set, and the code, if any. Enough for someone to try it themselves.
+      render: python
+    validations:
+      required: false

@@ -1,4 +1,5 @@
-[![Version](https://img.shields.io/github/v/release/C-CoMP-STC/MIT1002-GEM?sort=semver&label=version)](https://github.com/C-CoMP-STC/MIT1002-GEM/releases/latest)
+[![Version](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.github.com%2Frepos%2FC-CoMP-STC%2FMIT1002-GEM%2Freleases%2Flatest&query=%24.tag_name&label=version&color=blue)](https://github.com/C-CoMP-STC/MIT1002-GEM/releases/latest)
+[![DOI](https://zenodo.org/badge/514348089.svg)](https://doi.org/10.5281/zenodo.20559168)
 [![memote tested](https://img.shields.io/badge/memote-tested-blue.svg?style=plastic)](https://c-comp-stc.github.io/MIT1002-GEM/)
 
 # MIT1002-GEM: A manually curated metabolic model for *Alteromonas macleodii* MIT1002
@@ -10,13 +11,13 @@ The narrative for generating the draft model, is available here: https://narrati
 
 This repo uses GitHub Actions to test and release the model:
 
-1. **Every pull request** (Custom-CI) runs the tests in `code/test/` -- SBML
+1. **Every pull request** (Test-and-Report) runs the tests in `code/test/` -- SBML
    validity, no growth without carbon, the known growth phenotypes, ATP-generating
    cycles, and that no deprecated identifier is back in the model -- and
    regenerates the reports in `code/scripts/results/`.
-2. **Release PRs into `main`** (Release-Checks) also check the version bump and
+2. **Release PRs into `main`** (Release: Check) also check the version bump and
    changelog, build the full MEMOTE report, and run the full MACAW suite.
-3. **Merging a release into `main`** (Publish) exports the model to every
+3. **Merging a release into `main`** (Release: Publish) exports the model to every
    format, tags and creates the GitHub release, and publishes the MEMOTE report
    to GitHub Pages.
 
@@ -55,6 +56,11 @@ each kept together with its own inputs and results:
 `code/gene_essentiality/`, `code/kegg_maps/` and `code/pangenome/`.
 `data/` holds only external inputs -- things received or downloaded, sometimes
 with the small script that fetched or cleaned them.
+
+The continuous curation manuscript that used this repository as its worked example
+used to live in `docs/`. It now has its own repository,
+[segrelab/continuous-curation](https://github.com/segrelab/continuous-curation),
+with its history preserved.
 
 The layout follows [standard-GEM](https://github.com/MetabolicAtlas/standard-GEM).
 `code/` is a plain folder, not a Python package, because a package named `code`

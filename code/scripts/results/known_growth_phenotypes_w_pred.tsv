@@ -1,45 +1,55 @@
-Minimal Media	Medium N Source(s)	Added Metabolite(s)	Experimental Growth	Reference	Reason for Exclusion	FBA Predicted Growth Rate	Result
-L1	Nitrate	Acetate	Yes			0.37	True Positive
-L1	Nitrate	Alanine	Yes			0.585	True Positive
-L1	Nitrate	DHPS (dihydroxypropanesulfonate)	Yes			0.583	True Positive
-L1	Nitrate	Glucose	Yes			0.647	True Positive
-L1	Nitrate	Glutamate	Yes			0.71	True Positive
-L1	Nitrate	Glycerol-3-phosphate	Yes			0.804	True Positive
-L1	Nitrate	Proline	Yes			0.687	True Positive
-L1	Nitrate	Tyrosine	Yes			0.327	True Positive
-L1	Nitrate	Valine	Yes			0.492	True Positive
-Marine Broth	NH3, Nitrate	Alanine	Yes	(Kratzl, 2026)		0.585	True Positive
-Marine Broth	NH3, Nitrate	Alanine, Pyruvate	Yes	(Kratzl, 2026)		0.766	True Positive
-Marine Broth	NH3, Nitrate	Arginine	Yes	(Kratzl, 2026)		0.613	True Positive
-Marine Broth	NH3, Nitrate	Arginine, Pyruvate	Yes	(Kratzl, 2026)		0.78	True Positive
-Marine Broth	NH3, Nitrate	Cystine	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth	NH3, Nitrate	Cystine, Pyruvate	No	(Kratzl, 2026)		0.565	False Positive
-Marine Broth	NH3, Nitrate	Glutamine	Yes	(Kratzl, 2026)		0.719	True Positive
-Marine Broth	NH3, Nitrate	Glutamine, Pyruvate	Yes	(Kratzl, 2026)		0.889	True Positive
-Marine Broth	NH3, Nitrate	Lysine	Yes	(Kratzl, 2026)		0.504	True Positive
-Marine Broth	NH3, Nitrate	Lysine, Pyruvate	Yes	(Kratzl, 2026)		0.692	True Positive
-Marine Broth	NH3, Nitrate	Methionine	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth	NH3, Nitrate	Methionine, Pyruvate	Yes	(Kratzl, 2026)		0.565	True Positive
-Marine Broth	NH3, Nitrate	Proline	No	(Kratzl, 2026)		0.687	False Positive
-Marine Broth	NH3, Nitrate	Proline, Pyruvate	Yes	(Kratzl, 2026)		0.852	True Positive
-Marine Broth (No Nitrogen)		Ammonium, Succinate	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth (No Nitrogen)		Nitrate, Succinate	No	(Kratzl, 2026)		0.0	True Negative
-Marine Broth (No Nitrogen)		Urea, Succinate	No	(Kratzl, 2026)		0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	3-hydroxybutyrate	Yes			0.55	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	6-Phosphogluconate	Yes			0.778	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Acetate	Yes			0.385	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Alginate	No			0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	Choline	No			0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	Ectoine	No			0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	Fructose	No			0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	Galactose	Yes			0.73	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Galacturonic Acid	Yes			0.645	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Glucose	Yes			0.75	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Glucuronic Acid	No			0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	Glycolate	No			0.0	True Negative
-Minimal Basal Medium (Moran Lab)	NH3	Mannuronic Acid	Yes			0.645	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Phosphoenolpyruvate	Yes			0.705	True Positive
-Minimal Basal Medium (Moran Lab)	NH3	Sucrose	No			0.0	True Negative
+Base Medium	N Source(s) in Base Medium	Added Metabolite(s)	Experimental Growth	Reference	Reason for Exclusion	FBA Predicted Growth Rate	Result
+Kratzl Base Medium		Ammonium, Succinate	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium		Nitrate, Succinate	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium		Urea, Succinate	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Alanine	Yes	(Kratzl, 2026)		0.585	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Alanine, Pyruvate	Yes	(Kratzl, 2026)		0.766	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Arginine	Yes	(Kratzl, 2026)		0.613	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Arginine, Pyruvate	Yes	(Kratzl, 2026)		0.78	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Cystine	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Cystine, Pyruvate	No	(Kratzl, 2026)		0.565	False Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Glutamine	Yes	(Kratzl, 2026)		0.719	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Glutamine, Pyruvate	Yes	(Kratzl, 2026)		0.889	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Lysine	Yes	(Kratzl, 2026)		0.504	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Lysine, Pyruvate	Yes	(Kratzl, 2026)		0.692	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Methionine	No	(Kratzl, 2026)		0.0	True Negative
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Methionine, Pyruvate	Yes	(Kratzl, 2026)		0.565	True Positive
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Proline, Pyruvate	Yes	(Kratzl, 2026)		0.852	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	3-hydroxybutyrate	Yes	This study		0.55	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Acetate	Yes	This study		0.385	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Acetoin	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Alanine	Yes	This study		0.585	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Alginate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Allantoin	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Asparagine	Yes	This study		0.612	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Choline	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Citrate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Ectoine	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Formate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Fructose	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Fumarate	No	This study		0.611	False Positive
+Minimal Basal Medium (Moran Lab)	NH3	Galactose	Yes	This study		0.73	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Galacturonic Acid	Yes	This study		0.645	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Gluconate	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Glucose	Yes	This study		0.75	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Glucuronic Acid	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Glutamate	Yes	This study		0.71	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Glyceraldehyde 3-phosphate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Glycerol	Yes	This study		0.766	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Glycolate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Glyoxylate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Lactate	Yes	This study		0.585	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Leucine	Yes	This study		0.499	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Lysine	Yes	This study		0.466	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Mannuronic Acid	Yes	This study		0.645	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Phenylalanine	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Proline	Yes	This study		0.638	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Putrescine	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Pyruvate	Yes	This study		0.565	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Succinate	No	This study		0.0	True Negative
+Minimal Basal Medium (Moran Lab)	NH3	Sucrose	Yes	This study		0.0	False Negative
+Minimal Basal Medium (Moran Lab)	NH3	Valine	Yes	This study		0.47	True Positive
+Minimal Basal Medium (Moran Lab)	NH3	Xylose	No	This study		0.674	False Positive
 ProMM	NH3	3-methyl-2-oxobutanoic acid	Yes	(Halloran, 2026)		0.491	True Positive
 ProMM	NH3	3-methyl-2-oxopentanoic acid	No	(Halloran, 2026)		0.0	True Negative
 ProMM	NH3	4-hydroxybenzoic acid	No	(Halloran, 2026)		0.0	True Negative
@@ -51,12 +61,16 @@ ProMM	NH3	Thymidine	No	(Halloran, 2026)		0.0	True Negative
 ProMM	NH3	Valine	Yes	(Halloran, 2026)		0.47	True Positive
 Seawater Medium	NH3	Phenol	Yes	(Koch, 2020)		0.265	True Positive
 Seawater Medium	NH3	alpha-Mannan	Yes	(Koch, 2020)		0.0	False Negative
-Minimal Basal Medium (Moran Lab)	NH3	Alanine	Unsure			0.585	Unsure
-Minimal Basal Medium (Moran Lab)	NH3	Homarine	Unsure			0.0	Unsure
-Minimal Basal Medium (Moran Lab)	NH3	Proline	Unsure			0.638	Unsure
-Marine Broth (No Nitrogen)		Ammonium, Glucose	Yes	(Kratzl, 2026)	control_failed	0.75	Excluded
-Marine Broth (No Nitrogen)		Ammonium, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.565	Excluded
-Marine Broth (No Nitrogen)		Nitrate, Glucose	Yes	(Kratzl, 2026)	control_failed	0.647	Excluded
-Marine Broth (No Nitrogen)		Nitrate, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.486	Excluded
-Marine Broth (No Nitrogen)		Urea+Pyruvate	No	(Kratzl, 2026)	control_failed	0.0	Excluded
-Marine Broth (No Nitrogen)		Urea, Glucose	Yes	(Kratzl, 2026)	control_failed	0.0	Excluded
+Minimal Basal Medium (Moran Lab)	NH3	6-Phosphogluconate	Unsure	This study		0.778	Unsure
+Minimal Basal Medium (Moran Lab)	NH3	DHPS (dihydroxypropanesulfonate)	Unsure	This study		0.607	Unsure
+Minimal Basal Medium (Moran Lab)	NH3	Glycerol-3-phosphate	Unsure	This study		0.926	Unsure
+Minimal Basal Medium (Moran Lab)	NH3	Glycine	Unsure	This study		0.574	Unsure
+Minimal Basal Medium (Moran Lab)	NH3	Phosphoenolpyruvate	Unsure	This study		0.705	Unsure
+Minimal Basal Medium (Moran Lab)	NH3	Tyrosine	Unsure	This study		0.327	Unsure
+Kratzl Base Medium		Ammonium, Glucose	Yes	(Kratzl, 2026)	control_failed	0.75	Excluded
+Kratzl Base Medium		Ammonium, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.565	Excluded
+Kratzl Base Medium		Nitrate, Glucose	Yes	(Kratzl, 2026)	control_failed	0.647	Excluded
+Kratzl Base Medium		Nitrate, Pyruvate	Yes	(Kratzl, 2026)	control_failed	0.486	Excluded
+Kratzl Base Medium		Urea+Pyruvate	No	(Kratzl, 2026)	control_failed	0.0	Excluded
+Kratzl Base Medium		Urea, Glucose	Yes	(Kratzl, 2026)	control_failed	0.0	Excluded
+Kratzl Base Medium (with N-solution)	NH3, Nitrate	Proline	No	(Kratzl, 2026)	conflicting_reports	0.687	Excluded

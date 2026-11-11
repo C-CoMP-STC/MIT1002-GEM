@@ -1,4 +1,4 @@
-name: Custom-CI
+name: Test-and-Report
 
 # Controls when the workflow will run
 # Run only for pull requests
@@ -67,7 +67,7 @@ jobs:
       - name: Mention PR# in README.md
         env:
           PR_NUMBER: ${{ github.event.number }}
-        run: sed -i -e "s/[[:digit:]]\{3,4\}\*\* (CUSTOM-CI)/$PR_NUMBER\*\* (CUSTOM-CI)/" code/scripts/results/README.md
+        run: sed -i -e "s/[[:digit:]]\{3,4\}\*\* (TEST-AND-REPORT)/$PR_NUMBER\*\* (TEST-AND-REPORT)/" code/scripts/results/README.md
 
       # You cannot know your PR number before opening the PR, so `--pr` is
       # optional when deprecating something. Fill in the blanks here, the same
@@ -84,7 +84,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_user_name: action-bot
-          commit_message: "chore: add custom-CI test result"
+          commit_message: "chore: add Test-and-Report results"
           file_pattern: code/scripts/results/* data/deprecated_identifiers/*.tsv
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -98,7 +98,7 @@ jobs:
         uses: NejcZdovc/comment-pr@v2
         with:
           file: "ci_comment.md"
-          identifier: "GITHUB_COMMENT_CUSTOM_CI"
+          identifier: "GITHUB_COMMENT_TEST_AND_REPORT"
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
           GH_ACTION_RUN: ${{github.run_id}}

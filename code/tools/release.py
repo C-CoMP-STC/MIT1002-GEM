@@ -414,7 +414,7 @@ _CONVENTIONAL_RE = re.compile(
 )
 
 #: Change kinds left out of the changelog when they are direct commits rather
-#: than pull requests: CI bookkeeping ("chore: add custom-CI test result") and
+#: than pull requests: CI bookkeeping ("chore: add Test-and-Report results") and
 #: the version bump itself ("release: 4.0.0").
 SKIPPED_DIRECT_KINDS = ("chore", "release")
 
@@ -676,7 +676,7 @@ def verify_release(changelog: str | os.PathLike = CHANGELOG_PATH) -> Verificatio
     if bump is None:
         problems.append(
             f"version.txt says {version}, which is not one major, minor or patch "
-            f"step after the latest release {previous}. Run Prepare-Release."
+            f"step after the latest release {previous}. Run the Release: Prepare workflow."
         )
     try:
         problems.append(f"{version} is already released (tag {release_tag(version)}).")

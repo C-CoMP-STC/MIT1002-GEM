@@ -579,7 +579,7 @@ def stamp_pr_number(
 
     You cannot know your pull request number before you open the pull request,
     so ``--pr`` is optional when you deprecate something. CI closes the loop:
-    the ``Custom-CI`` workflow runs this on every pull request and commits the
+    the ``Test-and-Report`` workflow runs this on every pull request and commits the
     result, the same way it already stamps the PR number into
     ``code/scripts/results/README.md``.
 

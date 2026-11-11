@@ -12,6 +12,10 @@ FONT_DIR = Path(__file__).resolve().parent / "fonts"
 
 _FONTS_REGISTERED = False
 
+# Default colour for all text and axis lines in manuscript figures, the same
+# gray `set_plot_style` applies per axes.
+TEXT_COLOR = "gray"
+
 
 def _register_fonts():
     """Add the vendored font files to matplotlib's font manager (idempotent)."""
@@ -34,7 +38,7 @@ def set_manuscript_style(font_size=12):
     drawn. The two functions are deliberately different scopes -- this one
     is global and runs first, `set_plot_style` is per-axes and runs last.
 
-    Sets three things that used to be copy-pasted (inconsistently) across
+    Sets four things that used to be copy-pasted (inconsistently) across
     the plotting scripts:
 
     1. Font family. Source Sans 3, vendored under code/tools/fonts/. It is the
@@ -46,7 +50,13 @@ def set_manuscript_style(font_size=12):
        the figure is scaled to column width, so in-figure text sits close
        to the ~7.5 pt of the journal's typeset caption. Pass `font_size` to
        override for a figure that is scaled unusually.
-    3. Vector text output. `pdf.fonttype`/`ps.fonttype` 42 embeds TrueType
+    3. Text and axis colour. Gray for every label, tick, spine and free
+       text (ax.text, fig.text), matching what `set_plot_style` does per
+       axes. Setting it globally also covers artists `set_plot_style` never
+       sees: secondary axes (`secondary_xaxis`), twin axes (`twinx`), and
+       annotations, which otherwise fall back to black. Pass an explicit
+       `color=` to an artist to override.
+    4. Vector text output. `pdf.fonttype`/`ps.fonttype` 42 embeds TrueType
        rather than converting text to Type 3 subsets, which keeps the text
        selectable and editable in Illustrator and avoids the Type 3
        rejections some journals issue at submission.
@@ -60,6 +70,13 @@ def set_manuscript_style(font_size=12):
             "axes.linewidth": 0.8,
             "axes.spines.top": False,
             "axes.spines.right": False,
+            "text.color": TEXT_COLOR,
+            "axes.labelcolor": TEXT_COLOR,
+            "axes.titlecolor": TEXT_COLOR,
+            "axes.edgecolor": TEXT_COLOR,
+            "xtick.color": TEXT_COLOR,
+            "ytick.color": TEXT_COLOR,
+            "legend.labelcolor": TEXT_COLOR,
             "pdf.fonttype": 42,  # editable text in Illustrator
             "ps.fonttype": 42,
         }
@@ -87,6 +104,13 @@ summer_colors = {
 }
 
 
+# "CO2" with a real subscript 2. Uses the Unicode subscript character (U+2082)
+# rather than mathtext ("CO$_2$"): Source Sans 3 and Myriad Pro both draw
+# that glyph, so it matches the surrounding text, whereas mathtext would
+# typeset it in a different font unless mathtext.fontset is overridden.
+CO2_LABEL = "CO\u2082"
+
+
 # Define the style for the plots (gray axes, no top or right axis lines)
 def set_plot_style(g, color="gray"):
     # Make the axis lines the defined color
@@ -108,7 +132,7 @@ def set_plot_style(g, color="gray"):
             text.set_color(color)
 
 
-def carbon_fates_bar(data, byproduct_colors=None):
+def carbon_fates_bar(data, byproduct_colors=None, ax=None, legend_min_fraction=0.0):
     """Stacked bar plot of the fate of carbon: biomass, organic byproducts, CO2.
 
     By default `data` must have exactly the columns "biomass", "organic_c",
@@ -122,6 +146,15 @@ def carbon_fates_bar(data, byproduct_colors=None):
     the same palette can be reused across substrates that release different
     byproducts). Passing the same `byproduct_colors` dict across multiple
     calls keeps a given byproduct's color consistent across figures.
+
+    Pass `ax` to draw into an existing Axes (e.g. one from a figure with a
+    custom size); by default pandas makes a new figure.
+
+    Pass `legend_min_fraction` to leave out of the legend any segment that is
+    too thin to see: a column is only listed if its largest value is at least
+    this fraction of the tallest bar. The segment is still drawn, so the bars
+    keep their true heights. Because the cutoff is relative to the tallest
+    bar, it works the same for raw and normalized fluxes.
     """
     if byproduct_colors is not None:
         # Check that the required columns are present
@@ -139,7 +172,7 @@ def carbon_fates_bar(data, byproduct_colors=None):
             + [byproduct_colors[c] for c in byproduct_cols]
             + [summer_colors["yellow"]]
         )
-        custom_labels = ["Biomass"] + byproduct_cols + ["CO2"]
+        custom_labels = ["Biomass"] + byproduct_cols + [CO2_LABEL]
     else:
         # Check that the column names are correct
         assert set(data.columns) == set(["co2", "organic_c", "biomass"])
@@ -150,20 +183,30 @@ def carbon_fates_bar(data, byproduct_colors=None):
             summer_colors["light_blue"],
             summer_colors["yellow"],
         ]
-        custom_labels = ["Biomass", "Organic C", "CO2"]
+        custom_labels = ["Biomass", "Organic C", CO2_LABEL]
     # Plot the stacked bar plot
     g = data.plot(
         kind="bar",
         stacked=True,
         color=colors,
+        ax=ax,
     )
+    # Only list the segments that are big enough to see somewhere in the plot
+    cutoff = legend_min_fraction * data.sum(axis=1).max()
+    handles = g.get_legend_handles_labels()[0]
+    visible = [
+        (handle, label)
+        for handle, label, col in zip(handles, custom_labels, data.columns)
+        if data[col].abs().max() >= cutoff
+    ]
     # Move the legend outside of the plot
-    lgd = plt.legend(
+    lgd = g.legend(
+        [handle for handle, _ in visible],
+        [label for _, label in visible],
         bbox_to_anchor=(1.25, 0.5),
         loc="center right",
         borderaxespad=0.0,
         ncol=1,
-        labels=custom_labels,
     )
     # Make the legend text gray too
     for text in lgd.get_texts():

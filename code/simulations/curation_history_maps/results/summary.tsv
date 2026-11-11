@@ -1,0 +1,5 @@
+change	label	git_ref	commit_sha	model_path_at_commit	cobra_version	medium	carbon_met	c_uptake_mmolC	objective	growth_rate	EX_o2	EX_co2
+gapdhn-loop	before	3e5c456^1	6d98081d39b43ae689c06fe6d365836d9575b859	model.xml	0.32.1	minimal	cpd00027	60.0	bio1_biomass	1.6848	-1.3623	6.0621
+gapdhn-loop	after	3e5c456	3e5c456313327a083889787fe54e697cfb7e398f	model.xml	0.32.1	minimal	cpd00027	60.0	bio1_biomass	0.9198	-20.0	30.5881
+sucd	before	cf3cfad^1	7900cb8b175a9d42f1df9bb3d3df3641bf3e52ed	model.xml	0.32.1	minimal	cpd00027	60.0	bio1_biomass	0.8423	-20.0	23.7973
+sucd	after	cf3cfad	cf3cfad1729f510c675e265c24b838c59be96c28	model.xml	0.32.1	minimal	cpd00027	60.0	bio1_biomass	0.816	-20.0	22.8734

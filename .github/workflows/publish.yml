@@ -1,7 +1,7 @@
-name: Publish
+name: "Release: Publish"
 
 # Runs on every push to main, which should only ever be a merged release PR
-# (see "Making a release" in .github/CONTRIBUTING.md). Replaces Export-Model.
+# (see "Making a release" in .github/CONTRIBUTING.md). Replaces Export-Model (and was called Publish until 4.0.1).
 #
 # 1. Exports the model to every format standard-GEM wants on main (.yml, .txt,
 #    .json, .xlsx, .mat) and commits them to main.
@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   publish:
-    # Never run on Publish's own export commit (that caused a loop in 4.0.0).
+    # Never run on this workflow's own export commit (that caused a loop in 4.0.0).
     if: "!startsWith(github.event.head_commit.message, 'chore: export model')"
     runs-on: ubuntu-22.04
     permissions:
@@ -129,7 +129,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
-          # See Release-Checks: newer pandera needs a newer numpy than we pin.
+          # See Release: Check: newer pandera needs a newer numpy than we pin.
           python -m pip install pandera==0.22.1
 
       - name: MEMOTE snapshot report

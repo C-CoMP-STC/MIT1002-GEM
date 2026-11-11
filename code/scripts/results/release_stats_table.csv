@@ -1,0 +1,11 @@
+Statistic,Draft (v1.0.0),Current (v4.0.1)
+Model size,,
+Reactions,1335,1426
+Metabolites,1212,1238
+Genes,942,949
+Growth phenotypes (n = 62),,
+Matches,23 (37%),51 (82%)
+"Growth observed, growth predicted",0,31
+"Growth observed, no growth predicted",39,8
+"No growth observed, growth predicted",0,3
+"No growth observed, no growth predicted",23,20

@@ -1,0 +1,4 @@
+# "New issue" shows the template below AND an "Open a blank issue" link.
+# Blank issues stay on: issues here double as a curation notebook, and a form
+# would get in the way of that.
+blank_issues_enabled: true

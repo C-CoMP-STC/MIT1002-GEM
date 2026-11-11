@@ -1,14 +1,14 @@
-name: Release-Checks
+name: "Release: Check"
 
-# Extra checks on the release PR (develop -> main), on top of Custom-CI, which
-# runs on every PR. They are here rather than in Custom-CI because they are
+# Extra checks on the release PR (develop -> main), on top of Test-and-Report, which
+# runs on every PR. They are here rather than in Test-and-Report because they are
 # slow and only matter for what gets released.
 #
 # release-check  Is version.txt one correct step past the last release, with a
 #                CHANGELOG entry, and is the bump big enough for the changes?
 #                Fails the PR if not, and posts the report as a comment.
 # memote         Full MEMOTE snapshot report, uploaded as an artifact. The
-#                released report is published to GitHub Pages by Publish.
+#                released report is published to GitHub Pages by Release: Publish.
 # macaw          The full MACAW suite, including the slow dilution test,
 #                uploaded as an artifact. Records how long it took so we can
 #                decide whether it belongs here.
