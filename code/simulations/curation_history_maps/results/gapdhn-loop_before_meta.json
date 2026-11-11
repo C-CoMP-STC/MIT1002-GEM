@@ -1,0 +1,15 @@
+{
+  "change": "gapdhn-loop",
+  "label": "before",
+  "git_ref": "3e5c456^1",
+  "commit_sha": "6d98081d39b43ae689c06fe6d365836d9575b859",
+  "model_path_at_commit": "model.xml",
+  "cobra_version": "0.32.1",
+  "medium": "minimal",
+  "carbon_met": "cpd00027",
+  "c_uptake_mmolC": 60.0,
+  "objective": "bio1_biomass",
+  "growth_rate": 1.6848,
+  "EX_o2": -1.3623,
+  "EX_co2": 6.0621
+}
