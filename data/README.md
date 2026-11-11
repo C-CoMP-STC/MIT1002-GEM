@@ -84,7 +84,7 @@ source, which is what `rxn05654_c0` was deprecated on.
 
 Other rows worth considering for exclusion, left alone for now: `homarine` in
 `mbm` (the notes flag an uncertain metabolite ID) and `proline`, which is scored
-`Yes` in L1, `Unsure` in MBM and `No` in marine broth.
+`Yes` in MBM and `No` in marine broth.
 
 ## Expected mismatches
 
@@ -135,7 +135,7 @@ similar means writing it fresh against `tools.media.MEDIA`.
 ## A note on two key mismatches
 
 `code/biomass/check_producibility.py` looks up media under the names `"mbm_media"` and
-`"l1_media"`, but the registry keys — and the values in the `minimal_media`
-column of `known_growth_phenotypes.tsv` — are `"mbm"` and `"l1"`. That lookup
+`"l1_media"`, but the registry keys are `"mbm"` and `"l1"` (and `"mbm"` is what
+the `minimal_media` column of `known_growth_phenotypes.tsv` uses). That lookup
 could not have been matching before this refactor either; those names were never
 in the pickle. Flagged rather than changed, since fixing it alters behaviour.
