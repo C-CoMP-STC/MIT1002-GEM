@@ -1,4 +1,5 @@
 import os
+import textwrap
 
 # Make `tools` importable; everything else comes from tools.paths.
 import sys
@@ -8,6 +9,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from gem_utilities import biomass
+from matplotlib.patches import Patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -93,6 +95,23 @@ def _lighten(hex_color: str, amount: float) -> str:
 
 MISMATCH_FILL = _lighten(summer_colors["pink"], 0.55)
 
+# One Yes/No encoding for both heatmaps in the CI report, so "orange" means
+# "no" whether the reader is looking at growth or at component producibility.
+# Dark blue against orange stays far apart under every colour-vision
+# deficiency (OKLab ΔE ~34 protan, ~42 tritan), whereas the red/green pair the
+# producibility heatmap used to inherit from GEM-utilities collapses to ΔE ~7
+# for protan readers. The two also differ strongly in lightness, so the plot
+# still reads in grayscale. See issue #436.
+YES_COLOR = "#024064"  # C-CoMP dark blue
+NO_COLOR = "#FF7D0A"  # C-CoMP orange
+UNSURE_COLOR = "#5E5E5E"  # C-CoMP gray
+
+# Inches per heatmap cell in the producibility figure. Fixed per cell rather
+# than a fixed figure size, so adding media widens the figure instead of
+# squeezing (and then dropping) tick labels.
+PRODUCIBILITY_CELL_WIDTH = 0.24
+PRODUCIBILITY_CELL_HEIGHT = 0.16
+
 # Eight columns of 61 rows does not fit a portrait page at a readable size, so
 # the Word version is landscape and set small. Word tables are not typeset by
 # ASM at a fixed size, so this only has to be legible, not exact.
@@ -176,8 +195,7 @@ def generate_growth_phenotype_report(model: cobra.Model):
     )
 
     # Make a colormap of specified colors (in numerical order for the phenotypes)
-    # cmap = ['gray', '#F18F01', '#399E5A'] # Gray, orange, green
-    cmap = ["#5E5E5E", "#FF7D0A", "#024064"]  # C-CoMP gray, orange, and dark blue
+    cmap = [UNSURE_COLOR, NO_COLOR, YES_COLOR]
 
     # Dynamically set the figure height based on the number of rows
     fig_height = max(10, len(growth_phenotypes) * 0.4)  # 0.4 inches per row
@@ -508,8 +526,8 @@ def generate_biomass_producibility_report(model: cobra.Model):
     growth_phenotypes = growth_phenotypes[growth_phenotypes["growth"] == "Yes"]
 
     # Run the biomass producibility function on each of the models
-    sink_options = [False, True]
-    for option in sink_options:
+    sink_options = {False: "biomass_sinks_only", True: "all_sinks"}
+    for option, sinks in sink_options.items():
         biomass.check_biomass_producibility(
             model,
             growth_phenotypes,
@@ -517,6 +535,148 @@ def generate_biomass_producibility_report(model: cobra.Model):
             sinks_for_all=option,
             out_dir=RESULTS_DIR,
         )
+        # GEM-utilities also draws a heatmap, but with a fixed 10x10 figure
+        # seaborn thins the medium labels to every other column once there
+        # are ~45 media, and its red/green fill is not colour-blind safe
+        # (issue #436). Redraw it here from the CSV it just wrote, under the
+        # same file name so the CI comment link keeps working.
+        stem = f"{model.id}_biomass_producibility_"
+        producibility = pd.read_csv(
+            os.path.join(RESULTS_DIR, stem + sinks + ".csv"), index_col=0
+        )
+        plot_biomass_producibility(
+            producibility,
+            growth_phenotypes,
+            os.path.join(RESULTS_DIR, stem + "heatmap_" + sinks + ".png"),
+        )
+
+
+def _producibility_columns(producibility: pd.DataFrame, growth_phenotypes):
+    """Group and label the producibility columns by base medium.
+
+    GEM-utilities names each column ``<medium>_<c_source>``, plus one negative
+    control per base medium named just ``<medium>`` and an ``empty`` control.
+    Splitting those keys back apart on "_" is ambiguous (several medium names
+    contain underscores), so the keys are rebuilt from the same phenotype
+    rows GEM-utilities built them from.
+
+    Returns a list of ``(group_label, [(column_key, tick_label), ...])`` with
+    each base medium's control first, followed by its tested substrates in
+    the order of the phenotype table. Any column not accounted for is put in
+    a trailing "Other" group rather than silently dropped, so a column can
+    never go missing from the figure the way it did in #435.
+    """
+    groups = {"empty": [("empty", "Empty medium")]}
+    for medium in growth_phenotypes["minimal_media"].unique():
+        groups[medium] = [(medium, "Base medium only")]
+    for medium, c_source in zip(
+        growth_phenotypes["minimal_media"], growth_phenotypes["c_source"]
+    ):
+        groups[medium].append((f"{medium}_{c_source}", c_source.strip()))
+
+    seen = set()
+    ordered = []
+    for medium, columns in groups.items():
+        # Keep the first occurrence of a key; a repeated phenotype row would
+        # have overwritten the same column in GEM-utilities' results dict.
+        columns = [
+            (key, label)
+            for key, label in columns
+            if key in producibility.columns and not (key in seen or seen.add(key))
+        ]
+        if columns:
+            label = "" if medium == "empty" else media_names.get(medium, medium)
+            ordered.append((label, columns))
+
+    leftover = [key for key in producibility.columns if key not in seen]
+    if leftover:
+        ordered.append(("Other", [(key, key) for key in leftover]))
+    return ordered
+
+
+def plot_biomass_producibility(
+    producibility: pd.DataFrame, growth_phenotypes: pd.DataFrame, path: str
+):
+    """Heatmap of which biomass components each medium can produce.
+
+    Rows are biomass components, columns are media, grouped by base medium
+    (named above the plot) with one column per tested substrate (named below).
+    Every row and column is labelled, and the figure is sized per cell.
+    """
+    groups = _producibility_columns(producibility, growth_phenotypes)
+    keys = [key for _, columns in groups for key, _ in columns]
+    tick_labels = [label for _, columns in groups for _, label in columns]
+    # The CSV round-trip gives bools; cast so an all-True or all-False table
+    # still maps onto the right colour (vmin/vmax are pinned below).
+    data = producibility[keys].astype(bool).astype(int)
+    n_rows, n_cols = data.shape
+
+    fig, ax = plt.subplots(
+        figsize=(
+            n_cols * PRODUCIBILITY_CELL_WIDTH + 4,
+            n_rows * PRODUCIBILITY_CELL_HEIGHT + 3,
+        )
+    )
+    sns.heatmap(
+        data,
+        cmap=[NO_COLOR, YES_COLOR],
+        vmin=0,
+        vmax=1,
+        cbar=False,
+        linewidths=0.5,
+        linecolor="white",
+        xticklabels=tick_labels,
+        yticklabels=data.index,
+        ax=ax,
+    )
+    ax.tick_params(axis="both", length=0, labelsize=7)
+    ax.set_xticklabels(tick_labels, rotation=90)
+    ax.set_xlabel("Tested substrate(s)")
+    ax.set_ylabel("Biomass component")
+
+    # Separate the base-medium groups with a wider white gap, and name each
+    # group above its block of columns.
+    start = 0
+    for group_label, columns in groups:
+        end = start + len(columns)
+        if start > 0:
+            ax.axvline(start, color="white", linewidth=4)
+        if group_label:
+            ax.annotate(
+                "",
+                xy=(start + 0.15, -0.6),
+                xytext=(end - 0.15, -0.6),
+                xycoords="data",
+                annotation_clip=False,
+                arrowprops={"arrowstyle": "-", "color": "gray", "linewidth": 1},
+            )
+            # Wrap to the bracket's width (~4.5 characters of 7 pt text per
+            # cell) so a narrow group's name stacks instead of overrunning
+            # its neighbour's.
+            ax.text(
+                (start + end) / 2,
+                -1.0,
+                textwrap.fill(group_label, max(8, int(len(columns) * 4.5))),
+                ha="center",
+                va="bottom",
+                fontsize=7,
+                color="gray",
+            )
+        start = end
+
+    ax.legend(
+        handles=[
+            Patch(facecolor=YES_COLOR, label="Producible"),
+            Patch(facecolor=NO_COLOR, label="Not producible"),
+        ],
+        loc="upper left",
+        bbox_to_anchor=(1.01, 1),
+        frameon=False,
+        fontsize=8,
+    )
+
+    fig.savefig(path, bbox_inches="tight", dpi=150)
+    plt.close(fig)
 
 
 if __name__ == "__main__":
