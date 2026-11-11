@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
 from gem_utilities import biomass
-from matplotlib.patches import Patch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -97,20 +96,13 @@ MISMATCH_FILL = _lighten(summer_colors["pink"], 0.55)
 
 # One Yes/No encoding for both heatmaps in the CI report, so "orange" means
 # "no" whether the reader is looking at growth or at component producibility.
-# Dark blue against orange stays far apart under every colour-vision
-# deficiency (OKLab ΔE ~34 protan, ~42 tritan), whereas the red/green pair the
-# producibility heatmap used to inherit from GEM-utilities collapses to ΔE ~7
-# for protan readers. The two also differ strongly in lightness, so the plot
-# still reads in grayscale. See issue #436.
-YES_COLOR = "#024064"  # C-CoMP dark blue
-NO_COLOR = "#FF7D0A"  # C-CoMP orange
+# Taken from GEM-utilities, which draws the producibility heatmap, so the two
+# cannot drift apart. Dark blue against orange stays far apart under every
+# colour-vision deficiency (OKLab ΔE ~34 protan, ~42 tritan), unlike the
+# red/green pair it replaced (ΔE ~7 for protan readers). See issue #436.
+YES_COLOR = biomass.PRODUCIBLE_COLOR  # C-CoMP dark blue
+NO_COLOR = biomass.NOT_PRODUCIBLE_COLOR  # C-CoMP orange
 UNSURE_COLOR = "#5E5E5E"  # C-CoMP gray
-
-# Inches per heatmap cell in the producibility figure. Fixed per cell rather
-# than a fixed figure size, so adding media widens the figure instead of
-# squeezing (and then dropping) tick labels.
-PRODUCIBILITY_CELL_WIDTH = 0.24
-PRODUCIBILITY_CELL_HEIGHT = 0.16
 
 # Eight columns of 61 rows does not fit a portrait page at a readable size, so
 # the Word version is landscape and set small. Word tables are not typeset by
@@ -535,20 +527,18 @@ def generate_biomass_producibility_report(model: cobra.Model):
             sinks_for_all=option,
             out_dir=RESULTS_DIR,
         )
-        # GEM-utilities also draws a heatmap, but with a fixed 10x10 figure
-        # seaborn thins the medium labels to every other column once there
-        # are ~45 media, and its red/green fill is not colour-blind safe
-        # (issue #436). Redraw it here from the CSV it just wrote, under the
-        # same file name so the CI comment link keeps working.
-        stem = f"{model.id}_biomass_producibility_"
+        # GEM-utilities already drew a heatmap with every column labelled, but
+        # under its raw keys (e.g. "marine_broth_wo_yeast_and_peptone_no_n_Urea,
+        # Glucose") and in results-dict order. Redraw it with the same function
+        # from the CSV it just wrote, grouped and labelled by base medium, under
+        # the same file name so the CI comment link keeps working (issue #436).
         producibility = pd.read_csv(
-            os.path.join(RESULTS_DIR, stem + sinks + ".csv"), index_col=0
+            os.path.join(
+                RESULTS_DIR, f"{model.id}_biomass_producibility_{sinks}.csv"
+            ),
+            index_col=0,
         )
-        plot_biomass_producibility(
-            producibility,
-            growth_phenotypes,
-            os.path.join(RESULTS_DIR, stem + "heatmap_" + sinks + ".png"),
-        )
+        plot_grouped_producibility(model, producibility, growth_phenotypes, sinks)
 
 
 def _producibility_columns(producibility: pd.DataFrame, growth_phenotypes):
@@ -594,45 +584,32 @@ def _producibility_columns(producibility: pd.DataFrame, growth_phenotypes):
     return ordered
 
 
-def plot_biomass_producibility(
-    producibility: pd.DataFrame, growth_phenotypes: pd.DataFrame, path: str
+def plot_grouped_producibility(
+    model: cobra.Model,
+    producibility: pd.DataFrame,
+    growth_phenotypes: pd.DataFrame,
+    sinks: str,
 ):
-    """Heatmap of which biomass components each medium can produce.
+    """Producibility heatmap with the media grouped by base medium.
 
-    Rows are biomass components, columns are media, grouped by base medium
-    (named above the plot) with one column per tested substrate (named below).
-    Every row and column is labelled, and the figure is sized per cell.
+    The heatmap itself (sizing, colours, legend, one label per row/column) is
+    GEM-utilities' ``plot_biomass_producibility``. This only reorders and
+    relabels the columns before handing them over, then names each base
+    medium above its block of columns and re-saves the figure GEM-utilities
+    returns, at the path it saved to.
     """
     groups = _producibility_columns(producibility, growth_phenotypes)
     keys = [key for _, columns in groups for key, _ in columns]
     tick_labels = [label for _, columns in groups for _, label in columns]
-    # The CSV round-trip gives bools; cast so an all-True or all-False table
-    # still maps onto the right colour (vmin/vmax are pinned below).
-    data = producibility[keys].astype(bool).astype(int)
-    n_rows, n_cols = data.shape
+    # Tick labels repeat across groups ("Base medium only", "Glucose"), which
+    # GEM-utilities handles because it passes the column labels as a list.
+    relabelled = producibility[keys].set_axis(tick_labels, axis="columns")
 
-    fig, ax = plt.subplots(
-        figsize=(
-            n_cols * PRODUCIBILITY_CELL_WIDTH + 4,
-            n_rows * PRODUCIBILITY_CELL_HEIGHT + 3,
-        )
+    fig = biomass.plot_biomass_producibility(
+        model, relabelled, sinks, out_dir=RESULTS_DIR
     )
-    sns.heatmap(
-        data,
-        cmap=[NO_COLOR, YES_COLOR],
-        vmin=0,
-        vmax=1,
-        cbar=False,
-        linewidths=0.5,
-        linecolor="white",
-        xticklabels=tick_labels,
-        yticklabels=data.index,
-        ax=ax,
-    )
-    ax.tick_params(axis="both", length=0, labelsize=7)
-    ax.set_xticklabels(tick_labels, rotation=90)
+    ax = fig.axes[0]
     ax.set_xlabel("Tested substrate(s)")
-    ax.set_ylabel("Biomass component")
 
     # Separate the base-medium groups with a wider white gap, and name each
     # group above its block of columns.
@@ -664,18 +641,14 @@ def plot_biomass_producibility(
             )
         start = end
 
-    ax.legend(
-        handles=[
-            Patch(facecolor=YES_COLOR, label="Producible"),
-            Patch(facecolor=NO_COLOR, label="Not producible"),
-        ],
-        loc="upper left",
-        bbox_to_anchor=(1.01, 1),
-        frameon=False,
-        fontsize=8,
+    fig.savefig(
+        os.path.join(
+            RESULTS_DIR,
+            f"{model.id}_biomass_producibility_heatmap_{sinks}.png",
+        ),
+        bbox_inches="tight",
+        dpi=150,
     )
-
-    fig.savefig(path, bbox_inches="tight", dpi=150)
     plt.close(fig)
 
 
