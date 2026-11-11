@@ -82,9 +82,8 @@ produce a spurious *negative*. Those three conditions had nitrogen and still did
 not grow, so they remain valid evidence that succinate is not a usable carbon
 source, which is what `rxn05654_c0` was deprecated on.
 
-Other rows worth considering for exclusion, left alone for now: `homarine` in
-`mbm` (the notes flag an uncertain metabolite ID) and `proline`, which is scored
-`Yes` in MBM and `No` in marine broth.
+Another row worth considering for exclusion, left alone for now: `proline`,
+which is scored `Yes` in MBM and `No` in marine broth.
 
 ## Expected mismatches
 

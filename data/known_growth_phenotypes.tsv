@@ -2,7 +2,6 @@ minimal_media	c_source	met_id	pro_exomet	bigg_id	growth	exclude_reason	reference
 mbm	Glucose 	cpd00027		glc__D	Yes		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.199.
 mbm	Acetate	cpd00029		ac	Yes		This study	Growth curves (data/growth_curves): 12 mM C, OD600 increase 0.132.
 mbm	Glycolate	cpd00139		glyclt	No		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.005.
-mbm	Homarine	cpd00737			Unsure		This study	Not sure about metabolite ID. Called gynesine in ModelSEED.
 mbm	3-hydroxybutyrate	cpd00797			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.074.
 mbm	Choline	cpd00098		chol	Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.131. Earlier call: No.
 mbm	Ectoine	cpd03727		ectoine	Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.107. Earlier call: No.
