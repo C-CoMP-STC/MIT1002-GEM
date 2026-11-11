@@ -1,12 +1,12 @@
 minimal_media	c_source	category	notes
-marine_broth_wo_yeast_and_peptone	Cystine, Pyruvate	false_positive	
-mbm	Choline	false_negative	
-mbm	Ectoine	false_negative	
-mbm	Fructose	false_negative	
-mbm	Fumarate	false_positive	
-mbm	Gluconate	false_negative	
-mbm	Phenylalanine	false_negative	
-mbm	Putrescine	false_negative	
-mbm	Sucrose	false_negative	
-mbm	Xylose	false_positive	
-swm	alpha-Mannan	false_negative	
+marine_broth_wo_yeast_and_peptone	Cystine, Pyruvate	false_positive	surfaced by SCORING_VERSION 3; previously hidden as no_exchange. The model grows on the pyruvate, so the absent cystine exchange does not make this a no-growth prediction. The real disagreement is that pyruvate alone should not support growth in this condition.
+mbm	Choline	false_negative	Growth curves (data/growth_curves) changed the call from No to Yes; check the genome for an uptake and catabolic route before adding one, since a contaminated substrate is also possible.
+mbm	Ectoine	false_negative	Growth curves (data/growth_curves) changed the call from No to Yes; check the genome for an uptake and catabolic route before adding one, since a contaminated substrate is also possible.
+mbm	Fructose	false_negative	Growth curves (data/growth_curves) changed the call from No to Yes; check the genome for an uptake and catabolic route before adding one, since a contaminated substrate is also possible.
+mbm	Fumarate	false_positive	Model grows on fumarate; the growth curves (data/growth_curves) show no growth, consistent with succinate.
+mbm	Gluconate	false_negative	Growth curves (data/growth_curves) show growth, but the model has no exchange reaction for this compound.
+mbm	Phenylalanine	false_negative	Growth curves (data/growth_curves) show growth, but the model has no exchange reaction for this compound.
+mbm	Putrescine	false_negative	Growth curves (data/growth_curves) show growth, but the model has no exchange reaction for this compound.
+mbm	Sucrose	false_negative	Growth curves (data/growth_curves) changed the call from No to Yes; check the genome for an uptake and catabolic route before adding one, since a contaminated substrate is also possible.
+mbm	Xylose	false_positive	Model grows on xylose; the growth curves (data/growth_curves) show no growth. Check the gene evidence for the xylose uptake and catabolic reactions.
+swm	alpha-Mannan	false_negative	surfaced by SCORING_VERSION 3; previously hidden as no_exchange. Genuine reconstruction gap: no alpha-mannan uptake route, and the strain does grow on it.
