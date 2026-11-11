@@ -53,7 +53,7 @@ mbm	6-Phosphogluconate	cpd00284			Unsure		This study	Growth curves (data/growth_
 mbm	Asparagine	cpd00132			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.095.
 mbm	Glutamate	cpd00023			Yes		This study	Growth curves (data/growth_curves): strongest of 6 mM C (Yes, 0.087) and 12 mM C (Yes, 0.107).
 mbm	Glycerol	cpd00100			Yes		This study	Growth curves (data/growth_curves): strongest of 6 mM C (Yes, 0.090) and 8 mM C (Unsure, 0.044).
-mbm	Lactate	cpd00159			Yes		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.073. Christa's reagent was not specified as L- or D-lactate; using L-lactate for now (see GitHub issue).
+mbm	Lactate	cpd00159			Yes		This study	Growth curves (data/growth_curves): 8 mM C, OD600 increase 0.073. Christa's reagent was not specified as L- or D-lactate; using L-lactate for now (see #476).
 mbm	Leucine	cpd00107			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.104.
 mbm	Lysine	cpd00039			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.073.
 mbm	Pyruvate	cpd00020			Yes		This study	Growth curves (data/growth_curves): 6 mM C, OD600 increase 0.076.
