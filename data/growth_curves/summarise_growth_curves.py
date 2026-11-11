@@ -17,7 +17,7 @@ Rule (see README.md for the reasoning):
 * ``No`` if every replicate's increase is < ``NO_THRESHOLD``.
 * ``Unsure`` otherwise (in between, or replicates disagree).
 
-    python code/growth_curves/summarise_growth_curves.py
+    python data/growth_curves/summarise_growth_curves.py
 """
 
 import sys
@@ -25,7 +25,7 @@ from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "code"))
 from tools.paths import DATA_DIR  # noqa: E402
 
 TIDY_CSV = DATA_DIR / "growth_curves" / "MIT1002_growth_curves.csv"

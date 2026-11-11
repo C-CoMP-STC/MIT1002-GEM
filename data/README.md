@@ -12,7 +12,7 @@ which asks that it carry a README describing how it is organised.
 | `media_sources/` | Primary documents for the growth media — published recipes and lab protocols. Provenance for the definitions in `code/tools/media.py`. |
 | `deprecated_identifiers/` | Reactions and metabolites removed from the model, and why. See the README there. |
 | `genome/` | MIT1002 genome sequences, the four sets of gene calls (RefSeq, RAST via KBase, Michelle's 4106 and Zac's 4116) and eggNOG annotations, with the scripts that produced or cleaned them. The model uses the RefSeq (`WP_`) protein IDs. |
-| `growth_curves/` | OD600 growth curves from the Moran lab on single carbon sources: the primary data behind the "This study" growth calls, and a manuscript supplementary file. See the README there. |
+| `growth_curves/` | OD600 growth curves from the Moran lab on single carbon sources, with the scripts that clean, plot and summarise them: the primary data behind the "This study" growth calls, and a manuscript supplementary file. See the README there. |
 | `mutant_library/` | Mutant library tables from the Moran lab, compared against model gene essentiality in `code/gene_essentiality/`. See the README there. |
 | `pangenome/` | Provenance for the *Alteromonas* pangenome files used by `code/pangenome/`. The files themselves are not in git. See the README there. |
 

@@ -6,7 +6,7 @@ thresholds used for the provisional growth calls in
 
 Writes ``results/growth_curves.pdf`` and ``results/growth_curves.png``.
 
-    python code/growth_curves/plot_growth_curves.py
+    python data/growth_curves/plot_growth_curves.py
 """
 
 import math
@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
 import pandas as pd  # noqa: E402
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "code"))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from summarise_growth_curves import (  # noqa: E402
     NO_THRESHOLD,

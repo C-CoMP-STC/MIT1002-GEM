@@ -10,7 +10,7 @@ import unittest
 
 import pandas as pd
 
-from tools.paths import CODE_DIR, DATA_DIR
+from tools.paths import DATA_DIR
 
 GROWTH_DIR = DATA_DIR / "growth_curves"
 TIDY_CSV = GROWTH_DIR / "MIT1002_growth_curves.csv"
@@ -20,7 +20,7 @@ EXPECTED_COLUMNS = ["substrate", "carbon_mM_C", "replicate", "time_h", "OD600"]
 
 def _load_cleaner():
     spec = importlib.util.spec_from_file_location(
-        "clean_growth_curves", CODE_DIR / "growth_curves" / "clean_growth_curves.py")
+        "clean_growth_curves", GROWTH_DIR / "clean_growth_curves.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module

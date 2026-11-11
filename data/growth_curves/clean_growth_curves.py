@@ -12,8 +12,8 @@ Two steps, both reproducible:
 Every change made between raw and tidy is listed in ``CLEANING_NOTES`` and is
 written into the tidy file's header, so the supplement documents itself.
 
-    python code/growth_curves/clean_growth_curves.py
-    python code/growth_curves/clean_growth_curves.py --from-xlsx "MIT1002_growth tests_ALL.xlsx"
+    python data/growth_curves/clean_growth_curves.py
+    python data/growth_curves/clean_growth_curves.py --from-xlsx "MIT1002_growth tests_ALL.xlsx"
 """
 
 import argparse
@@ -23,7 +23,7 @@ from pathlib import Path
 
 import pandas as pd
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "code"))
 from tools.paths import DATA_DIR  # noqa: E402
 
 GROWTH_DIR = DATA_DIR / "growth_curves"
@@ -83,7 +83,7 @@ HEADER = """\
 #   time_h       hours since inoculation
 #   OD600        blank-subtracted optical density at 600 nm
 #
-# Processing (code/growth_curves/clean_growth_curves.py in the MIT1002-GEM repository):
+# Processing (data/growth_curves/clean_growth_curves.py in the MIT1002-GEM repository):
 {notes}
 #
 """

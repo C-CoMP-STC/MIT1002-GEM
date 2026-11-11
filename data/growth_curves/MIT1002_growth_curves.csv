@@ -19,7 +19,7 @@
 #   time_h       hours since inoculation
 #   OD600        blank-subtracted optical density at 600 nm
 #
-# Processing (code/growth_curves/clean_growth_curves.py in the MIT1002-GEM repository):
+# Processing (data/growth_curves/clean_growth_curves.py in the MIT1002-GEM repository):
 #   Reshaped from one column per well to one row per well per time point.
 #   Split each column label (e.g. '12C_Acetate') into carbon_mM_C and substrate;
 #     '?C_' labels have an empty carbon_mM_C (amount too small to weigh).
