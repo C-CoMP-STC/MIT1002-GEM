@@ -55,9 +55,12 @@ FLUX_DECIMALS = 3
 BIOMASS_RXN = "bio1_biomass"
 CO2_EX_RXN = "EX_cpd00011_e0"
 
-# Define the amount of carbon in biomass
-# From scripts/results/iHS4156_biomass_composition_work_table.csv
-N_C_BIOMASS = 42.948  # mmol C
+# Define the amount of carbon in biomass (mmol C per unit biomass flux)
+# The "Total" carbon_content row of
+# code/scripts/results/MIT1002_GEM_biomass_composition_work_table.csv
+# (42.94278526624263 at release 4.0.1). Update it if the biomass reaction
+# changes. Earlier versions of this script used 42.948, a transposition.
+N_C_BIOMASS = 42.9428  # mmol C
 
 
 def main():
